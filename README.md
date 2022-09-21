@@ -33,23 +33,25 @@ Awesome list for embedded security tools and knowledge
 * [Firmware Analysis and Comparison Tool (FACT)](https://fkie-cad.github.io/FACT_core/) - The Firmware Analysis and Comparison Tool (FACT) is intended to automate Firmware Security analysis (Router, IoT, UEFI, Webcams, Drones, …). Thereby it shall be easy to use (web UI), extend (plug-in system) and integrate (REST API).
 * [FwAnalyzer (Firmware Analyzer)](https://github.com/cruise-automation/fwanalyzer) - FwAnalyzer is a tool to analyze (ext2/3/4), FAT/VFat, SquashFS, UBIFS filesystem images, cpio archives, and directory content using a set of configurable rules. FwAnalyzer relies on e2tools for ext filesystems, mtools for FAT filesystems, squashfs-tools for SquashFS filesystems, and ubi_reader for UBIFS filesystems. cpio for cpio archives. SELinux/Capability support for ext2/3/4 images requires a patched version of e2tools. SELinux/Capability support for SquashFS images requires a patched version of squashfs-tools.
 
-## RF Tools
+## Hardware Tools
+
+### RF Tools
 
 * [Flipper Zero](https://flipperzero.one/) - Flipper Zero is a portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more. It's fully open-source and customizable, so you can extend it in whatever way you like.
 * [Awesome Flipper Zero](https://github.com/RogueMaster/awesome-flipperzero-withModules)
 * [Pwnagotchi](https://pwnagotchi.ai/)
 
-# Further Learning
+## Further Learning
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - We aim to provide a beginners resource on embedded systems security.
 
-# Search Engines
+## Search Engines
 ![image](https://user-images.githubusercontent.com/89217603/189990679-49ddd4fb-12ea-4959-a296-63c726e179d8.png)
 
 
-# Contribute
+## Contribute
 
 Contributions welcome! Read the [contribution guidelines](contributing.md) first.
 
-# License
+## License
 
 [![CC0](https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/cc-zero.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
