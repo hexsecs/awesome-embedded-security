@@ -20,7 +20,7 @@ Awesome list for embedded security tools and knowledge
 
 ## Language Specific Decompilers
 * .NET
-  * ILSpy
+  * [ILSpy](https://github.com/icsharpcode/ILSpy) - .NET Decompiler with support for PDB generation, ReadyToRun, Metadata (&more) - cross-platform!
   * dnSpy
   * de4dot
 * Java
