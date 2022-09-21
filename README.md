@@ -8,6 +8,23 @@ Awesome list for embedded security tools and knowledge
 * [Binwalk](https://github.com/ReFirmLabs/binwalk) - Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 * [OFRAK](https://github.com/redballoonsecurity/ofrak) - OFRAK is a binary analysis and modification platform that combines the ability to unpack, analyze, modify, and repack binaries.
 
+## Disassember/Decompilers
+* IDA Pro
+* Vivisect
+* Binary Ninja
+* Cutter
+* Ghidra
+* Angr Management
+
+## Language Specific Decompilers
+* .NET
+  * ILSpy
+  * dnSpy
+  * de4dot
+* Java
+  * JD-GUI
+  * JADX
+
 # RF Tools
 
 * [Flipper Zero](https://flipperzero.one/) - Flipper Zero is a portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more. It's fully open-source and customizable, so you can extend it in whatever way you like.
