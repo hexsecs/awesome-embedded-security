@@ -9,12 +9,13 @@ Awesome list for embedded security tools and knowledge
 * [OFRAK](https://github.com/redballoonsecurity/ofrak) - OFRAK is a binary analysis and modification platform that combines the ability to unpack, analyze, modify, and repack binaries.
 
 ## Disassember/Decompilers
-* IDA Pro
-* Vivisect
-* Binary Ninja
-* Cutter
-* Ghidra
-* Angr Management
+* [IDA Pro](https://hex-rays.com/ida-pro/) - IDA Pro as a disassembler is capable of creating maps of their execution to show the binary instructions that are actually executed by the processor in a symbolic representation (assembly language). Advanced techniques have been implemented into IDA Pro so that it can generate assembly language source code from machine-executable code and make this complex code more human-readable.
+* [Vivisect](https://github.com/vivisect/vivisect) - A combined disassembler/static analysis/symbolic execution/debugger framework.
+* [Binary Ninja](https://binary.ninja/) - Binary Ninja is an interactive disassembler, decompiler, and binary analysis platform for reverse engineers, malware analysts, vulnerability researchers, and software developers that runs on Windows, macOS, and Linux.
+* [Cutter](https://cutter.re/) - Free and Open Source RE Platform powered by Rizin
+* [Rizin](https://rizin.re/) - A free and open-source Reverse Engineering framework, providing a complete binary analysis experience with features like Disassembler, Hexadecimal editor, Emulation, Binary inspection, Debugger, and more.
+* [Ghidra](https://ghidra-sre.org/) - A software reverse engineering (SRE) suite of tools developed by NSA's Research Directorate in support of the Cybersecurity mission.
+* [Angr Management](https://github.com/angr/angr-management) - Angr is a multi-architecture binary analysis toolkit, with the capability to perform dynamic symbolic execution (like Mayhem, KLEE, etc.) and various static analyses on binaries. If you'd like to learn how to use it, you're in the right place!
 
 ## Language Specific Decompilers
 * .NET
