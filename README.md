@@ -28,7 +28,7 @@ Awesome list for embedded security tools and knowledge
   * JADX
 
 ### Security Auditing Frameworks
-* [Expliot](https://pypi.org/project/expliot/) - EXPLIoT is a Framework for security testing and exploiting IoT products and IoT infrastructure. It provides a set of plugins (test cases) which are used to perform the assessment and can be extended easily with new ones. The name EXPLIoT (pronounced expl-aa-yo-tee) is a pun on the word exploit and explains the purpose of the framework i.e. IoT exploitation.
+* [EXPLIoT](https://pypi.org/project/expliot/) - EXPLIoT is a Framework for security testing and exploiting IoT products and IoT infrastructure. It provides a set of plugins (test cases) which are used to perform the assessment and can be extended easily with new ones. The name EXPLIoT (pronounced expl-aa-yo-tee) is a pun on the word exploit and explains the purpose of the framework i.e. IoT exploitation.
 * [Metasploit](https://www.metasploit.com/) - Knowledge is power, especially when it’s shared. A collaboration between the open source community and Rapid7, Metasploit helps security teams do more than just verify vulnerabilities, manage security assessments, and improve security awareness; it empowers and arms defenders to always stay one step (or two) ahead of the game.
 
 ## RF Tools
