@@ -44,7 +44,7 @@ Awesome list for embedded security tools and knowledge
 ### Software Defined Radio
 * [HackRF One](https://greatscottgadgets.com/hackrf/) - HackRF One from Great Scott Gadgets is a Software Defined Radio peripheral capable of transmission or reception of radio signals from 1 MHz to 6 GHz. Designed to enable test and development of modern and next generation radio technologies, HackRF One is an open source hardware platform that can be used as a USB peripheral or programmed for stand-alone operation.
 * [ADALM-PLUTO (PlutoSDR)](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html) - The easy to use ADALM-PLUTO active learning module (PlutoSDR) helps introduce electrical engineering students to the fundamentals of software-defined radio (SDR), radio frequency (RF), and wireless communications. Designed for students at all levels and from all backgrounds, the module can be used for both instructor-led and self-directed learning to help students develop a foundation in real-world RF and communications that they can build on as they pursue science, technology, or engineering degrees.
-
+* [RTL-SDR](https://www.rtl-sdr.com/) - RTL-SDR is a very cheap ~$30 USB dongle that can be used as a computer based radio scanner for receiving live radio signals in your area (no internet required). Depending on the particular model it could receive frequencies from 500 kHz up to 1.75 GHz. Most software for the RTL-SDR is also community developed, and provided free of charge. Note that RTL-SDRs cannot transmit.
 
 ### Wifi Tools
 * [Pwnagotchi](https://pwnagotchi.ai/)
