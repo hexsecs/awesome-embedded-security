@@ -59,6 +59,7 @@ Awesome list for embedded security tools and knowledge
 
 ## Further Learning
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - We aim to provide a beginners resource on embedded systems security.
+* [SecuringHardware.com](https://learn.securinghardware.com/) - Training by the legendary Joe Fitz [@securlyfitz](https://twitter.com/securelyfitz) 
 
 ## Search Engines
 ![image](https://user-images.githubusercontent.com/89217603/189990679-49ddd4fb-12ea-4959-a296-63c726e179d8.png)
