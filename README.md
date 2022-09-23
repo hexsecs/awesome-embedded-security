@@ -57,9 +57,10 @@ Awesome list for embedded security tools and knowledge
 ### Wifi Tools
 * [Pwnagotchi](https://pwnagotchi.ai/) - Pwnagotchi is an A2C-based “AI” powered by bettercap and running on a Raspberry Pi Zero W that learns from its surrounding WiFi environment in order to maximize the crackable WPA key material it captures (either through passive sniffing or by performing deauthentication and association attacks). This material is collected on disk as PCAP files containing any form of handshake supported by hashcat, including full and half WPA handshakes as well as PMKIDs.
 
-## Further Learning
+## Further Learning and Training
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - We aim to provide a beginners resource on embedded systems security.
 * [SecuringHardware.com](https://learn.securinghardware.com/) - Training by the legendary Joe Fitz [@securlyfitz](https://twitter.com/securelyfitz) 
+* [GrandIdeaStudio.com](http://www.grandideastudio.com/hardware-hacking-training/) - Hardware hacking training with Joe Grand (aka Kingpin)
 
 ## Search Engines
 ![image](https://user-images.githubusercontent.com/89217603/189990679-49ddd4fb-12ea-4959-a296-63c726e179d8.png)
