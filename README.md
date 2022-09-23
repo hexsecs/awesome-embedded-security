@@ -35,6 +35,13 @@ Awesome list for embedded security tools and knowledge
 
 ## Hardware Tools
 
+### Hardware Reverse Engineering Mulitools
+* [Tiguard](https://github.com/tigard-tools/tigard) - An FTDI FT2232H-based multi-protocol tool for hardware hacking.
+* [Bus Pirate](https://github.com/BusPirate/Bus_Pirate) - The Bus Pirate is an open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
+
+### Logic Analyzer
+* [Saleae](https://www.saleae.com/) - Saleae logic analyzers are used by electrical engineers, firmware developers, enthusiasts, and engineering students to record, measure, visualize, and decode the signals in their electrical circuits.
+
 ### RF Tools (Non-SDR)
 
 * [Flipper Zero](https://flipperzero.one/) - Flipper Zero is a portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more. It's fully open-source and customizable, so you can extend it in whatever way you like.
