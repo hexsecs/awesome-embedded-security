@@ -2,6 +2,25 @@
 
 A curated Awesome-list for embedded security tools and knowledge.
 
+## Table of Contents
+  * [Software Tools](#software-tools)
+    + [Binary Parsing and Analysis Tools](#binary-parsing-and-analysis-tools)
+    + [Disassember/Decompilers](#disassemberdecompilers)
+    + [Language Specific Decompilers](#language-specific-decompilers)
+    + [Security Auditing Frameworks](#security-auditing-frameworks)
+  * [Hardware Tools](#hardware-tools)
+    + [Hardware Reverse Engineering Mulitools](#hardware-reverse-engineering-mulitools)
+    + [Logic Analyzer](#logic-analyzer)
+    + [RF Tools (Non-SDR)](#rf-tools-non-sdr)
+    + [Software Defined Radio](#software-defined-radio)
+    + [Wifi Tools](#wifi-tools)
+  * [Further Learning and Training](#further-learning-and-training)
+  * [Search Engines](#search-engines)
+    + [Servers](#servers)
+    + [Threat Intelligence](#threat-intelligence)
+  * [Contribute](#contribute)
+  * [License](#license)
+
 ## Software Tools
 
 ### Binary Parsing and Analysis Tools
