@@ -63,6 +63,18 @@ Awesome list for embedded security tools and knowledge
 * [GrandIdeaStudio.com](http://www.grandideastudio.com/hardware-hacking-training/) - Hardware hacking training with Joe Grand (aka Kingpin)
 
 ## Search Engines
+
+### Servers
+1. [Shodan.io](https://Shodan.io)
+2. [onyphe.io](https://onyphe.io)
+3. [censys.io](https://search.censys.io/)
+4. [ivre.rocks](https://ivre.rocks/#about)
+
+### Threat Intelligence
+1. [app.binaryedge]()
+
+
+
 ![image](https://user-images.githubusercontent.com/89217603/189990679-49ddd4fb-12ea-4959-a296-63c726e179d8.png)
 
 
