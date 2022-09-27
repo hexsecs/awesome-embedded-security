@@ -95,6 +95,23 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ![image](https://user-images.githubusercontent.com/89217603/189990679-49ddd4fb-12ea-4959-a296-63c726e179d8.png)
 
+## Other Awesome Lists
+
+List of lists.
+
+- Security
+  - [Application Security](https://github.com/paragonie/awesome-appsec)
+  - [Android Security](https://github.com/ashishb/android-security-awesome)
+  - [Capture the Flag](https://github.com/apsdehal/awesome-ctf)
+  - [Hacking](https://github.com/carpedm20/awesome-hacking)
+  - [Honeypots](https://github.com/paralax/awesome-honeypots)
+  - [Incident Response](https://github.com/meirwah/awesome-incident-response)
+  - [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis)
+  - [Security](https://github.com/sbilly/awesome-security)
+- Meta
+  - [awesome](https://github.com/sindresorhus/awesome)
+  - [lists](https://github.com/jnv/lists)
+
 ## Contribute
 
 Contributions welcome! Read the [contribution guidelines](contributing.md) first.
