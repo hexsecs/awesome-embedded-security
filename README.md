@@ -1,6 +1,6 @@
 # Awesome Embedded Security [![Awesome](https://awesome.re/badge-flat.svg)](https://awesome.re)
 
-Acurated Awesome-list for embedded security tools and knowledge.
+A curated Awesome-list for embedded security tools and knowledge.
 
 ## Software Tools
 
