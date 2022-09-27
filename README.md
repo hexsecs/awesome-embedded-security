@@ -1,5 +1,6 @@
-# awesome-embedded-security
-Awesome list for embedded security tools and knowledge
+# Awesome Embedded Security [![Awesome](https://awesome.re/badge-flat.svg)](https://awesome.re)
+
+Acurated Awesome-list for embedded security tools and knowledge.
 
 ## Software Tools
 
@@ -73,10 +74,7 @@ Awesome list for embedded security tools and knowledge
 ### Threat Intelligence
 1. [app.binaryedge]()
 
-
-
 ![image](https://user-images.githubusercontent.com/89217603/189990679-49ddd4fb-12ea-4959-a296-63c726e179d8.png)
-
 
 ## Contribute
 
