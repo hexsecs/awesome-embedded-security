@@ -12,7 +12,7 @@ A curated Awesome-list for embedded security tools and knowledge.
     + [Hardware Reverse Engineering Mulitools](#hardware-reverse-engineering-mulitools)
     + [Logic Analyzer](#logic-analyzer)
     + [RF Tools (Non-SDR)](#rf-tools-non-sdr)
-    + [Software Defined Radio](#software-defined-radio)
+    + [Software Defined Radios](#software-defined-radios)
     + [Wifi Tools](#wifi-tools)
   * [Further Learning and Training](#further-learning-and-training)
   * [Search Engines](#search-engines)
@@ -37,6 +37,12 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [radare2](https://www.radare.org/n/) - A free/libre toolchain for easing several low level tasks like forensics, software reverse engineering, exploiting, debugging. It is composed by a bunch of libraries (which are extended with plugins) and programs that can be automated with almost any programming language.
 * [Ghidra](https://ghidra-sre.org/) - A software reverse engineering (SRE) suite of tools developed by NSA's Research Directorate in support of the Cybersecurity mission.
 * [Angr Management](https://github.com/angr/angr-management) - Angr is a multi-architecture binary analysis toolkit, with the capability to perform dynamic symbolic execution (like Mayhem, KLEE, etc.) and various static analyses on binaries. If you'd like to learn how to use it, you're in the right place!
+
+### Debugging Tools
+* [Open OCD](https://openocd.org/) - OpenOCD provides on-chip programming and debugging support with a layered architecture of JTAG interface and TAP support.
+* [GDB](https://www.sourceware.org/gdb/) - GDB, the GNU Project debugger, allows you to see what is going on `inside' another program while it executes -- or what another program was doing at the moment it crashed.
+* [GEF](https://hugsy.github.io/gef/) - GEF (pronounced ʤɛf - "Jeff") is a kick-ass set of commands for X86, ARM, MIPS, PowerPC and SPARC to make GDB cool again for exploit dev. It is aimed to be used mostly by exploit developers and reverse-engineers, to provide additional features to GDB using the Python API to assist during the process of dynamic analysis and exploit development.
+
 
 ### Language Specific Decompilers
 * .NET
