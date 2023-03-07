@@ -121,6 +121,7 @@ List of security lists.
   - [Incident Response](https://github.com/meirwah/awesome-incident-response)
   - [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis)
   - [Security](https://github.com/sbilly/awesome-security)
+  - [Fuzzing]()https://github.com/cpuu/awesome-fuzzing)
 - Domain Specific
   - Automotive
     - [CANbus](https://github.com/iDoka/awesome-canbus)
