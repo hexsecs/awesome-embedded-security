@@ -93,6 +93,8 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [SecuringHardware.com](https://learn.securinghardware.com/) - Training by the legendary Joe Fitz [@securlyfitz](https://twitter.com/securelyfitz) 
 * [GrandIdeaStudio.com](http://www.grandideastudio.com/hardware-hacking-training/) - Hardware hacking training with Joe Grand (aka Kingpin)
 
+
+
 ## Search Engines
 
 ### Servers
@@ -108,9 +110,9 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ## Other Awesome Lists
 
-List of lists.
+List of security lists.
 
-- Security
+- General Security
   - [Application Security](https://github.com/paragonie/awesome-appsec)
   - [Android Security](https://github.com/ashishb/android-security-awesome)
   - [Capture the Flag](https://github.com/apsdehal/awesome-ctf)
@@ -119,9 +121,14 @@ List of lists.
   - [Incident Response](https://github.com/meirwah/awesome-incident-response)
   - [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis)
   - [Security](https://github.com/sbilly/awesome-security)
+- Domain Specific
+  - Automotive
+    - [CANbus](https://github.com/iDoka/awesome-canbus)
+    - [CANb IDs](https://github.com/iDoka/awesome-automotive-can-id)
 - Meta
   - [awesome](https://github.com/sindresorhus/awesome)
   - [lists](https://github.com/jnv/lists)
+ 
 
 ## Contribute
 
