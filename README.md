@@ -92,6 +92,8 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - We aim to provide a beginners resource on embedded systems security.
 * [SecuringHardware.com](https://learn.securinghardware.com/) - Training by the legendary Joe Fitz [@securlyfitz](https://twitter.com/securelyfitz) 
 * [GrandIdeaStudio.com](http://www.grandideastudio.com/hardware-hacking-training/) - Hardware hacking training with Joe Grand (aka Kingpin)
+* [raelize.com - Blog](https://raelize.com/blog) - Great insight into hardware hacking such as fault injection and side-channel attacks.
+* [riscure.com - Blog](https://www.riscure.com/blog/) - One of the OG companies working on fault injection. Jasper van Woudenberg (Riscure) and Colin O'Flynn (Newae) literally [wrote the book](https://nostarch.com/hardwarehacking) on hardware hacking. 
 
 
 
