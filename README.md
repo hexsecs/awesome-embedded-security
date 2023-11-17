@@ -96,20 +96,10 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [raelize.com - Blog](https://raelize.com/blog) - Great insight into hardware hacking such as fault injection and side-channel attacks.
 * [riscure.com - Blog](https://www.riscure.com/blog/) - One of the OG companies working on fault injection. Jasper van Woudenberg (Riscure) and Colin O'Flynn (Newae) literally [wrote the book](https://nostarch.com/hardwarehacking) on hardware hacking. 
 
+## Open Source Intelligence (OSINT)
 
+* [Awesome OSINT](https://github.com/jivoi/awesome-osint)
 
-## Search Engines
-
-### Servers
-1. [Shodan.io](https://Shodan.io)
-2. [onyphe.io](https://onyphe.io)
-3. [censys.io](https://search.censys.io/)
-4. [ivre.rocks](https://ivre.rocks/#about)
-
-### Threat Intelligence
-1. [app.binaryedge]()
-
-![image](https://user-images.githubusercontent.com/89217603/189990679-49ddd4fb-12ea-4959-a296-63c726e179d8.png)
 
 ## Other Awesome Lists
 
