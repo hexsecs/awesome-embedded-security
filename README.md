@@ -117,6 +117,7 @@ List of security lists.
   - [Fuzzing](https://github.com/cpuu/awesome-fuzzing)
 - Embedded
   - [General Embedded](https://github.com/nhivp/Awesome-Embedded)
+  - [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security)
 - Domain Specific
   - Automotive
     - [CANbus](https://github.com/iDoka/awesome-canbus)
