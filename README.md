@@ -115,6 +115,8 @@ List of security lists.
   - [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis)
   - [Security](https://github.com/sbilly/awesome-security)
   - [Fuzzing](https://github.com/cpuu/awesome-fuzzing)
+- Embedded
+  - [General Embedded](https://github.com/nhivp/Awesome-Embedded)
 - Domain Specific
   - Automotive
     - [CANbus](https://github.com/iDoka/awesome-canbus)
