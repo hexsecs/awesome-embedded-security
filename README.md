@@ -105,26 +105,26 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 List of security lists.
 
-- General Security
-  - [Application Security](https://github.com/paragonie/awesome-appsec)
-  - [Android Security](https://github.com/ashishb/android-security-awesome)
-  - [Capture the Flag](https://github.com/apsdehal/awesome-ctf)
-  - [Hacking](https://github.com/carpedm20/awesome-hacking)
-  - [Honeypots](https://github.com/paralax/awesome-honeypots)
-  - [Incident Response](https://github.com/meirwah/awesome-incident-response)
-  - [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis)
-  - [Security](https://github.com/sbilly/awesome-security)
-  - [Fuzzing](https://github.com/cpuu/awesome-fuzzing)
-- Embedded
-  - [General Embedded](https://github.com/nhivp/Awesome-Embedded)
-  - [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security)
-- Domain Specific
-  - Automotive
-    - [CANbus](https://github.com/iDoka/awesome-canbus)
-    - [CANb IDs](https://github.com/iDoka/awesome-automotive-can-id)
-- Meta
-  - [awesome](https://github.com/sindresorhus/awesome)
-  - [lists](https://github.com/jnv/lists)
+* General Security
+  * [Application Security](https://github.com/paragonie/awesome-appsec)
+  * [Android Security](https://github.com/ashishb/android-security-awesome)
+  * [Capture the Flag](https://github.com/apsdehal/awesome-ctf)
+  * [Hacking](https://github.com/carpedm20/awesome-hacking)
+  * [Honeypots](https://github.com/paralax/awesome-honeypots)
+  * [Incident Response](https://github.com/meirwah/awesome-incident-response)
+  * [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis)
+  * [Security](https://github.com/sbilly/awesome-security)
+  * [Fuzzing](https://github.com/cpuu/awesome-fuzzing)
+* Embedded
+  * [General Embedded](https://github.com/nhivp/Awesome-Embedded)
+  * [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security)
+* Domain Specific
+  * Automotive
+    * [CANbus](https://github.com/iDoka/awesome-canbus)
+    * [CANb IDs](https://github.com/iDoka/awesome-automotive-can-id)
+* Meta
+  * [awesome](https://github.com/sindresorhus/awesome)
+  * [lists](https://github.com/jnv/lists)
  
 
 ## Contribute
