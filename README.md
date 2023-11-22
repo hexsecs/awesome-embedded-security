@@ -1,5 +1,7 @@
 # Awesome Embedded Security [![Awesome](https://awesome.re/badge-flat.svg)](https://awesome.re)
 
+[![Check Markdown links](https://github.com/hexsecs/awesome-embedded-security/actions/workflows/markdown-lint.yml/badge.svg)](https://github.com/hexsecs/awesome-embedded-security/actions/workflows/markdown-lint.yml)
+
 A curated Awesome-list for embedded security tools and knowledge.
 
 ## Table of Contents
