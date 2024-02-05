@@ -72,6 +72,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ### Logic Analyzer
 * [Saleae](https://www.saleae.com/) - Saleae logic analyzers are used by electrical engineers, firmware developers, enthusiasts, and engineering students to record, measure, visualize, and decode the signals in their electrical circuits.
+* [Sigrok](https://sigrok.org/) - The sigrok project aims at creating a portable, cross-platform, Free/Libre/Open-Source signal analysis software suite that supports various device types (e.g. logic analyzers, oscilloscopes, and many more). 
 
 ### RF Tools (Non-SDR)
 
