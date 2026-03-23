@@ -54,11 +54,11 @@ A curated Awesome-list for embedded security tools and knowledge.
 ### Language Specific Decompilers
 * .NET
   * [ILSpy](https://github.com/icsharpcode/ILSpy) - .NET Decompiler with support for PDB generation, ReadyToRun, Metadata (&more) - cross-platform!
-  * dnSpy
-  * de4dot
+  * [dnSpy](https://github.com/dnSpyEx/dnSpy) - .NET debugger and assembly editor
+  * [de4dot](https://github.com/de4dot/de4dot) - .NET deobfuscator
 * Java
-  * JD-GUI
-  * JADX
+  * [JD-GUI](https://github.com/java-decompiler/jd-gui) - Java decompiler
+  * [JADX](https://github.com/skylot/jadx) - Dex to Java decompiler
 
 ### Security Auditing Frameworks
 * [EXPLIoT](https://pypi.org/project/expliot/) - EXPLIoT is a Framework for security testing and exploiting IoT products and IoT infrastructure. It provides a set of plugins (test cases) which are used to perform the assessment and can be extended easily with new ones. The name EXPLIoT (pronounced expl-aa-yo-tee) is a pun on the word exploit and explains the purpose of the framework i.e. IoT exploitation.
