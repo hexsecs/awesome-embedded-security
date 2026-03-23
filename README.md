@@ -156,6 +156,7 @@ List of security lists.
   * Automotive
     * [CANbus](https://github.com/iDoka/awesome-canbus)
     * [CANb IDs](https://github.com/iDoka/awesome-automotive-can-id)
+    * [Awesome Automotive Security](https://github.com/hexsecs/awesome-automotive-security)
 * Meta
   * [awesome](https://github.com/sindresorhus/awesome)
   * [lists](https://github.com/jnv/lists)
