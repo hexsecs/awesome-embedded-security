@@ -8,13 +8,16 @@ A curated Awesome-list for embedded security tools and knowledge.
 ## Table of Contents
 
 * [Software Tools](#software-tools)
-  * [Binary Parsing and Analysis Tools](#binary-parsing-and-analysis-tools)
-  * [Disassember/Decompilers](#disassemberdecompilers)
+* [Binary Parsing and Analysis Tools](#binary-parsing-and-analysis-tools)
+  * [Disassemblers/Decompilers](#disassemblersdecompilers)
+  * [Fuzzing Tools](#fuzzing-tools)
+  * [Emulation Tools](#emulation-tools)
   * [Debugging Tools](#debugging-tools)
   * [Language Specific Decompilers](#language-specific-decompilers)
   * [Security Auditing Frameworks](#security-auditing-frameworks)
 * [Hardware Tools](#hardware-tools)
-  * [Hardware Reverse Engineering Mulitools](#hardware-reverse-engineering-mulitools)
+  * [Hardware Reverse Engineering Multitools](#hardware-reverse-engineering-multitools)
+  * [Side-Channel Analysis](#side-channel-analysis)
   * [Logic Analyzer](#logic-analyzer)
   * [RF Tools (Non-SDR)](#rf-tools-non-sdr)
   * [Software Defined Radios](#software-defined-radios)
@@ -33,7 +36,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Binwalk](https://github.com/ReFirmLabs/binwalk) - Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 * [OFRAK](https://github.com/redballoonsecurity/ofrak) - OFRAK is a binary analysis and modification platform that combines the ability to unpack, analyze, modify, and repack binaries.
 
-### Disassember/Decompilers
+### Disassemblers/Decompilers
 * [IDA Pro](https://hex-rays.com/ida-pro/) - IDA Pro as a disassembler is capable of creating maps of their execution to show the binary instructions that are actually executed by the processor in a symbolic representation (assembly language). Advanced techniques have been implemented into IDA Pro so that it can generate assembly language source code from machine-executable code and make this complex code more human-readable.
 * [Vivisect](https://github.com/vivisect/vivisect) - A combined disassembler/static analysis/symbolic execution/debugger framework.
 * [Binary Ninja](https://binary.ninja/) - Binary Ninja is an interactive disassembler, decompiler, and binary analysis platform for reverse engineers, malware analysts, vulnerability researchers, and software developers that runs on Windows, macOS, and Linux.
@@ -44,11 +47,15 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Angr](https://github.com/angr/angr) - angr is a platform-agnostic binary analysis framework. It is brought to you by the Computer Security Lab at UC Santa Barbara, SEFCOM at Arizona State University, their associated CTF team, Shellphish, the open source community, and @rhelmot.
 * [Angr Management](https://github.com/angr/angr-management) - Angr is a multi-architecture binary analysis toolkit, with the capability to perform dynamic symbolic execution (like Mayhem, KLEE, etc.) and various static analyses on binaries. If you'd like to learn how to use it, you're in the right place!
 * [Capstone](https://github.com/capstone-engine/capstone) - Capstone is a lightweight multi-platform, multi-architecture disassembly framework. Their target is to make Capstone the ultimate disassembly engine for binary analysis and reversing in the security community.
+* [Keystone](https://github.com/keystone-engine/keystone) - A lightweight multi-architecture assembler framework that complements Capstone.
+* [BARF](https://github.com/programa-stic/barf-project) - A binary analysis and reverse engineering framework with support for ROP gadget search and CFG recovery.
 
 ### Debugging Tools
 * [Open OCD](https://openocd.org/) - OpenOCD provides on-chip programming and debugging support with a layered architecture of JTAG interface and TAP support.
 * [GDB](https://www.sourceware.org/gdb/) - GDB, the GNU Project debugger, allows you to see what is going on `inside' another program while it executes -- or what another program was doing at the moment it crashed.
 * [GEF](https://hugsy.github.io/gef/) - GEF (pronounced ʤɛf - "Jeff") is a kick-ass set of commands for X86, ARM, MIPS, PowerPC and SPARC to make GDB cool again for exploit dev. It is aimed to be used mostly by exploit developers and reverse-engineers, to provide additional features to GDB using the Python API to assist during the process of dynamic analysis and exploit development.
+* [Black Magic Probe](https://codeberg.org/blackmagic-debug/blackmagic) - An open-source JTAG/SWD debugger with embedded GDB server and automatic target detection.
+* [pyOCD](https://pyocd.io) - An open-source Python library for programming and debugging Arm Cortex-M microcontrollers with cross-platform debug probe support.
 
 
 ### Language Specific Decompilers
@@ -66,11 +73,27 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Firmware Analysis and Comparison Tool (FACT)](https://fkie-cad.github.io/FACT_core/) - The Firmware Analysis and Comparison Tool (FACT) is intended to automate Firmware Security analysis (Router, IoT, UEFI, Webcams, Drones, …). Thereby it shall be easy to use (web UI), extend (plug-in system) and integrate (REST API).
 * [FwAnalyzer (Firmware Analyzer)](https://github.com/cruise-automation/fwanalyzer) - FwAnalyzer is a tool to analyze (ext2/3/4), FAT/VFat, SquashFS, UBIFS filesystem images, cpio archives, and directory content using a set of configurable rules. FwAnalyzer relies on e2tools for ext filesystems, mtools for FAT filesystems, squashfs-tools for SquashFS filesystems, and ubi_reader for UBIFS filesystems. cpio for cpio archives. SELinux/Capability support for ext2/3/4 images requires a patched version of e2tools. SELinux/Capability support for SquashFS images requires a patched version of squashfs-tools.
 
+### Fuzzing Tools
+* [AFL++](https://github.com/AFLplusplus/AFLplusplus) - A coverage-guided fuzzer with enhanced mutations, QEMU and Unicorn emulation modes, and custom power schedules.
+* [honggfuzz](https://github.com/google/honggfuzz) - A feedback-driven evolutionary fuzzer supporting hardware-based coverage (Intel BTS/PT) and persistent mode for extreme speed.
+* [Fuzzowski](https://github.com/nccgroup/fuzzowski) - A network protocol fuzzer based on the Sulley/BooFuzz framework with support for TCP/UDP/SSL protocols.
+* [Peach](https://gitlab.com/peachtech/peach-fuzzer-community) - A smart fuzzer supporting both generation-based and mutation-based fuzzing via Peach Pit definitions.
+
+### Emulation Tools
+* [FirmAE](https://github.com/pr0v3rbs/FirmAE) - An automated framework for emulation and vulnerability analysis of IoT firmware with an 79% success rate using arbitration techniques.
+* [Qiling](https://github.com/qilingframework/qiling) - An advanced binary emulation framework supporting cross-platform OS-level emulation for Windows, Linux, Android, BSD, UEFI, and multiple architectures.
+* [Unicorn Engine](https://github.com/unicorn-engine/unicorn) - A lightweight multi-architecture CPU emulator framework providing pure CPU emulation for ARM, MIPS, x86, RISC-V, and more.
+* [PANDA](https://github.com/panda-re/panda) - Platform for Architecture-Neutral Dynamic Analysis with record/replay functionality and LLVM IR translation for whole-system analysis.
+
 ## Hardware Tools
 
-### Hardware Reverse Engineering Mulitools
+### Hardware Reverse Engineering Multitools
 * [Tiguard](https://github.com/tigard-tools/tigard) - An FTDI FT2232H-based multi-protocol tool for hardware hacking.
 * [Bus Pirate](https://github.com/BusPirate/Bus_Pirate) - The Bus Pirate is an open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
+
+### Side-Channel Analysis
+* [ChipWhisperer](https://github.com/newaetech/chipwhisperer) - An open-source toolchain for side-channel power analysis and fault injection attacks with complete hardware and software stack.
+* [SCALE](https://github.com/danpage/scale) - Side-Channel Attack Lab Exercises providing educational material for learning power analysis attacks with low-cost hardware.
 
 ### Logic Analyzer
 * [Saleae](https://www.saleae.com/) - Saleae logic analyzers are used by electrical engineers, firmware developers, enthusiasts, and engineering students to record, measure, visualize, and decode the signals in their electrical circuits.
