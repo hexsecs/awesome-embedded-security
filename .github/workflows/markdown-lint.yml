@@ -3,28 +3,37 @@ name: Check Markdown links
 on:
   workflow_dispatch:
   push:
-    branches:
-    - main
+    branches: [main]
+    paths:
+      - '**/*.md'
+      - '.github/workflows/markdown.links.config.json'
   schedule:
-  # Run every first day at 00:00 AM every month.
-    - cron: "0 0 * * *"
+    # Run at 00:00 UTC on the first day of every month.
+    - cron: '0 0 1 * *'
   pull_request:
     branches: [main]
     paths:
-      - 'readme.md'
+      - '**/*.md'
+      - '.github/workflows/markdown.links.config.json'
 
 jobs:
   markdown-link-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      - uses: gaurav-nelson/github-action-markdown-link-check@499c1e7f3637c131334fa8e937c45144f79d72d2 # v1
         with:
           retry-after: 10
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
           config-file: '.github/workflows/markdown.links.config.json'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+          cache: npm
       - name: Awesome linter
-        run: npx awesome-lint
+        run: |
+          npm ci
+          npm run lint:awesome

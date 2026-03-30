@@ -1,0 +1,12 @@
+{
+  "name": "awesome-embedded-security-ci",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned CI tooling for markdown checks",
+  "scripts": {
+    "lint:awesome": "awesome-lint"
+  },
+  "devDependencies": {
+    "awesome-lint": "2.2.3"
+  }
+}
