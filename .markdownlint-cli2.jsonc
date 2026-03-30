@@ -1,0 +1,14 @@
+{
+  "config": {
+    "default": true,
+    "MD013": false
+  },
+  "globs": [
+    "contributing.md",
+    "docs/**/*.md"
+  ],
+  "ignores": [
+    "node_modules/**",
+    ".agents/**"
+  ]
+}

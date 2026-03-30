@@ -4,9 +4,12 @@
   "version": "1.0.0",
   "description": "Pinned CI tooling for markdown checks",
   "scripts": {
-    "lint:awesome": "awesome-lint"
+    "lint:awesome": "awesome-lint README.md",
+    "lint:markdown": "markdownlint-cli2",
+    "validate": "npm run lint:markdown && npm run lint:awesome"
   },
   "devDependencies": {
-    "awesome-lint": "2.2.3"
+    "awesome-lint": "2.2.3",
+    "markdownlint-cli2": "0.22.0"
   }
 }

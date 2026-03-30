@@ -1,18 +1,43 @@
 # Contributing Guide
 
-This repository is curated as a security reference. Every contribution must be easy to review, reproduce, and verify.
+This repository is curated as a security reference. Every contribution should be
+easy to review, reproduce, and verify from a clean clone.
 
 ## Scope
 
 Accepted changes include:
 
-- New embedded-security resources/tools
-- Quality fixes for existing entries (stale links, naming, categorization, duplication)
-- Structural/documentation improvements that improve curation quality
+- New embedded-security resources and references.
+- Quality fixes for existing entries, such as stale links, naming, categorization,
+  or duplication.
+- Documentation and workflow changes that improve curation quality or repository
+  maintenance.
+
+## Local Validation
+
+Use the pinned tooling in `package.json` before opening a pull request:
+
+```bash
+npm ci
+npm run validate
+```
+
+Current validation behavior:
+
+- `npm run lint:markdown` checks `contributing.md` and `docs/**/*.md` with
+  `markdownlint-cli2`.
+- `npm run lint:awesome` runs `awesome-lint` against `README.md`.
+- GitHub Actions also runs markdown link checking via
+  `.github/workflows/markdown-lint.yml`.
+
+`README.md` is intentionally excluded from markdownlint because the awesome-list
+layout uses formatting patterns that conflict with the default markdownlint
+ruleset.
 
 ## Required PR Evidence
 
-Every pull request must include enough evidence for a reviewer to reproduce your claim from a clean clone.
+Every pull request should include enough evidence for a reviewer to reproduce the
+claim from repository state.
 
 Use this template in the PR description:
 
@@ -30,179 +55,204 @@ Use this template in the PR description:
   - After: <state>
 
 ## Verification
-- [ ] Markdown links check passes
-- [ ] Awesome linter passes
+- [ ] `npm run validate` passes locally
+- [ ] Markdown link check passes in CI
 - [ ] Entry placement/category is correct
 - [ ] Description is accurate and neutral
 ```
 
 Minimum evidence requirements:
 
-- Exact file path(s) and line references for each claim
-- Exact command(s) used for reproduction/verification
-- Clear before/after delta (diff or explicit textual comparison)
-- Any assumptions or environment constraints
+- Exact file paths and line references for each claim.
+- Exact commands used for reproduction or verification.
+- A clear before-and-after delta.
+- Any assumptions or environment constraints.
 
-## Reviewer Triage Flow (Reproducible)
+## Reviewer Triage Flow
 
 Follow this sequence for every PR:
 
-1. Confirm scope and claim
-- Read PR summary and map each claim to changed files.
-- Reject ambiguous claims that cannot be verified from repository state.
+1. Confirm scope and claim.
 
-2. Reproduce claimed changes
-- Run the commands provided by the contributor.
-- Validate that command output supports each claim.
-- Request missing commands/evidence if reproduction is incomplete.
+   - Read the PR summary and map each claim to changed files.
+   - Reject ambiguous claims that cannot be verified from repository state.
 
-3. Verify curation quality
-- Confirm section/category placement is correct.
-- Check for duplicates and naming consistency.
-- Validate descriptions are factual, concise, and non-promotional.
+1. Reproduce claimed changes.
 
-4. Verify repository checks
-- Ensure markdown link checks and awesome-list linting pass in CI.
-- If CI is not available, run equivalent local checks and report results.
+   - Run the commands provided by the contributor.
+   - Validate that command output supports each claim.
+   - Request missing commands or evidence if reproduction is incomplete.
 
-5. Make review decision
-- Approve only when claims are reproducible and checks pass.
-- Otherwise request changes with precise, reproducible remediation steps.
+1. Verify curation quality.
+
+   - Confirm section or category placement is correct.
+   - Check for duplicates and naming consistency.
+   - Validate descriptions are factual, concise, and non-promotional.
+
+1. Verify repository checks.
+
+   - Ensure `npm run validate` and the markdown link workflow pass.
+   - If CI is not available, run the equivalent local checks and report results.
+
+1. Make a review decision.
+
+   - Approve only when claims are reproducible and checks pass.
+   - Otherwise request changes with precise, reproducible remediation steps.
 
 ## Reviewer False-Positive Guardrails
 
-Do not reject a contribution on intuition alone. Use the matrix below before deciding.
+Do not reject a contribution on intuition alone. Use the matrix below before
+deciding.
 
 ### Reviewer Decision Matrix
 
 | Proposed rejection reason | Required verification step | Decision if verification fails |
 | --- | --- | --- |
-| "Tool is not embedded-security relevant" | Confirm README/docs show no embedded, firmware, hardware, IoT, or low-level security use case. | Mark as `Needs Clarification` (not rejected). Ask contributor for concrete use case. |
-| "Project is dead/unmaintained" | Check recent releases/commits/issues and whether project still works for current workflows. | Downgrade to `Stale but Useful` and allow if historically valuable with clear note. |
-| "Duplicate entry" | Search the list for exact project and meaningful synonyms/renames/forks. | Keep submission open and request dedup merge wording. |
-| "Security value is weak" | Validate whether at least one realistic security workflow is enabled (audit, reversing, fuzzing, hardening, forensics, verification). | Request expanded description and usage example instead of immediate rejection. |
-| "Commercial/proprietary tool not suitable" | Verify project license and ecosystem value against existing list precedent. | Escalate for consistency review; do not reject as a solo reviewer. |
-| "Low-quality description" | Confirm whether issue is content quality only, not tool relevance. | Convert to edit request; reject only after no response window expires. |
+| Tool is not embedded-security relevant | Confirm `README.md` or supporting docs show no embedded, firmware, hardware, IoT, or low-level security use case. | Mark as `Needs Clarification` and ask for a concrete use case. |
+| Project is dead or unmaintained | Check recent releases, commits, issues, and whether the project still supports current workflows. | Downgrade to `Stale but Useful` and allow if it remains historically valuable. |
+| Duplicate entry | Search the list for the exact project and meaningful synonyms, renames, or forks. | Keep the submission open and request dedup wording. |
+| Security value is weak | Validate whether at least one realistic workflow is enabled, such as audit, reversing, fuzzing, hardening, forensics, or verification. | Request an expanded description and usage example instead of immediate rejection. |
+| Commercial or proprietary tool not suitable | Verify license and ecosystem value against existing list precedent. | Escalate for consistency review instead of rejecting solo. |
+| Low-quality description | Confirm the problem is content quality only, not tool relevance. | Convert to an edit request and reject only after the response window expires. |
 
 ### Decision Outcomes
 
-- `Accept`: Meets quality/relevance checks.
+- `Accept`: Meets quality and relevance checks.
 - `Needs Clarification`: Evidence is incomplete or ambiguous.
 - `Escalate`: Potential policy inconsistency or reviewer disagreement.
-- `Reject`: Only after reproducible, documented verification against policy.
+- `Reject`: Reserved for reproducible, documented policy failures.
 
-### Edge-Case Examples
+### Edge Cases
 
-1. Fork with active maintenance, original archived
-- Treat as eligible when fork is now the de facto maintained source.
-- Ask contributor to reference both upstream and maintained fork if helpful.
+1. Fork with active maintenance and archived upstream.
 
-2. Tool is old but still standard in labs
-- Age alone is not rejection criteria.
-- Accept when workflows remain valid and community still references it.
+   - Treat the fork as eligible when it is now the de facto maintained source.
+   - Ask the contributor to reference both upstream and maintained fork if useful.
 
-3. Dual-use tool (general RE plus embedded applicability)
-- Accept if contributor demonstrates embedded-specific usage.
-- Update description to anchor embedded context.
+1. Tool is old but still standard in labs.
 
-4. Vendor docs moved, repo link changed
-- Request URL correction first.
-- Do not reject for transient link rot if project identity is clear.
+   - Age alone is not rejection criteria.
+   - Accept when workflows remain valid and the community still references it.
 
-5. New category proposal for emerging techniques
-- Escalate for taxonomy review instead of rejecting as out of scope.
-- Accept pending category decision when contribution quality is otherwise strong.
+1. Dual-use tool with embedded applicability.
 
-## Appeal Path (Contributor-Facing)
+   - Accept if the contributor demonstrates embedded-specific usage.
+   - Update the description to anchor the embedded context.
 
-If your submission is rejected and you believe the decision is incorrect, open or update the PR/issue with:
+1. Vendor docs moved or repo link changed.
 
-1. The rejection reason you are appealing.
-2. A short evidence bundle (links, usage proof, maintenance signals).
-3. The exact text you propose for the list entry.
+   - Request a URL correction first.
+   - Do not reject for transient link rot if project identity is clear.
+
+1. New category proposal for emerging techniques.
+
+   - Escalate for taxonomy review instead of rejecting as out of scope.
+   - Accept pending category decision when contribution quality is otherwise
+     strong.
+
+## Appeal Path
+
+If a submission is rejected and the contributor believes the decision is
+incorrect, they should update the PR or issue with:
+
+1. The rejection reason being appealed.
+1. A short evidence bundle, such as links, usage proof, or maintenance signals.
+1. The exact text proposed for the list entry.
 
 Appeal handling rules:
 
-- A different reviewer (or maintainer) performs a second review.
-- The second review must cite concrete policy criteria and evidence.
-- If disagreement remains, maintainers resolve via documented final decision.
+- A different reviewer or maintainer performs a second review.
+- The second review cites concrete policy criteria and evidence.
+- If disagreement remains, maintainers resolve it with a documented final
+  decision.
 
-## Verification Checklist (Reviewer Gate)
+## Verification Checklist
 
 A PR is review-complete only when all items are true:
 
-- [ ] Every recommendation/finding references exact file path(s) and line(s)
-- [ ] Reproduction commands execute successfully from a clean clone
-- [ ] Before/after behavior is explicitly demonstrated
-- [ ] CI checks pass (`Check Markdown links`, `awesome-lint`)
-- [ ] Any rejected/blocked claim includes concrete reason and next action
+- [ ] Every recommendation or finding references exact file paths and lines.
+- [ ] Reproduction commands execute successfully from a clean clone.
+- [ ] Before-and-after behavior is explicitly demonstrated.
+- [ ] CI checks pass, including `npm run validate` and link validation.
+- [ ] Any rejected or blocked claim includes a concrete reason and next action.
 
 ## Policy-Evasion Variant Checks
 
-Use these checks to detect contributions that imitate acceptable entries while bypassing curation policy.
+Use these checks to detect contributions that imitate acceptable entries while
+bypassing curation policy.
 
-### 1. Renamed duplicate resources
+### Renamed Duplicate Resources
 
-- Pattern: same project submitted with alternate naming, acronym expansion, or minor URL variation.
+- Pattern: the same project is submitted with alternate naming, acronym
+  expansion, or minor URL variation.
 - Detection heuristics:
-  - Normalize destination identifiers (domain plus canonical `owner/repo`) and compare to existing entries.
-  - Compare aliases/taglines in descriptions for near-duplicate semantics.
+  - Normalize destination identifiers, such as domain plus canonical
+    `owner/repo`, and compare them to existing entries.
+  - Compare aliases and taglines for near-duplicate semantics.
   - Run targeted searches in `README.md` before accepting a resource as novel.
 - Escalate when:
   - Duplicate submissions continue after reviewer correction.
   - Wording appears intentionally altered to bypass previous removal decisions.
 
-### 2. Mirror domains and redirect wrappers
+### Mirror Domains and Redirect Wrappers
 
-- Pattern: links use non-canonical mirrors, shorteners, or redirect/tracking wrappers in place of upstream sources.
+- Pattern: links use non-canonical mirrors, shorteners, or tracking wrappers
+  instead of upstream sources.
 - Detection heuristics:
-  - Prefer official project pages/repos when available.
-  - Inspect redirect chains and query parameters for affiliate or campaign tracking.
+  - Prefer official project pages or repos when available.
+  - Inspect redirect chains and query parameters for affiliate or campaign
+    tracking.
   - Reject links that conceal final destinations during review.
 - Escalate when:
-  - Destination changes between initial review and merge.
+  - The destination changes between initial review and merge.
   - Redirect targets resolve to unrelated or commercial landing pages.
 
-### 3. Stale forks presented as upstream
+### Stale Forks Presented as Upstream
 
-- Pattern: inactive forks or mirrors are represented as primary resources.
+- Pattern: inactive forks or mirrors are represented as the primary resource.
 - Detection heuristics:
-  - Confirm fork lineage and recent maintenance (commits, issues, releases).
+  - Confirm fork lineage and recent maintenance through commits, issues, and
+    releases.
   - Validate maintainer identity and governance claims in project docs.
-  - Require explicit fork labeling when listing a fork for a justified reason.
+  - Require explicit fork labeling when a fork is listed for a justified reason.
 - Escalate when:
   - Fork staleness could mislead users into unsafe or obsolete workflows.
-  - Submitter omits fork disclosure after reviewer request.
+  - The submitter omits fork disclosure after reviewer request.
 
-### 4. Marketing content disguised as research
+### Marketing Content Disguised as Research
 
-- Pattern: promotional pages submitted as technical references.
+- Pattern: promotional pages are submitted as technical references.
 - Detection heuristics:
-  - Require technical substance (methods, code, reproducible experiments, primary data).
-  - Flag conversion-first pages (pricing, lead forms, demo funnels) lacking technical depth.
-  - Prefer neutral technical artifacts (papers, talks, docs, benchmarks).
+  - Require technical substance such as methods, code, reproducible
+    experiments, or primary data.
+  - Flag conversion-first pages like pricing, lead forms, or demo funnels when
+    they lack technical depth.
+  - Prefer neutral technical artifacts, such as papers, talks, docs, or
+    benchmarks.
 - Escalate when:
   - Claims are non-verifiable or methodology is absent.
-  - Submitter repeatedly rotates equivalent promotional URLs after rejection.
+  - Submitters repeatedly rotate equivalent promotional URLs after rejection.
 
 ## High-Risk Escalation Criteria
 
 Escalate for maintainer consensus when one or more of the following apply:
 
 - Multiple evasion signals appear in the same pull request.
-- Contributor shows repeated evasion behavior across recent submissions.
+- A contributor shows repeated evasion behavior across recent submissions.
 - Resource authenticity or ownership cannot be validated from primary sources.
-- Link behavior indicates potential trust degradation (malicious redirects, deceptive ownership, fabricated claims).
+- Link behavior indicates potential trust degradation, such as malicious
+  redirects, deceptive ownership, or fabricated claims.
 
 Recommended response:
 
 - Pause merge and request a second maintainer review.
-- Document evidence-based rejection rationale in the PR.
-- Add the newly observed evasion pattern to this guide for future triage.
+- Document the evidence-based rationale in the PR.
+- Add newly observed evasion patterns to this guide for future triage.
 
-## Finding Recommendation Format (for audit/report compilation)
+## Finding Recommendation Format
 
-When leaving review findings, use this structure to keep report assembly deterministic:
+When leaving review findings, use this structure to keep report assembly
+deterministic:
 
 ```md
 ### Finding: <short title>
@@ -221,27 +271,32 @@ When leaving review findings, use this structure to keep report assembly determi
   - Expected result: <pass condition>
 ```
 
-This format is required whenever a reviewer recommends a change, so findings can be copied directly into final reports without rework.
-
-## Dynamic Validation Workflow (Web Resources)
+## Dynamic Validation Workflow
 
 Use this lightweight check for any newly submitted URL before merge.
 
-1. Reachability
-- Confirm HTTPS is used and the endpoint resolves.
-- Accept `2xx` responses or intentional `403` for gated resources.
-- Reject dead links, parking pages, and typo-squat lookalikes.
+1. Reachability.
 
-2. Redirect safety
-- Follow redirects to the final destination.
-- Verify final domain and path match the claimed project/vendor.
-- Reject suspicious redirect chains, unrelated destinations, or deceptive tracking hops.
+   - Confirm HTTPS is used and the endpoint resolves.
+   - Accept `2xx` responses or intentional `403` responses for gated resources.
+   - Reject dead links, parking pages, and typo-squat lookalikes.
 
-3. Content sanity
-- Confirm the page actually contains the described resource.
-- Prefer official repos/docs over mirrors when available.
-- Reject pages that appear malicious, deceptive, or unrelated to embedded security.
+1. Redirect safety.
 
-4. Reviewer handoff (when uncertain)
-- If behavior appears anomalous, request a second maintainer review before merge.
-- Document what was observed and the exact URL chain in the PR comment.
+   - Follow redirects to the final destination.
+   - Verify the final domain and path match the claimed project or vendor.
+   - Reject suspicious redirect chains, unrelated destinations, or deceptive
+     tracking hops.
+
+1. Content sanity.
+
+   - Confirm the page actually contains the described resource.
+   - Prefer official repos or docs over mirrors when available.
+   - Reject pages that appear malicious, deceptive, or unrelated to embedded
+     security.
+
+1. Reviewer handoff.
+
+   - If behavior appears anomalous, request a second maintainer review before
+     merge.
+   - Document the observed behavior and exact URL chain in the PR comment.

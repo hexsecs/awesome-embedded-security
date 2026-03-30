@@ -1,4 +1,4 @@
-name: Check Markdown links
+name: Validate Markdown
 
 on:
   workflow_dispatch:
@@ -7,6 +7,10 @@ on:
     paths:
       - '**/*.md'
       - '.github/workflows/markdown.links.config.json'
+      - '.github/workflows/markdown-lint.yml'
+      - '.markdownlint-cli2.jsonc'
+      - 'package.json'
+      - 'package-lock.json'
   schedule:
     # Run at 00:00 UTC on the first day of every month.
     - cron: '0 0 1 * *'
@@ -15,10 +19,39 @@ on:
     paths:
       - '**/*.md'
       - '.github/workflows/markdown.links.config.json'
+      - '.github/workflows/markdown-lint.yml'
+      - '.markdownlint-cli2.jsonc'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: markdown-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  markdown-quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install pinned markdown tooling
+        run: |
+          npm ci
+      - name: Run markdown quality checks
+        run: npm run validate
+
   markdown-link-check:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -29,11 +62,3 @@ jobs:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
           config-file: '.github/workflows/markdown.links.config.json'
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '20'
-          cache: npm
-      - name: Awesome linter
-        run: |
-          npm ci
-          npm run lint:awesome

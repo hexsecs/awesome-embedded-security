@@ -1,77 +1,143 @@
 # Submission Quality Lint Strategy
 
-This document defines automatable static checks for list submissions, with CI-ready commands and triage guidance.
+This document describes the repository's current markdown validation pipeline and
+the additional checks that are still planned.
 
-## Scope
+## Current Coverage
 
-Target files:
-- `README.md`
-- `contributing.md`
-- `docs/**/*.md`
+The repository currently enforces three automated checks:
 
-## CI Check Pipeline
+1. Markdown style for repository docs.
+1. Awesome-list linting for the curated list.
+1. Link health validation for markdown content.
 
-Run checks in this order to fail fast while keeping noise low.
+## Implemented Checks
 
-1. Formatting and structure
-2. Metadata completeness
-3. Duplicate detection
-4. Link health
+### 1. Markdown Style for Docs
 
-## 1) Formatting and Structure
+Goal: keep contributor-facing process documentation readable and consistent.
 
-Goal: enforce consistent markdown style and list formatting.
-
-Suggested command:
+Implemented command:
 
 ```bash
-npx markdownlint-cli2 "**/*.md" "#node_modules"
+npm run lint:markdown
 ```
 
-Suggested policy:
-- Require one top-level heading per file.
-- Disallow trailing spaces and inconsistent heading increments.
-- Enforce list indentation and blank lines around headings/lists.
+Implementation details:
 
-Noise reduction:
-- Keep repo-level `.markdownlint.jsonc` exceptions narrow and line-specific.
-- Prefer fixing style violations over disabling rules globally.
+- Tool: `markdownlint-cli2`
+- Config: `.markdownlint-cli2.jsonc`
+- Current scope:
+  - `contributing.md`
+  - `docs/**/*.md`
 
-## 2) Metadata Completeness
+`README.md` is intentionally excluded from markdownlint because the awesome-list
+layout relies on dense heading and list formatting that conflicts with the
+default markdownlint ruleset.
 
-Goal: every list item must include minimum metadata so entries are reviewable.
+### 2. Awesome-List Validation
 
-Minimum required submission fields per entry:
-- Project name
-- URL
-- One-sentence description
+Goal: keep the curated list compliant with awesome-list conventions.
 
-List item format requirement:
+Implemented command:
+
+```bash
+npm run lint:awesome
+```
+
+Implementation details:
+
+- Tool: `awesome-lint`
+- Current scope:
+  - `README.md`
+
+### 3. Link Health
+
+Goal: detect dead or drifting references while minimizing flaky failures.
+
+Implemented in CI through `.github/workflows/markdown-lint.yml` using
+`.github/workflows/markdown.links.config.json`.
+
+Current behavior:
+
+- Runs on pull requests and pushes to `main` when markdown or workflow config
+  changes.
+- Runs on a monthly schedule to catch drift.
+- Retries link checks and allows controlled `403` responses for known anti-bot
+  sites.
+
+## Local Validation Path
+
+Contributors should use the pinned toolchain in `package.json`:
+
+```bash
+npm ci
+npm run validate
+```
+
+`npm run validate` currently runs:
+
+1. `npm run lint:markdown`
+1. `npm run lint:awesome`
+
+## GitHub Actions Layout
+
+The repository uses `.github/workflows/markdown-lint.yml` with two jobs:
+
+1. `markdown-quality`
+
+   - Installs pinned npm dependencies with `npm ci`.
+   - Runs `npm run validate`.
+
+1. `markdown-link-check`
+
+   - Runs the GitHub Action based markdown link checker.
+
+The workflow also uses:
+
+- SHA-pinned actions.
+- `permissions: contents: read`.
+- Job timeouts.
+- Workflow concurrency cancellation for superseded runs.
+
+## Planned Checks
+
+The following controls are still documented strategy, not yet automated in the
+repository:
+
+### Metadata Completeness
+
+Goal: every list item includes enough metadata to be reviewable.
+
+Desired minimum fields per entry:
+
+- Project name.
+- URL.
+- One-sentence description.
+
+Reference format:
 
 ```markdown
 * [Project Name](https://example.com) - Short description.
 ```
 
-Suggested command (fast heuristic):
+Candidate heuristic:
 
 ```bash
 rg -n "^\* \[[^\]]+\]\(https?://[^)]+\) - .+" README.md
 ```
 
-Triage notes:
-- If a valid entry format intentionally differs (for section-specific reasons), mark as `needs-review` and gate by maintainer decision.
-- If URL is present but no description, classify as `likely` quality defect.
-
-## 3) Duplicate Detection
+### Duplicate Detection
 
 Goal: prevent redundant entries and variant duplicates across sections.
 
-Checks:
-- Duplicate exact URLs
-- Duplicate project names with different URLs
-- Near-duplicate names differing only by punctuation/case
+Desired checks:
 
-Suggested commands:
+- Duplicate exact URLs.
+- Duplicate project names with different URLs.
+- Near-duplicate names differing only by punctuation or case.
+
+Candidate commands:
 
 ```bash
 # Duplicate URLs
@@ -86,55 +152,10 @@ rg -o "\[[^\]]+\]\(https?://[^)]+\)" README.md \
   | sort | uniq -d
 ```
 
-Triage notes:
-- If duplicate URL appears with substantially different context (for example, tool and paper homepage), classify as `needs-review`.
-- If same project appears in multiple categories without clear justification, classify as `likely` duplicate.
+## Triage Labels
 
-## 4) Link Health
+Use these labels in PR comments or issue triage:
 
-Goal: detect dead or drifting references while minimizing flaky failures.
-
-Suggested command:
-
-```bash
-npx awesome-lint README.md
-```
-
-Existing CI already runs markdown link checking plus awesome-lint in `.github/workflows/markdown-lint.yml`.
-
-Noise reduction:
-- Allow controlled status-code exceptions for known anti-bot sites via `.github/workflows/markdown.links.config.json`.
-- Use retries and monthly scheduled runs to catch drift without blocking contributors on transient outages.
-
-Triage notes:
-- `403` with known anti-bot behavior: `needs-review` unless persistent for more than 2 runs.
-- `404`/`410`: `likely` broken link.
-- DNS/TLS timeout: `needs-review` first, `likely` if repeatable across reruns.
-
-## Finding Confidence Levels
-
-Use the following confidence labels in PR comments or issue triage:
-- `confirmed`: deterministic violation with direct evidence (for example malformed list item, exact duplicate URL, `404` confirmed twice).
-- `likely`: high-signal check hit with low ambiguity (for example missing description, duplicate normalized project name).
+- `confirmed`: deterministic violation with direct evidence.
+- `likely`: high-signal finding with low ambiguity.
 - `needs-review`: potential false positive or contextual exception.
-
-## Suggested GitHub Actions Layout
-
-Use a dedicated workflow (for example `.github/workflows/submission-quality.yml`) with these jobs:
-
-1. `markdown-style`: markdownlint on all markdown files.
-2. `metadata-and-duplicates`: regex and duplicate commands above.
-3. `links`: existing link checker and awesome-lint.
-
-PR policy:
-- Block on `confirmed` and `likely` findings.
-- Allow maintainers to override `needs-review` with rationale in review comments.
-
-## Example Local Pre-Submission Command
-
-```bash
-npx markdownlint-cli2 "**/*.md" "#node_modules" \
-  && npx awesome-lint README.md \
-  && rg -o "https?://[^)\s]+" README.md | sort | uniq -d
-```
-
