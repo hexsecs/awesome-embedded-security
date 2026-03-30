@@ -166,16 +166,16 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Sigrok](https://sigrok.org/) - Portable, cross-platform, Free/Libre/Open-Source signal analysis software suite that supports various device types (e.g. logic analyzers, oscilloscopes, and many more).
 
 ### RF Tools (Non-SDR)
-* [Flipper Zero](https://flipper.net/) - Portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more.
+* [Flipper Zero](https://docs.flipper.net/) - Portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more.
 * [Awesome Flipper Zero](https://github.com/RogueMaster/awesome-flipperzero-withModules) - A collection of Awesome resources for the Flipper Zero device.
 * [Yard Stick One](https://greatscottgadgets.com/yardstickone/) - Transmit or receive digital wireless signals at frequencies below 1 GHz. It uses the same radio circuit as the popular IM-Me.
-* [Proxmark](https://proxmark.com/) - RFID swiss-army tool, allowing for both high and low level interactions with the vast majority of RFID tags and systems world-wide.
+* [Proxmark3](https://github.com/RfidResearchGroup/proxmark3) - Open-source RFID research platform for low-level interaction, analysis, and testing across a wide range of LF and HF tags and systems.
 * [ChameleonUltra](https://github.com/RfidResearchGroup/ChameleonUltra) - Pocket friendly powerful LF and HF emulation & manipulation tool which is based on the open-source project ChameleonMini.
 * [Bruce](https://bruce.computer/) - Powerful open-source ESP32 firmware designed for offensive security and Red Team operations.
 
 ### Software Defined Radios
 * [HackRF One](https://greatscottgadgets.com/hackrf/) - Software Defined Radio peripheral capable of transmission or reception of radio signals from 1 MHz to 6 GHz.
-* [ADALM-PLUTO (PlutoSDR)](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html) - Active learning module (PlutoSDR) helps introduce electrical engineering students to the fundamentals of software-defined radio (SDR), radio frequency (RF), and wireless communications.
+* [ADALM-PLUTO (PlutoSDR)](https://wiki.analog.com/university/tools/pluto) - Active learning module (PlutoSDR) used to explore software-defined radio, RF experimentation, and wireless communications.
 * [RTL-SDR](https://www.rtl-sdr.com/) - Very cheap ~$30 USB dongle that can be used as a computer based radio scanner for receiving live radio signals in your area (no internet required).
 
 ### Software Defined Radio Software
