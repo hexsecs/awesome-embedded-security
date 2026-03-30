@@ -67,7 +67,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ### Secure Boot and Firmware Trust
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
-* [AVB (Android Verified Boot)](https://source.android.com/docs/security/features/verifiedboot) - Reference implementation and design guidance for chained trust and verified partitions in embedded Android systems.
+* [AVB (Android Verified Boot)](https://android.googlesource.com/platform/external/avb/+/master/README.md) - Reference implementation and design guidance for chained trust and verified partitions in embedded Android systems.
 * [U-Boot Verified Boot](https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html) - FIT-signature based verified boot support for embedded Linux boot chains.
 
 ### Firmware Supply Chain and SBOM
@@ -105,10 +105,9 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ### TEE/Trusted Execution Environments
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
-* [Trusty TEE](https://source.android.com/docs/security/features/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
+* [Trusty TEE](https://android.googlesource.com/trusty/) - Trusted Execution Environment used in Android for secure services and keystore.
 * [Intel SGX SDK](https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/overview.html) - Software Development Kit for Intel Software Guard Extensions providing hardware-based memory enclaves.
 * [AMD SEV](https://developer.amd.com/sev/) - Secure Encrypted Virtualization for encrypting VM memory with AMD-V hardware assistance.
-* [Riscure Hypervisor](https://www.riscure.com/hypervisor/) - Commercial hypervisor-based TEE for embedded systems with security evaluation tools.
 
 ### Root of Trust and TPM
 * [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
@@ -192,7 +191,6 @@ A curated Awesome-list for embedded security tools and knowledge.
 * Fault Injection and Side Channel Attacks
   * [synacktiv - Blog](https://www.synacktiv.com/en/publications/how-to-voltage-fault-injection) - A how-to on voltage fault injection.
   * [raelize.com - Blog](https://raelize.com/blog) - Great insight into hardware hacking such as fault injection and side-channel attacks.
-  * [riscure.com - Blog](https://www.riscure.com/blog/) - One of the OG companies working on fault injection.
 
 ## Open Source Intelligence (OSINT)
 * [Awesome OSINT](https://github.com/jivoi/awesome-osint)
