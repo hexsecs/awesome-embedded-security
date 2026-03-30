@@ -4,8 +4,7 @@
     "MD013": false
   },
   "globs": [
-    "contributing.md",
-    "docs/**/*.md"
+    "contributing.md"
   ],
   "ignores": [
     "node_modules/**",

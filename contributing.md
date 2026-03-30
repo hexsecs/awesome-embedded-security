@@ -22,7 +22,7 @@ npm run validate
 
 This currently does two things:
 
-- Lints `contributing.md` and `docs/**/*.md`.
+- Lints `contributing.md`.
 - Runs `awesome-lint` on `README.md`.
 
 GitHub Actions also checks markdown links in CI.
