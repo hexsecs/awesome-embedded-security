@@ -99,46 +99,42 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [FwAnalyzer (Firmware Analyzer)](https://github.com/cruise-automation/fwanalyzer) - Tool to analyze (ext2/3/4), FAT/VFat, SquashFS, UBIFS filesystem images, cpio archives, and directory content using a set of configurable rules.
 
 ### RTOS Security
-* [FreeRTOS Security](https://aws.amazon.com/freertos/security/) - Security features and documentation for FreeRTOS including MQTT over TLS, PKCS#11, and PSA Certified implementation.
+* [FreeRTOS Security](https://www.freertos.org/Security/01-Security-overview) - Security features and documentation for FreeRTOS including MQTT over TLS, PKCS#11, and PSA Certified implementation.
 * [Zephyr Project Security](https://docs.zephyrproject.org/latest/security/index.html) - Security documentation for the Zephyr RTOS including TF-M integration, verified boot, and security testing.
-* [RT-Thread Security](https://club.rt-thread.io/enterprise/rt-thread-security/) - Security resources and vulnerability reporting for RT-Thread IoT OS.
+* [RT-Thread Security](https://github.com/RT-Thread/rt-thread/security) - Security resources and vulnerability reporting for RT-Thread IoT OS.
 * [SafeRTOS](https://www.whatsafe.com/) - Safety-certified RTOS from Wittenstein with separation of safety-critical and non-safety components.
 
 ### TEE/Trusted Execution Environments
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
-* [Trusty TEE](https://source.android.com/docs/security/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
-* [Intel SGX SDK](https://software.intel.com/sgx) - Software Development Kit for Intel Software Guard Extensions providing hardware-based memory enclaves.
+* [Trusty TEE](https://source.android.com/docs/security/features/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
+* [Intel SGX SDK](https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/overview.html) - Software Development Kit for Intel Software Guard Extensions providing hardware-based memory enclaves.
 * [AMD SEV](https://developer.amd.com/sev/) - Secure Encrypted Virtualization for encrypting VM memory with AMD-V hardware assistance.
 * [Riscure Hypervisor](https://www.riscure.com/hypervisor/) - Commercial hypervisor-based TEE for embedded systems with security evaluation tools.
 
 ### Root of Trust and TPM
 * [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
-* [IBM Software TPM](https://github.com/ibm/software-tpm2) - Software TPM 2.0 emulator for testing and development.
-* [TPM 2.0 TS](https://github.com/Fraunhofer-AISEC/tpm2-tss) - TCG Software Stack for TPM 2.0 providing API for key management and attestation.
+* [IBM Software TPM](https://sourceforge.net/projects/ibmswtpm2/) - Software TPM 2.0 emulator for testing and development.
+* [TPM 2.0 TS](https://github.com/tpm2-software/tpm2-tss) - TCG Software Stack for TPM 2.0 providing API for key management and attestation.
 * [Keylime](https://keylime.dev/) - Open source TPM-based remote attestation for cloud and edge.
-* [fTPM](https://github.com/AMDESE/fTPM) - AMD Firmware TPM implementation for platform security.
+* [AMD fTPM Security Guidance](https://www.amd.com/en/resources/product-security/bulletin/amd-sb-4011.html) - AMD guidance and security bulletin coverage related to firmware TPM behavior on supported platforms.
 
 ### OTA Update Security
-* [SUIT](https://www.ietf.org/workgrp/mu/) - Software Update for the Internet of Things (SUIT) working group developing manifest-based firmware update architecture.
+* [SUIT](https://datatracker.ietf.org/wg/suit/about/) - Software Update for the Internet of Things (SUIT) working group developing manifest-based firmware update architecture.
 * [RAUC](https://rauc.io/) - Safe and secure firmware update framework for embedded Linux with bundle signing and A/B partitioning.
 * [Mender](https://mender.io/) - Over-the-air software updater for Linux IoT devices with atomic updates and rollback.
 * [SWUpdate](https://sbabic.github.io/swupdate/) - Linux firmware update agent with image verification and incremental updates.
-* [OTA Secure Boot](https://github.com/AT30n/ota-secure-boot) - Framework for secure OTA updates with signed firmware validation.
 
 ### IoT Protocol Security
 * [TLS for MQTT](https://mqtt.org/faq/) - Overview of TLS implementation for MQTT brokers and clients.
 * [wolfMQTT](https://www.wolfssl.com/products/wolfmqtt/) - MQTT client library with TLS support optimized for embedded systems.
 * [CoAP Security](https://datatracker.ietf.org/doc/html/rfc7252) - Constrained Application Protocol (CoAP) security with DTLS.
 * [libcoap](https://libcoap.net/) - C implementation of CoAP with DTLS support for secure IoT communication.
-* [Wireshark MQTT](https://www.wireshark.org/docs/man-pages/mqtt.html) - Protocol analyzer support for MQTT traffic inspection and security analysis.
-* [Smart-Thief](https://github.com/zateeman/smat-thief) - Tool for attacking smart home devices by intercepting and analyzing MQTT traffic.
+* [Wireshark MQTT](https://www.wireshark.org/docs/dfref/m/mqtt.html) - Protocol analyzer support for MQTT traffic inspection and security analysis.
 
 ### Firmware Malware Analysis
-* [Firmware Security Testing](https://github.com/OWASP/Internet-of-Things-Project) - OWASP IoT project with firmware security testing methodologies.
-* [binbloom](https://github.com/threat9/binbloom) - Firmware analysis tool for locating and extracting raw data, strings, and potential malware signatures.
-* [Firmware Analysis Toolkit](https://github.com/ATECHI/FAT) - Automated tool for firmware emulation and vulnerability discovery.
+* [Firmware Security Testing](https://github.com/scriptingxss/owasp-fstm) - OWASP firmware security testing methodology and practical guidance for assessing embedded devices.
+* [Firmware Analysis Toolkit](https://github.com/attify/firmware-analysis-toolkit) - Automated tool for firmware emulation and vulnerability discovery.
 * [emba](https://github.com/e-m-b-a/emba) - Efficient malware analysis framework for embedded firmware with scanning and reporting.
-* [Firmware Slap](https://github.com/youyouu/FirmwareSlap) - Firmware analysis tool using dynamic and static analysis to detect vulnerabilities.
 
 ### Emulation Tools
 * [FirmAE](https://github.com/pr0v3rbs/FirmAE) - An automated framework for emulation and vulnerability analysis of IoT firmware with an 79% success rate using arbitration techniques.
@@ -150,11 +146,10 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ### Hardware Reverse Engineering Multitools
 * [Tiguard](https://github.com/tigard-tools/tigard) - An FTDI FT2232H-based multi-protocol tool for hardware hacking.
-* [Bus Pirate](https://github.com/BusPirate/Bus_Pirate) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
+* [Bus Pirate](https://github.com/ElderlyPirate/Bus_Pirate) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
 
 ### Hardware Debug Interfaces
 * [JTAGenum](https://github.com/cyphunk/JTAGenum) - Enumerates JTAG pinouts on unknown boards by brute-force testing candidate pin mappings.
-* [SWDEnabler](https://github.com/pellepl/swdenabler) - Utility for re-enabling/debugging locked SWD interfaces on supported STM32 targets.
 * [UrJTAG](https://urjtag.sourceforge.io/) - Open-source JTAG toolkit for boundary scan, flash programming, and low-level target interaction.
 
 ### Chip-Off and Memory Forensics
@@ -171,7 +166,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Sigrok](https://sigrok.org/) - Portable, cross-platform, Free/Libre/Open-Source signal analysis software suite that supports various device types (e.g. logic analyzers, oscilloscopes, and many more).
 
 ### RF Tools (Non-SDR)
-* [Flipper Zero](https://flipperzero.one/) - Portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more.
+* [Flipper Zero](https://flipper.net/) - Portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more.
 * [Awesome Flipper Zero](https://github.com/RogueMaster/awesome-flipperzero-withModules) - A collection of Awesome resources for the Flipper Zero device.
 * [Yard Stick One](https://greatscottgadgets.com/yardstickone/) - Transmit or receive digital wireless signals at frequencies below 1 GHz. It uses the same radio circuit as the popular IM-Me.
 * [Proxmark](https://proxmark.com/) - RFID swiss-army tool, allowing for both high and low level interactions with the vast majority of RFID tags and systems world-wide.
@@ -193,8 +188,8 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ## Further Learning and Training
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - Beginners resource on embedded systems security.
-* [SecuringHardware.com](https://learn.securinghardware.com/) - Training by the legendary Joe Fitz [@securlyfitz](https://twitter.com/securelyfitz).
-* [GrandIdeaStudio.com](http://www.grandideastudio.com/hardware-hacking-training/) - Hardware hacking training with Joe Grand (aka Kingpin).
+* [SecuringHardware.com](https://learn.securinghardware.com/) - Training by the legendary Joe Fitz [@securlyfitz](https://x.com/securelyfitz).
+* [GrandIdeaStudio.com](https://grandideastudio.com/training/) - Hardware hacking training with Joe Grand (aka Kingpin).
 * Fault Injection and Side Channel Attacks
   * [synacktiv - Blog](https://www.synacktiv.com/en/publications/how-to-voltage-fault-injection) - A how-to on voltage fault injection.
   * [raelize.com - Blog](https://raelize.com/blog) - Great insight into hardware hacking such as fault injection and side-channel attacks.
