@@ -16,6 +16,12 @@ A curated Awesome-list for embedded security tools and knowledge.
   * Firmware Supply Chain and SBOM
   * Language Specific Decompilers
   * Security Auditing Frameworks
+  * RTOS Security
+  * TEE/Trusted Execution Environments
+  * Root of Trust and TPM
+  * OTA Update Security
+  * IoT Protocol Security
+  * Firmware Malware Analysis
 * Hardware Tools
   * Hardware Reverse Engineering Multitools
   * Hardware Debug Interfaces
@@ -70,6 +76,12 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Syft](https://github.com/anchore/syft) - SBOM generator for filesystems and artifacts, useful for firmware package/component inventories.
 * [Grype](https://github.com/anchore/grype) - Vulnerability scanner that consumes SBOMs to identify known CVEs in firmware dependencies.
 
+### Fuzzing Tools
+* [AFL++](https://github.com/AFLplusplus/AFLplusplus) - A coverage-guided fuzzer with enhanced mutations, QEMU and Unicorn emulation modes, and custom power schedules.
+* [honggfuzz](https://github.com/google/honggfuzz) - A feedback-driven evolutionary fuzzer supporting hardware-based coverage (Intel BTS/PT) and persistent mode for extreme speed.
+* [Fuzzowski](https://github.com/nccgroup/fuzzowski) - A network protocol fuzzer based on the Sulley/BooFuzz framework with support for TCP/UDP/SSL protocols.
+* [Peach](https://gitlab.com/peachtech/peach-fuzzer-community) - A smart fuzzer supporting both generation-based and mutation-based fuzzing via Peach Pit definitions.
+* [libFuzzer](https://llvm.org/docs/LibFuzzer.html) - In-process, coverage-guided, evolutionary fuzzing engine integrated with LLVM.
 
 ### Language Specific Decompilers
 * .NET
@@ -86,11 +98,47 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Firmware Analysis and Comparison Tool (FACT)](https://fkie-cad.github.io/FACT_core/) - Automated Firmware Security analysis (Router, IoT, UEFI, Webcams, Drones, …). It is easy to use (web UI), extend (plug-in system) and integrate (REST API).
 * [FwAnalyzer (Firmware Analyzer)](https://github.com/cruise-automation/fwanalyzer) - Tool to analyze (ext2/3/4), FAT/VFat, SquashFS, UBIFS filesystem images, cpio archives, and directory content using a set of configurable rules.
 
-### Fuzzing Tools
-* [AFL++](https://github.com/AFLplusplus/AFLplusplus) - A coverage-guided fuzzer with enhanced mutations, QEMU and Unicorn emulation modes, and custom power schedules.
-* [honggfuzz](https://github.com/google/honggfuzz) - A feedback-driven evolutionary fuzzer supporting hardware-based coverage (Intel BTS/PT) and persistent mode for extreme speed.
-* [Fuzzowski](https://github.com/nccgroup/fuzzowski) - A network protocol fuzzer based on the Sulley/BooFuzz framework with support for TCP/UDP/SSL protocols.
-* [Peach](https://gitlab.com/peachtech/peach-fuzzer-community) - A smart fuzzer supporting both generation-based and mutation-based fuzzing via Peach Pit definitions.
+### RTOS Security
+* [FreeRTOS Security](https://aws.amazon.com/freertos/security/) - Security features and documentation for FreeRTOS including MQTT over TLS, PKCS#11, and PSA Certified implementation.
+* [Zephyr Project Security](https://docs.zephyrproject.org/latest/security/index.html) - Security documentation for the Zephyr RTOS including TF-M integration, verified boot, and security testing.
+* [RT-Thread Security](https://club.rt-thread.io/enterprise/rt-thread-security/) - Security resources and vulnerability reporting for RT-Thread IoT OS.
+* [SafeRTOS](https://www.whatsafe.com/) - Safety-certified RTOS from Wittenstein with separation of safety-critical and non-safety components.
+
+### TEE/Trusted Execution Environments
+* [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
+* [Trusty TEE](https://source.android.com/docs/security/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
+* [Intel SGX SDK](https://software.intel.com/sgx) - Software Development Kit for Intel Software Guard Extensions providing hardware-based memory enclaves.
+* [AMD SEV](https://developer.amd.com/sev/) - Secure Encrypted Virtualization for encrypting VM memory with AMD-V hardware assistance.
+* [Riscure Hypervisor](https://www.riscure.com/hypervisor/) - Commercial hypervisor-based TEE for embedded systems with security evaluation tools.
+
+### Root of Trust and TPM
+* [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
+* [IBM Software TPM](https://github.com/ibm/software-tpm2) - Software TPM 2.0 emulator for testing and development.
+* [TPM 2.0 TS](https://github.com/Fraunhofer-AISEC/tpm2-tss) - TCG Software Stack for TPM 2.0 providing API for key management and attestation.
+* [Keylime](https://keylime.dev/) - Open source TPM-based remote attestation for cloud and edge.
+* [fTPM](https://github.com/AMDESE/fTPM) - AMD Firmware TPM implementation for platform security.
+
+### OTA Update Security
+* [SUIT](https://www.ietf.org/workgrp/mu/) - Software Update for the Internet of Things (SUIT) working group developing manifest-based firmware update architecture.
+* [RAUC](https://rauc.io/) - Safe and secure firmware update framework for embedded Linux with bundle signing and A/B partitioning.
+* [Mender](https://mender.io/) - Over-the-air software updater for Linux IoT devices with atomic updates and rollback.
+* [SWUpdate](https://sbabic.github.io/swupdate/) - Linux firmware update agent with image verification and incremental updates.
+* [OTA Secure Boot](https://github.com/AT30n/ota-secure-boot) - Framework for secure OTA updates with signed firmware validation.
+
+### IoT Protocol Security
+* [TLS for MQTT](https://mqtt.org/faq/) - Overview of TLS implementation for MQTT brokers and clients.
+* [wolfMQTT](https://www.wolfssl.com/products/wolfmqtt/) - MQTT client library with TLS support optimized for embedded systems.
+* [CoAP Security](https://datatracker.ietf.org/doc/html/rfc7252) - Constrained Application Protocol (CoAP) security with DTLS.
+* [libcoap](https://libcoap.net/) - C implementation of CoAP with DTLS support for secure IoT communication.
+* [Wireshark MQTT](https://www.wireshark.org/docs/man-pages/mqtt.html) - Protocol analyzer support for MQTT traffic inspection and security analysis.
+* [Smart-Thief](https://github.com/zateeman/smat-thief) - Tool for attacking smart home devices by intercepting and analyzing MQTT traffic.
+
+### Firmware Malware Analysis
+* [Firmware Security Testing](https://github.com/OWASP/Internet-of-Things-Project) - OWASP IoT project with firmware security testing methodologies.
+* [binbloom](https://github.com/threat9/binbloom) - Firmware analysis tool for locating and extracting raw data, strings, and potential malware signatures.
+* [Firmware Analysis Toolkit](https://github.com/ATECHI/FAT) - Automated tool for firmware emulation and vulnerability discovery.
+* [emba](https://github.com/e-m-b-a/emba) - Efficient malware analysis framework for embedded firmware with scanning and reporting.
+* [Firmware Slap](https://github.com/youyouu/FirmwareSlap) - Firmware analysis tool using dynamic and static analysis to detect vulnerabilities.
 
 ### Emulation Tools
 * [FirmAE](https://github.com/pr0v3rbs/FirmAE) - An automated framework for emulation and vulnerability analysis of IoT firmware with an 79% success rate using arbitration techniques.
