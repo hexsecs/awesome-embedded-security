@@ -59,7 +59,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [BARF](https://github.com/programa-stic/barf-project) - A binary analysis and reverse engineering framework with support for ROP gadget search and CFG recovery.
 
 ### Debugging Tools
-* [Open OCD](https://openocd.org/) - Provides on-chip programming and debugging support with a layered architecture of JTAG interface and TAP support.
+* [Open OCD](https://github.com/openocd-org/openocd/) - Provides on-chip programming and debugging support with a layered architecture of JTAG interface and TAP support.
 * [GDB](https://www.sourceware.org/gdb/) - The GNU Project debugger, allows you to see what is going on `inside' another program while it executes -- or what another program was doing at the moment it crashed.
 * [GEF](https://hugsy.github.io/gef/) - Kick-ass set of commands for X86, ARM, MIPS, PowerPC and SPARC to make GDB cool again for exploit dev. It is aimed to be used mostly by exploit developers and reverse-engineers, to provide additional features to GDB using the Python API to assist during the process of dynamic analysis and exploit development.
 * [Black Magic Probe](https://codeberg.org/blackmagic-debug/blackmagic) - An open-source JTAG/SWD debugger with embedded GDB server and automatic target detection.
@@ -102,7 +102,6 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [FreeRTOS Security](https://www.freertos.org/Security/01-Security-overview) - Security features and documentation for FreeRTOS including MQTT over TLS, PKCS#11, and PSA Certified implementation.
 * [Zephyr Project Security](https://docs.zephyrproject.org/latest/security/index.html) - Security documentation for the Zephyr RTOS including TF-M integration, verified boot, and security testing.
 * [RT-Thread Security](https://github.com/RT-Thread/rt-thread/security) - Security resources and vulnerability reporting for RT-Thread IoT OS.
-* [SafeRTOS](https://www.whatsafe.com/) - Safety-certified RTOS from Wittenstein with separation of safety-critical and non-safety components.
 
 ### TEE/Trusted Execution Environments
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
