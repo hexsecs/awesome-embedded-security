@@ -10,6 +10,6 @@
   },
   "devDependencies": {
     "awesome-lint": "2.3.0",
-    "markdownlint-cli2": "0.22.0"
+    "markdownlint-cli2": "0.22.1"
   }
 }
