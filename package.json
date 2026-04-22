@@ -9,7 +9,7 @@
     "validate": "npm run lint:markdown && npm run lint:awesome"
   },
   "devDependencies": {
-    "awesome-lint": "2.2.3",
+    "awesome-lint": "2.3.0",
     "markdownlint-cli2": "0.22.0"
   }
 }
