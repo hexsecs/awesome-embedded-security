@@ -21,6 +21,7 @@ A curated Awesome-list for embedded security tools and knowledge.
   * Root of Trust and TPM
   * OTA Update Security
   * IoT Protocol Security
+  * Bluetooth and BLE Security
   * Firmware Malware Analysis
 * Hardware Tools
   * Hardware Reverse Engineering Multitools
@@ -43,6 +44,9 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Kaitai Struct](https://kaitai.io/) - Declarative language used to describe various binary data structures, laid out in files or in memory: i.e. binary file formats, network stream packet formats, etc.
 * [Binwalk](https://github.com/ReFirmLabs/binwalk) - Fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 * [OFRAK](https://github.com/redballoonsecurity/ofrak) - Binary analysis and modification platform that combines the ability to unpack, analyze, modify, and repack binaries.
+* [LIEF](https://github.com/lief-project/LIEF) - Library to Instrument Executable Formats: parse, modify, and abstract ELF, PE, Mach-O, DEX, and OAT binaries found in firmware images.
+* [checksec](https://github.com/slimm609/checksec.sh) - Shell script to check binary security hardening flags (NX, PIE, RELRO, stack canary, ASLR) on ELF executables extracted from firmware.
+* [firmwalker](https://github.com/craigz28/firmwalker) - Searches extracted firmware filesystems for interesting files, credentials, configuration, and known-vulnerable components.
 
 ### Disassemblers/Decompilers
 * [IDA Pro](https://hex-rays.com/ida-pro/) - Disassembler capable of creating maps of their execution to show the binary instructions that are actually executed by the processor in a symbolic representation (assembly language). Advanced techniques have been implemented into IDA Pro so that it can generate assembly language source code from machine-executable code and make this complex code more human-readable.
@@ -57,6 +61,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Capstone](https://github.com/capstone-engine/capstone) - Lightweight multi-platform, multi-architecture disassembly framework. Their target is to make Capstone the ultimate disassembly engine for binary analysis and reversing in the security community.
 * [Keystone](https://github.com/keystone-engine/keystone) - A lightweight multi-architecture assembler framework that complements Capstone.
 * [BARF](https://github.com/programa-stic/barf-project) - A binary analysis and reverse engineering framework with support for ROP gadget search and CFG recovery.
+* [RetDec](https://github.com/avast/retdec) - Retargetable machine-code decompiler from Avast supporting ARM, MIPS, x86, and other architectures common in embedded firmware.
 
 ### Debugging Tools
 * [Open OCD](https://github.com/openocd-org/openocd/) - Provides on-chip programming and debugging support with a layered architecture of JTAG interface and TAP support.
@@ -64,6 +69,8 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [GEF](https://hugsy.github.io/gef/) - Kick-ass set of commands for X86, ARM, MIPS, PowerPC and SPARC to make GDB cool again for exploit dev. It is aimed to be used mostly by exploit developers and reverse-engineers, to provide additional features to GDB using the Python API to assist during the process of dynamic analysis and exploit development.
 * [Black Magic Probe](https://codeberg.org/blackmagic-debug/blackmagic) - An open-source JTAG/SWD debugger with embedded GDB server and automatic target detection.
 * [pyOCD](https://pyocd.io) - An open-source Python library for programming and debugging Arm Cortex-M microcontrollers with cross-platform debug probe support.
+* [probe-rs](https://probe.rs/) - Modern Rust-based embedded debug toolkit supporting SWD/JTAG with built-in flashing, RTT logging, and GDB server for ARM and RISC-V targets.
+* [Frida](https://frida.re/) - Dynamic instrumentation toolkit for injecting JavaScript or native code into running processes on embedded Linux, Android, iOS, and bare-metal targets.
 
 ### Secure Boot and Firmware Trust
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
@@ -82,6 +89,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Fuzzowski](https://github.com/nccgroup/fuzzowski) - A network protocol fuzzer based on the Sulley/BooFuzz framework with support for TCP/UDP/SSL protocols.
 * [Peach](https://gitlab.com/peachtech/peach-fuzzer-community) - A smart fuzzer supporting both generation-based and mutation-based fuzzing via Peach Pit definitions.
 * [libFuzzer](https://llvm.org/docs/LibFuzzer.html) - In-process, coverage-guided, evolutionary fuzzing engine integrated with LLVM.
+* [boofuzz](https://github.com/jtpereyda/boofuzz) - Actively maintained network protocol fuzzer and the spiritual successor to Sulley, with session management, target monitoring, and protocol graph support.
 
 ### Language Specific Decompilers
 * .NET
@@ -129,6 +137,12 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [libcoap](https://libcoap.net/) - C implementation of CoAP with DTLS support for secure IoT communication.
 * [Wireshark MQTT](https://www.wireshark.org/docs/dfref/m/mqtt.html) - Protocol analyzer support for MQTT traffic inspection and security analysis.
 
+### Bluetooth and BLE Security
+* [nRF Sniffer for Bluetooth LE](https://www.nordicsemi.com/Products/Development-tools/nRF-Sniffer-for-Bluetooth-LE) - Nordic Semiconductor's BLE packet sniffer for capturing and analyzing Bluetooth Low Energy traffic with Wireshark integration.
+* [GATTacker](https://github.com/securing/gattacker) - BLE MITM tool for intercepting and relaying GATT profiles to test BLE device authentication and data integrity.
+* [BtleJuice](https://github.com/DigitalSecurity/btlejuice) - Bluetooth Low Energy MITM proxy framework for real-time interception and manipulation of BLE communications.
+* [Bettercap BLE](https://www.bettercap.org/modules/ble/) - BLE scanning, enumeration, and characteristic read/write module integrated into the bettercap Swiss-army knife framework.
+
 ### Firmware Malware Analysis
 * [Firmware Security Testing](https://github.com/scriptingxss/owasp-fstm) - OWASP firmware security testing methodology and practical guidance for assessing embedded devices.
 * [Firmware Analysis Toolkit](https://github.com/attify/firmware-analysis-toolkit) - Automated tool for firmware emulation and vulnerability discovery.
@@ -139,6 +153,8 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Qiling](https://github.com/qilingframework/qiling) - An advanced binary emulation framework supporting cross-platform OS-level emulation for Windows, Linux, Android, BSD, UEFI, and multiple architectures.
 * [Unicorn Engine](https://github.com/unicorn-engine/unicorn) - A lightweight multi-architecture CPU emulator framework providing pure CPU emulation for ARM, MIPS, x86, RISC-V, and more.
 * [PANDA](https://github.com/panda-re/panda) - Platform for Architecture-Neutral Dynamic Analysis with record/replay functionality and LLVM IR translation for whole-system analysis.
+* [Renode](https://renode.io/) - Open-source hardware simulation framework from Antmicro for functional testing and security analysis of embedded firmware without physical hardware.
+* [Avatar2](https://github.com/avatartwo/avatar2) - Dynamic analysis orchestration framework for binary firmware that coordinates execution across emulators (QEMU, Unicorn) and real hardware targets.
 
 ## Hardware Tools
 
