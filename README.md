@@ -47,6 +47,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [LIEF](https://github.com/lief-project/LIEF) - Library to Instrument Executable Formats: parse, modify, and abstract ELF, PE, Mach-O, DEX, and OAT binaries found in firmware images.
 * [checksec](https://github.com/slimm609/checksec.sh) - Shell script to check binary security hardening flags (NX, PIE, RELRO, stack canary, ASLR) on ELF executables extracted from firmware.
 * [firmwalker](https://github.com/craigz28/firmwalker) - Searches extracted firmware filesystems for interesting files, credentials, configuration, and known-vulnerable components.
+* [SCOUT](https://github.com/R00T-Kim/SCOUT) - Deterministic firmware analysis pipeline emitting SARIF 2.1, CycloneDX 1.6 + VEX SBOM, and hash-anchored evidence chains; auto-detects Ghidra and runs P-code SSA dataflow taint with 4-tier confidence caps. Pure stdlib (no pip dependencies).
 
 ### Disassemblers/Decompilers
 * [IDA Pro](https://hex-rays.com/ida-pro/) - Disassembler capable of creating maps of their execution to show the binary instructions that are actually executed by the processor in a symbolic representation (assembly language). Advanced techniques have been implemented into IDA Pro so that it can generate assembly language source code from machine-executable code and make this complex code more human-readable.
@@ -82,6 +83,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Sigstore Cosign](https://github.com/sigstore/cosign) - Tooling for keyless signing and verification of firmware/container artifacts in CI/CD pipelines.
 * [Syft](https://github.com/anchore/syft) - SBOM generator for filesystems and artifacts, useful for firmware package/component inventories.
 * [Grype](https://github.com/anchore/grype) - Vulnerability scanner that consumes SBOMs to identify known CVEs in firmware dependencies.
+* [SCOUT](https://github.com/R00T-Kim/SCOUT) - Firmware-to-SBOM pipeline producing CycloneDX 1.6 + VEX with SLSA Level 2 in-toto attestations and per-finding hash-anchored evidence chains.
 
 ### Fuzzing Tools
 * [AFL++](https://github.com/AFLplusplus/AFLplusplus) - A coverage-guided fuzzer with enhanced mutations, QEMU and Unicorn emulation modes, and custom power schedules.
