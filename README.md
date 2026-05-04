@@ -83,7 +83,6 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Sigstore Cosign](https://github.com/sigstore/cosign) - Tooling for keyless signing and verification of firmware/container artifacts in CI/CD pipelines.
 * [Syft](https://github.com/anchore/syft) - SBOM generator for filesystems and artifacts, useful for firmware package/component inventories.
 * [Grype](https://github.com/anchore/grype) - Vulnerability scanner that consumes SBOMs to identify known CVEs in firmware dependencies.
-* [SCOUT](https://github.com/R00T-Kim/SCOUT) - Firmware-to-SBOM pipeline producing CycloneDX 1.6 + VEX with SLSA Level 2 in-toto attestations and per-finding hash-anchored evidence chains.
 
 ### Fuzzing Tools
 * [AFL++](https://github.com/AFLplusplus/AFLplusplus) - A coverage-guided fuzzer with enhanced mutations, QEMU and Unicorn emulation modes, and custom power schedules.
