@@ -6,42 +6,42 @@ A curated Awesome-list for embedded security tools and knowledge.
 
 ## Table of Contents
 
-* [Software Tools](#software-tools)
-  * [Binary Parsing and Analysis Tools](#binary-parsing-and-analysis-tools)
-  * [Disassemblers/Decompilers](#disassemblersdecompilers)
-  * [Fuzzing Tools](#fuzzing-tools)
-  * [MCU Firmware Fuzzing](#mcu-firmware-fuzzing)
-  * [Emulation Tools](#emulation-tools)
-  * [Debugging Tools](#debugging-tools)
-  * [Secure Boot and Firmware Trust](#secure-boot-and-firmware-trust)
-  * [Firmware Supply Chain and SBOM](#firmware-supply-chain-and-sbom)
-  * [Language Specific Decompilers](#language-specific-decompilers)
-  * [Security Auditing Frameworks](#security-auditing-frameworks)
-  * [Firmware Taint Analysis](#firmware-taint-analysis)
-  * [RTOS Security](#rtos-security)
-  * [TEE/Trusted Execution Environments](#teetrusted-execution-environments)
-  * [Root of Trust and TPM](#root-of-trust-and-tpm)
-  * [OTA Update Security](#ota-update-security)
-  * [IoT Protocol Security](#iot-protocol-security)
-  * [Bluetooth and BLE Security](#bluetooth-and-ble-security)
-  * [Zigbee / Z-Wave Security](#zigbee--z-wave-security)
-  * [Baseband Security](#baseband-security)
-  * [Firmware Malware Analysis](#firmware-malware-analysis)
-* [Hardware Tools](#hardware-tools)
-  * [Hardware Reverse Engineering Multitools](#hardware-reverse-engineering-multitools)
-  * [Hardware Debug Interfaces](#hardware-debug-interfaces)
-  * [Chip-Off and Memory Forensics](#chip-off-and-memory-forensics)
-  * [Side-Channel Analysis](#side-channel-analysis)
-  * [Fault Injection](#fault-injection)
-  * [Logic Analyzer](#logic-analyzer)
-  * [RF Tools (Non-SDR)](#rf-tools-non-sdr)
-  * [Software Defined Radios](#software-defined-radios)
-  * [Software Defined Radio Software](#software-defined-radio-software)
-  * [Wifi Tools](#wifi-tools)
-* [Further Learning and Training](#further-learning-and-training)
-* [Open Source Intelligence (OSINT)](#open-source-intelligence-osint)
-* [Other Awesome Lists](#other-awesome-lists)
-* [Contribute](#contribute)
+* Software Tools
+  * Binary Parsing and Analysis Tools
+  * Disassemblers/Decompilers
+  * Fuzzing Tools
+  * MCU Firmware Fuzzing
+  * Emulation Tools
+  * Debugging Tools
+  * Secure Boot and Firmware Trust
+  * Firmware Supply Chain and SBOM
+  * Language Specific Decompilers
+  * Security Auditing Frameworks
+  * Firmware Taint Analysis
+  * RTOS Security
+  * TEE/Trusted Execution Environments
+  * Root of Trust and TPM
+  * OTA Update Security
+  * IoT Protocol Security
+  * Bluetooth and BLE Security
+  * Zigbee / Z-Wave Security
+  * Baseband Security
+  * Firmware Malware Analysis
+* Hardware Tools
+  * Hardware Reverse Engineering Multitools
+  * Hardware Debug Interfaces
+  * Chip-Off and Memory Forensics
+  * Side-Channel Analysis
+  * Fault Injection
+  * Logic Analyzer
+  * RF Tools (Non-SDR)
+  * Software Defined Radios
+  * Software Defined Radio Software
+  * Wifi Tools
+* Further Learning and Training
+* Open Source Intelligence (OSINT)
+* Other Awesome Lists
+* Contribute
 
 ## Software Tools
 
