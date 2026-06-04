@@ -125,8 +125,6 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [KARONTE](https://github.com/ucsb-seclab/karonte) - Static analysis tool that tracks untrusted input flows across binary boundaries (shared files, sockets, env vars) in embedded Linux firmware using angr-based inter-binary taint propagation. IEEE S&P 2020.
 * [SaTC](https://github.com/NSSL-SJTU/SaTC) - Anchors taint analysis to string literals shared between web front-end and back-end binaries to pinpoint user-controlled input entry points; found 33 unknown bugs in commercial firmware. USENIX Security 2021.
 * [EmTaint](https://github.com/kuc001/EmTaint) - Structured symbolic expression-based taint analysis with on-demand alias resolution for embedded Linux firmware; found 151 0-day vulnerabilities across 35 real-world images. ISSTA 2023.
-* [FirmSolo](https://github.com/BUseclab/FirmSolo) - Reverse-engineers vendor Linux kernel module version magic to load proprietary `.ko` drivers into a compatible kernel for dynamic analysis and fuzzing, unlocking code previously inaccessible to emulators. USENIX Security 2023.
-* [EMBArk](https://github.com/e-m-b-a/embark) - Enterprise web interface for EMBA providing multi-user scan management, aggregated vulnerability dashboards, and CI/CD integration for continuous firmware security monitoring.
 
 ### RTOS Security
 * [FreeRTOS Security](https://www.freertos.org/Security/01-Security-overview) - Security features and documentation for FreeRTOS including MQTT over TLS, PKCS#11, and PSA Certified implementation.
@@ -185,6 +183,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Firmware Security Testing](https://github.com/scriptingxss/owasp-fstm) - OWASP firmware security testing methodology and practical guidance for assessing embedded devices.
 * [Firmware Analysis Toolkit](https://github.com/attify/firmware-analysis-toolkit) - Automated tool for firmware emulation and vulnerability discovery.
 * [emba](https://github.com/e-m-b-a/emba) - Efficient malware analysis framework for embedded firmware with scanning and reporting.
+* [EMBArk](https://github.com/e-m-b-a/embark) - Enterprise web interface for EMBA providing multi-user scan management, aggregated vulnerability dashboards, and CI/CD integration for continuous firmware security monitoring.
 
 ### Emulation Tools
 * [FirmAE](https://github.com/pr0v3rbs/FirmAE) - An automated framework for emulation and vulnerability analysis of IoT firmware with an 79% success rate using arbitration techniques.
@@ -195,6 +194,7 @@ A curated Awesome-list for embedded security tools and knowledge.
 * [Avatar2](https://github.com/avatartwo/avatar2) - Dynamic analysis orchestration framework for binary firmware that coordinates execution across emulators (QEMU, Unicorn) and real hardware targets.
 * [Firmadyne](https://github.com/firmadyne/firmadyne) - Automated system for emulating and analyzing Linux-based embedded firmware; extracts and boots firmware images in QEMU to enable dynamic vulnerability discovery.
 * [HALucinator](https://github.com/embedded-sec/halucinator) - MCU firmware emulation framework that replaces Hardware Abstraction Layer (HAL) functions with high-level models, enabling full firmware execution without physical hardware.
+* [FirmSolo](https://github.com/BUseclab/FirmSolo) - Reverse-engineers vendor Linux kernel module version magic to load proprietary `.ko` drivers into a compatible kernel for dynamic analysis and fuzzing, unlocking code previously inaccessible to emulators. USENIX Security 2023.
 
 ### MCU Firmware Fuzzing
 * [Fuzzware](https://github.com/fuzzware-fuzzer/fuzzware) - Automatically models MMIO peripheral inputs via symbolic execution to enable coverage-guided fuzzing of ARM Cortex-M firmware with no hardware required. Achieves up to 3.25× coverage over prior approaches. USENIX Security 2022.
