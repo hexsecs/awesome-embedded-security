@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Validates README.md list entries: catches duplicate links and malformed
-// bullet syntax that markdownlint/awesome-lint don't check for.
+// Validates README.md: catches duplicate links, malformed list-item
+// syntax, and a Table of Contents that's out of sync with the actual
+// ## / ### headings — none of which markdownlint/awesome-lint check.
 
 'use strict';
 
@@ -67,10 +68,88 @@ lines.forEach((line, idx) => {
   }
 });
 
+// --- Table of Contents <-> heading sync check -------------------------
+// The ToC is plain text (not anchor links), so this can't be a link
+// checker; instead verify the set of ToC entries matches the set of
+// actual ## / ### headings, including their ## -> ### grouping. Order
+// is intentionally not enforced (the ToC and document order are already
+// allowed to diverge), only presence/absence.
+
+const tocStart = lines.findIndex((l) => l.trim() === '## Table of Contents');
+if (tocStart === -1) {
+  errors.push('README.md: could not find "## Table of Contents" heading.');
+} else {
+  const tocEnd = lines.findIndex(
+    (l, i) => i > tocStart && /^##\s+/.test(l)
+  );
+  const tocLines = lines.slice(tocStart + 1, tocEnd === -1 ? lines.length : tocEnd);
+
+  const tocSections = new Map(); // top-level name -> Set of nested names
+  let currentTop = null;
+  for (const line of tocLines) {
+    const topMatch = line.match(/^\*\s+(.+?)\s*$/);
+    const nestedMatch = line.match(/^\s{2,}\*\s+(.+?)\s*$/);
+    if (nestedMatch) {
+      if (currentTop) tocSections.get(currentTop).add(nestedMatch[1]);
+    } else if (topMatch) {
+      currentTop = topMatch[1];
+      tocSections.set(currentTop, new Set());
+    }
+  }
+
+  // Group actual ## / ### headings the same way, skipping the ToC heading.
+  const docSections = new Map();
+  let currentDocTop = null;
+  for (const line of lines) {
+    const h2Match = line.match(/^##\s+(.+?)\s*$/);
+    const h3Match = line.match(/^###\s+(.+?)\s*$/);
+    if (h2Match) {
+      if (h2Match[1] === 'Table of Contents') {
+        currentDocTop = null;
+        continue;
+      }
+      currentDocTop = h2Match[1];
+      docSections.set(currentDocTop, new Set());
+    } else if (h3Match && currentDocTop) {
+      docSections.get(currentDocTop).add(h3Match[1]);
+    }
+  }
+
+  const tocTops = new Set(tocSections.keys());
+  const docTops = new Set(docSections.keys());
+
+  for (const name of tocTops) {
+    if (!docTops.has(name)) {
+      errors.push(`README.md: ToC lists "${name}" but no matching "## ${name}" heading exists.`);
+    }
+  }
+  for (const name of docTops) {
+    if (!tocTops.has(name)) {
+      errors.push(`README.md: "## ${name}" heading exists but is missing from the ToC.`);
+    }
+  }
+
+  for (const name of tocTops) {
+    if (!docTops.has(name)) continue;
+    const tocNested = tocSections.get(name);
+    const docNested = docSections.get(name);
+    for (const sub of tocNested) {
+      if (!docNested.has(sub)) {
+        errors.push(`README.md: ToC lists "${sub}" under "${name}" but no matching "### ${sub}" heading exists.`);
+      }
+    }
+    for (const sub of docNested) {
+      if (!tocNested.has(sub)) {
+        errors.push(`README.md: "### ${sub}" heading under "${name}" is missing from the ToC.`);
+      }
+    }
+  }
+}
+
 if (errors.length > 0) {
   console.error(`Found ${errors.length} issue(s) in README.md:\n`);
   for (const err of errors) console.error(`  - ${err}`);
   process.exit(1);
 }
 
-console.log(`README.md check passed: ${seenUrls.size} unique entries, no duplicates or malformed links.`);
+console.log(`README.md check passed: ${seenUrls.size} unique entries, ToC matches headings, no duplicates or malformed links.`);

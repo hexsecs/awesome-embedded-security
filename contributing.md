@@ -24,7 +24,8 @@ This currently does three things:
 
 - Lints `contributing.md`.
 - Runs `awesome-lint` on `README.md`.
-- Checks `README.md` for duplicate links and malformed entries.
+- Checks `README.md` for duplicate links, malformed entries, and a Table
+  of Contents that's out of sync with the actual headings.
 
 GitHub Actions also checks markdown links in CI.
 
