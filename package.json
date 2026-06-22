@@ -6,7 +6,8 @@
   "scripts": {
     "lint:awesome": "awesome-lint README.md",
     "lint:markdown": "markdownlint-cli2",
-    "validate": "npm run lint:markdown && npm run lint:awesome"
+    "check:readme": "node scripts/check-readme.js",
+    "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {
     "awesome-lint": "2.3.0",

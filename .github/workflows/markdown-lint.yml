@@ -11,6 +11,7 @@ on:
       - '.markdownlint-cli2.jsonc'
       - 'package.json'
       - 'package-lock.json'
+      - 'scripts/**'
   schedule:
     # Run at 00:00 UTC on the first day of every month.
     - cron: '0 0 1 * *'
@@ -23,6 +24,7 @@ on:
       - '.markdownlint-cli2.jsonc'
       - 'package.json'
       - 'package-lock.json'
+      - 'scripts/**'
 
 permissions:
   contents: read
