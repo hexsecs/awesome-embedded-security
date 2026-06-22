@@ -20,10 +20,11 @@ npm ci
 npm run validate
 ```
 
-This currently does two things:
+This currently does three things:
 
 - Lints `contributing.md`.
 - Runs `awesome-lint` on `README.md`.
+- Checks `README.md` for duplicate links and malformed entries.
 
 GitHub Actions also checks markdown links in CI.
 
