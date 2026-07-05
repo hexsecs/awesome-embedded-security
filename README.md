@@ -2,7 +2,9 @@
 
 [![Validate Markdown](https://github.com/hexsecs/awesome-embedded-security/workflows/Validate%20Markdown/badge.svg)](https://github.com/hexsecs/awesome-embedded-security/actions/workflows/markdown-lint.yml)
 
-A curated Awesome-list for embedded security tools and knowledge.
+A curated list of embedded security tools, resources, and training for firmware analysis, reverse engineering, hardware hacking, and IoT security.
+
+Topics covered include firmware extraction and fuzzing, secure boot and root of trust, side-channel analysis, fault injection, JTAG/SWD debugging, RTOS and TEE security, Bluetooth/BLE, Zigbee, and other wireless protocol security, and software-defined radio (SDR).
 
 ## Table of Contents
 
