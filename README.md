@@ -46,6 +46,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
   * [Wi-Fi Tools](#wi-fi-tools)
 * [Further Learning and Training](#further-learning-and-training)
   * [Security Assessment and Design Guidance](#security-assessment-and-design-guidance)
+  * [Standards and Regulation](#standards-and-regulation)
 * [Open Source Intelligence (OSINT)](#open-source-intelligence-osint)
 * [Other Awesome Lists](#other-awesome-lists)
 * [Contribute](#contribute)
@@ -349,6 +350,20 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [OWASP IoT Security Testing Guide](https://github.com/OWASP/owasp-istg) - Methodology and test catalog for repeatable IoT penetration testing and security assessments.
 * [PSA Certified](https://www.psacertified.org/) - IoT security framework, certification scheme, and developer resources for device, silicon, software, and root-of-trust security.
+
+### Standards and Regulation
+
+* [Common Criteria](https://www.commoncriteriaportal.org/) - ISO/IEC 15408 security evaluation framework, with the public database of certified products and the protection profiles they were evaluated against.
+* [ETSI EN 303 645](https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/) - Consumer IoT security baseline of 33 provisions, used as the basis for national schemes in the UK, Singapore, Finland, and Australia.
+* [EU Cyber Resilience Act](https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act) - Regulation 2024/2847, setting security requirements and vulnerability reporting obligations for products with digital elements sold in the EU.
+* [FIPS 140-3](https://csrc.nist.gov/pubs/fips/140-3/final) - US federal requirements for cryptographic modules across four security levels, including the embedded single-chip and multi-chip categories.
+* [GSMA IoT Security Guidelines](https://www.gsma.com/solutions-and-impact/technologies/internet-of-things/iot-security/iot-security-guidelines/) - Industry guidance covering endpoint, network, and service security across the IoT device lifecycle, endorsed by major mobile operators.
+* [ISA/IEC 62443](https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards) - Industrial automation and control systems security series; part 4-2 defines the component-level requirements that apply to embedded devices.
+* [Matter](https://csa-iot.org/all-solutions/matter/) - Smart home connectivity standard whose specification mandates device attestation, secure boot, and signed over-the-air updates.
+* [NIST IR 8259A](https://csrc.nist.gov/pubs/ir/8259/a/final) - Baseline technical capabilities expected of IoT devices, referenced by US federal procurement under the IoT Cybersecurity Improvement Act.
+* [NIST SP 800-193](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-193.pdf) - Platform Firmware Resiliency Guidelines covering firmware protection, corruption detection, and recovery to a known good state.
+* [UNECE R155](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0387) - UN vehicle regulation requiring a certified cybersecurity management system for type approval, mandatory for new EU vehicle types since July 2022.
+* [UNECE R156](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0388) - Companion regulation to R155, requiring a software update management system covering over-the-air updates for the life of the vehicle.
 
 ## Open Source Intelligence (OSINT)
 
