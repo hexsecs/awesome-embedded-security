@@ -14,7 +14,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
   * [Binary Parsing and Analysis Tools](#binary-parsing-and-analysis-tools)
   * [Disassemblers/Decompilers](#disassemblersdecompilers)
   * [Debugging Tools](#debugging-tools)
-  * [USB Security](#usb-security)
+  * [USB Emulation and Fuzzing](#usb-emulation-and-fuzzing)
   * [Secure Boot and Firmware Trust](#secure-boot-and-firmware-trust)
   * [Firmware Supply Chain and SBOM](#firmware-supply-chain-and-sbom)
   * [Fuzzing Tools](#fuzzing-tools)
@@ -35,7 +35,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Hardware Tools](#hardware-tools)
   * [Hardware Reverse Engineering Multitools](#hardware-reverse-engineering-multitools)
   * [Hardware Debug Interfaces](#hardware-debug-interfaces)
-  * [USB Analysis and Security](#usb-analysis-and-security)
+  * [USB Protocol Analysis](#usb-protocol-analysis)
   * [Chip-Off and Memory Forensics](#chip-off-and-memory-forensics)
   * [Side-Channel Analysis](#side-channel-analysis)
   * [Fault Injection](#fault-injection)
@@ -48,7 +48,6 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Further Learning and Training](#further-learning-and-training)
   * [Security Assessment and Design Guidance](#security-assessment-and-design-guidance)
   * [Standards and Regulation](#standards-and-regulation)
-* [Open Source Intelligence (OSINT)](#open-source-intelligence-osint)
 * [Other Awesome Lists](#other-awesome-lists)
 * [Contribute](#contribute)
 
@@ -106,7 +105,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [probe-rs](https://probe.rs/) - Modern Rust-based embedded debug toolkit supporting SWD/JTAG with built-in flashing, RTT logging, and GDB server for ARM and RISC-V targets.
 * [pyOCD](https://pyocd.io) - An open-source Python library for programming and debugging Arm Cortex-M microcontrollers with cross-platform debug probe support.
 
-### USB Security
+### USB Emulation and Fuzzing
 
 * [Facedancer](https://github.com/greatscottgadgets/facedancer) - Python framework for emulating, creating, and tampering with USB devices using compatible hardware such as Cynthion or GreatFET.
 
@@ -277,7 +276,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [JTAGulator](https://github.com/grandideastudio/jtagulator) - Automates discovery of JTAG, SWD, and UART debug interfaces on unknown PCBs by brute-forcing pin combinations, with sigrok-compatible logic analyzer mode and direct OpenOCD integration for post-discovery exploitation.
 * [UrJTAG](https://urjtag.sourceforge.io/) - Open-source JTAG toolkit for boundary scan, flash programming, and low-level target interaction.
 
-### USB Analysis and Security
+### USB Protocol Analysis
 
 * [Cynthion](https://greatscottgadgets.com/cynthion/) - FPGA-based USB research tool and high-speed USB 2.0 protocol analyzer for capturing traffic and experimenting with USB devices.
 * [LUNA](https://github.com/greatscottgadgets/luna) - FPGA-based USB analysis and development platform from Great Scott Gadgets, enabling USB sniffing, protocol fuzzing, and custom USB peripheral development via Amaranth HDL.
@@ -388,35 +387,32 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [UNECE R155](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0387) - UN vehicle regulation requiring a certified cybersecurity management system for type approval, mandatory for new EU vehicle types since July 2022.
 * [UNECE R156](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0388) - Companion regulation to R155, requiring a software update management system covering over-the-air updates for the life of the vehicle.
 
-## Open Source Intelligence (OSINT)
-
-* [Awesome OSINT](https://github.com/jivoi/awesome-osint)
-
 ## Other Awesome Lists
 
 List of security lists.
 
 * Domain Specific
   * Automotive
-    * [Awesome Automotive Security](https://github.com/hexsecs/awesome-automotive-security)
-    * [CANb IDs](https://github.com/iDoka/awesome-automotive-can-id)
-    * [CANbus](https://github.com/iDoka/awesome-canbus)
+    * [Awesome Automotive Security](https://github.com/hexsecs/awesome-automotive-security) - Vehicle security research covering CAN, ECUs, telematics, and automotive standards.
+    * [CAN IDs](https://github.com/iDoka/awesome-automotive-can-id) - Catalogue of decoded CAN bus identifiers and message formats across vehicle makes and models.
+    * [CANbus](https://github.com/iDoka/awesome-canbus) - CAN bus tooling, adapters, protocol documentation, and reverse engineering resources.
 * Embedded
-  * [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security)
-  * [General Embedded](https://github.com/nhivp/Awesome-Embedded)
+  * [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security) - Firmware analysis, emulation, and IoT security research, maintained by Fraunhofer FKIE.
+  * [General Embedded](https://github.com/nhivp/Awesome-Embedded) - Embedded development resources: RTOSes, toolchains, libraries, and hardware platforms.
 * General Security
-  * [Android Security](https://github.com/ashishb/android-security-awesome)
-  * [Application Security](https://github.com/paragonie/awesome-appsec)
-  * [Capture the Flag](https://github.com/apsdehal/awesome-ctf)
-  * [Fuzzing](https://github.com/cpuu/awesome-fuzzing)
-  * [Hacking](https://github.com/carpedm20/awesome-hacking)
-  * [Honeypots](https://github.com/paralax/awesome-honeypots)
-  * [Incident Response](https://github.com/meirwah/awesome-incident-response)
-  * [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis)
-  * [Security](https://github.com/sbilly/awesome-security)
+  * [Android Security](https://github.com/ashishb/android-security-awesome) - Android reverse engineering, exploitation, and mobile application security tooling.
+  * [Application Security](https://github.com/paragonie/awesome-appsec) - Secure development practices, code analysis, and application security testing.
+  * [Capture the Flag](https://github.com/apsdehal/awesome-ctf) - CTF frameworks, practice platforms, wargames, and write-up archives.
+  * [Fuzzing](https://github.com/cpuu/awesome-fuzzing) - Fuzzers, harnesses, corpora, and research on automated test generation.
+  * [Hacking](https://github.com/carpedm20/awesome-hacking) - Broad collection of offensive security tools, courses, and reference material.
+  * [Honeypots](https://github.com/paralax/awesome-honeypots) - Deception tooling and honeynets spanning network, application, and industrial protocols.
+  * [Incident Response](https://github.com/meirwah/awesome-incident-response) - Digital forensics and incident response tooling, playbooks, and training material.
+  * [Malware Analysis](https://github.com/rshipp/awesome-malware-analysis) - Static and dynamic malware analysis tools, sandboxes, and sample sources.
+  * [OSINT](https://github.com/jivoi/awesome-osint) - Open source intelligence tooling for reconnaissance across people, infrastructure, and internet-exposed devices.
+  * [Security](https://github.com/sbilly/awesome-security) - General-purpose security resources spanning network, host, web, and cryptography.
 * Meta
-  * [awesome](https://github.com/sindresorhus/awesome)
-  * [lists](https://github.com/jnv/lists)
+  * [awesome](https://github.com/sindresorhus/awesome) - The root Awesome list, indexing curated lists across every topic.
+  * [lists](https://github.com/jnv/lists) - Index of curated lists of lists, broader in scope than Awesome itself.
 
 ## Contribute
 
