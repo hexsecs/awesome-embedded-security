@@ -31,6 +31,7 @@
   ],
   "aliveStatusCodes": [
     200,
+    202,
     206
   ]
 }
