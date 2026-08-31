@@ -20,20 +20,34 @@ npm ci
 npm run validate
 ```
 
-This currently does three things:
+This does three things:
 
-- Lints `contributing.md`.
+- Runs `markdownlint` over every markdown file in the repository.
 - Runs `awesome-lint` on `README.md`.
-- Checks `README.md` for duplicate links, malformed entries, and a Table
-  of Contents that's out of sync with the actual headings.
+- Checks `README.md` for duplicate links, malformed entries, entries out of
+  alphabetical order, and Table of Contents anchors that don't resolve to a
+  real heading.
 
-GitHub Actions also checks markdown links in CI.
+`validate` deliberately stays fast and offline. To check links as well, which
+takes a couple of minutes and needs network access:
+
+```bash
+npm run lint:links
+```
+
+CI runs both, and retries the link check to absorb hosts that intermittently
+drop connections.
 
 ## Entry Guidelines
 
 When adding or updating an entry:
 
 - Put it in the most relevant section.
+- Keep entries in alphabetical order within their section. This is enforced,
+  and ordering ignores leading punctuation, so `.NET` files under N.
+- Name the entry whatever the project calls itself, not an approximation. The
+  link checker cannot catch a misspelled name, because the URL still resolves,
+  and someone searching the list for the real name will not find it.
 - Use the official project page or repository when possible.
 - Keep the description short, factual, and non-promotional.
 - Avoid duplicates unless there is a clear reason to list both resources.
@@ -60,6 +74,20 @@ Two optional markers go between the link and the dash:
   reason to remove an entry on its own: paper artifacts and vulnerable-by-design
   teaching targets are expected to be frozen. If a maintained successor exists,
   name it at the end of the description.
+
+### Two rules awesome-lint enforces quietly
+
+Both of these fail CI with messages that don't obviously point at the fix:
+
+- A description must not start with the entry's own name. `* [Honeypots](...) -
+  Honeypots, honeynets, and ...` is rejected; reword the description so it
+  leads with something else.
+- A description must start with a capital letter. Without a marker this is
+  reported clearly, as `List item description must start with valid casing`.
+  With a 💰 or 🗄️ marker the same mistake is reported as `List item link and
+  description must be separated with a dash`, which points at the wrong thing
+  entirely — if you see that error on an entry that plainly has its dash, check
+  the casing. `* [de4dot](...) 🗄️ - .NET deobfuscator.` fails this way.
 
 ## Pull Request Notes
 
