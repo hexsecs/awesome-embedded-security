@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Validates README.md: catches duplicate links, malformed list-item
-// syntax, and a Table of Contents that's out of sync with the actual
-// ## / ### headings — none of which markdownlint/awesome-lint check.
+// syntax, entries that are out of alphabetical order, and a Table of
+// Contents that's out of sync with the actual ## / ### headings — none
+// of which markdownlint/awesome-lint check.
 
 'use strict';
 
@@ -19,6 +20,16 @@ const LINK_ITEM_RE = /^\s*\*\s+\[([^\]]*)\]\(([^)]*)\)/;
 const BROKEN_LINK_ITEM_RE = /^\s*\*\s+\[/;
 // Matches a Table of Contents entry: "* [Name](#anchor)", any nesting depth.
 const TOC_ITEM_RE = /^(\s*)\*\s+\[([^\]]+)\]\(#([^)]*)\)\s*$/;
+
+// Sort key for an entry label. Leading punctuation is dropped so that
+// ".NET" files under N rather than ahead of everything, matching how the
+// list is actually ordered. Only *leading* punctuation is stripped —
+// stripping it throughout would reorder existing pairs like
+// "EM-Fault-It-Yourself"/"emba" — and letters are preserved, so the "μ" in
+// μAFL and μEmu still sorts as a letter.
+function sortKey(label) {
+  return label.toLowerCase().replace(/^[^\p{L}\p{N}]+/u, '');
+}
 
 // GitHub's heading-anchor algorithm: lowercase, drop everything that isn't
 // alphanumeric/underscore/space/hyphen, then spaces become hyphens.
@@ -101,6 +112,70 @@ lines.forEach((line, idx) => {
     );
   }
 });
+
+// --- Alphabetical order check ----------------------------------------
+// Entries are kept alphabetically within each group of siblings. A group
+// is a run of list items at the same indent under the same heading, so
+// nested lists (the language groups under Language Specific Decompilers,
+// the categories under Other Awesome Lists) are each checked against
+// themselves rather than against the surrounding list. Headings and the
+// ToC break a group.
+
+{
+  const groups = [];
+  const stack = [];
+  let section = '';
+  const closeAll = () => {
+    while (stack.length > 0) groups.push(stack.pop());
+  };
+
+  lines.forEach((line, idx) => {
+    if (tocStart !== -1 && idx > tocStart && idx < tocLast) return;
+
+    const heading = line.match(/^#{2,3}\s+(.+?)\s*$/);
+    if (heading) {
+      closeAll();
+      section = heading[1];
+      return;
+    }
+
+    const item = line.match(/^(\s*)\*\s+(.*)$/);
+    if (!item) return;
+
+    const indent = item[1].length;
+    const linked = item[2].match(/^\[([^\]]+)\]/);
+    const entry = {
+      section,
+      label: linked ? linked[1] : item[2].trim(),
+      lineNo: idx + 1,
+    };
+
+    while (stack.length > 0 && stack[stack.length - 1].indent > indent) {
+      groups.push(stack.pop());
+    }
+    if (stack.length === 0 || stack[stack.length - 1].indent < indent) {
+      stack.push({ indent, members: [entry] });
+    } else {
+      stack[stack.length - 1].members.push(entry);
+    }
+  });
+  closeAll();
+
+  for (const group of groups) {
+    if (group.members.length < 2) continue;
+    for (let i = 1; i < group.members.length; i++) {
+      const prev = group.members[i - 1];
+      const curr = group.members[i];
+      if (sortKey(prev.label).localeCompare(sortKey(curr.label)) > 0) {
+        errors.push(
+          `README.md:${curr.lineNo}: "${curr.label}" is out of alphabetical ` +
+            `order under "${curr.section}" — it should come before ` +
+            `"${prev.label}" (line ${prev.lineNo}).`
+        );
+      }
+    }
+  }
+}
 
 // --- Table of Contents <-> heading sync check -------------------------
 // Verify that the set of ToC entries matches the set of actual ## / ###
@@ -200,5 +275,5 @@ if (errors.length > 0) {
 
 console.log(
   `README.md check passed: ${seenUrls.size} unique entries, ` +
-    `ToC anchors resolve, no duplicates or malformed links.`
+    `alphabetized, ToC anchors resolve, no duplicates or malformed links.`
 );
