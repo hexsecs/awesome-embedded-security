@@ -16,7 +16,15 @@
     }
   ],
   "ignorePatterns": [
-    { "pattern": "^https://www\\.analog\\.com/" }
+    {
+      "pattern": "^https://www\\.analog\\.com/"
+    },
+    {
+      "pattern": "^https://www\\.nordicsemi\\.com/"
+    }
   ],
-  "aliveStatusCodes": [200, 206]
+  "aliveStatusCodes": [
+    200,
+    206
+  ]
 }
