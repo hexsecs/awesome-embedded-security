@@ -4,10 +4,9 @@
     "MD013": false
   },
   "globs": [
-    "contributing.md"
+    "**/*.md"
   ],
   "ignores": [
-    "node_modules/**",
-    ".agents/**"
+    "node_modules/**"
   ]
 }
