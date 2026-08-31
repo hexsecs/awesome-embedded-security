@@ -40,6 +40,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
   * [Side-Channel Analysis](#side-channel-analysis)
   * [Fault Injection](#fault-injection)
   * [Logic Analyzers](#logic-analyzers)
+  * [NFC and RFID](#nfc-and-rfid)
   * [RF Tools (Non-SDR)](#rf-tools-non-sdr)
   * [Software Defined Radios](#software-defined-radios)
   * [Software Defined Radio Software](#software-defined-radio-software)
@@ -222,11 +223,14 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [VFuzz](https://github.com/CNK2100/VFuzz-public) - The only dedicated open-source Z-Wave security fuzzer; uses a Field Prioritization Algorithm to mutate protocol-valid frames and assess target encryption capabilities. IEEE Access 2022.
 * [Z-Fuzzer](https://github.com/zigbeeprotocol/Z-Fuzzer) - Coverage-guided Zigbee protocol fuzzer using a software simulator with pre-defined peripheral and interrupt configurations; found 6 CVEs in TI Z-Stack. ACM Digital Threats 2022.
+* [Zigator](https://github.com/akestoridis/zigator) - Security analysis tool for Zigbee and Thread networks, supporting packet capture, selective jamming, and injection.
 
 ### Baseband Security
 
 * [FirmWire](https://github.com/FirmWire/FirmWire) - Full-system emulation platform for Samsung (Shannon) and MediaTek cellular baseband firmware with AFL++ fuzzing integration, a task-injection ModKit, and dynamic debugging support. Found 7 pre-authentication memory corruptions. NDSS 2022.
+* [Open5GS](https://github.com/open5gs/open5gs) - Open-source 5G core and 4G EPC, used to stand up a controlled network for baseband and cellular protocol testing.
 * [OsmocomBB](https://github.com/osmocom/osmocom-bb) - Free Software GSM baseband (Layer 1-3) implementation for TI Calypso-based phones, replacing proprietary baseband firmware entirely and enabling open research into the GSM air interface.
+* [QCSuper](https://github.com/P1sec/QCSuper) - Captures raw 2G to 5G radio frames from Qualcomm basebands over the Diag protocol, producing PCAPs for analysis in Wireshark.
 * [Rayhunter](https://github.com/EFForg/rayhunter) - EFF's open source Rust tool that runs on a cheap mobile hotspot to detect cell-site simulators (IMSI catchers/Stingrays) by monitoring signaling traffic for suspicious behavior like forced 2G downgrades.
 
 ### Firmware Malware Analysis
@@ -289,7 +293,10 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Side-Channel Analysis
 
 * [ChipWhisperer](https://github.com/newaetech/chipwhisperer) - An open-source toolchain for side-channel power analysis and fault injection attacks with complete hardware and software stack.
+* [Daredevil](https://github.com/SideChannelMarvels/Daredevil) - Multi-core correlation power analysis tool supporting higher-order attacks, part of the SideChannelMarvels toolset.
+* [Jlsca](https://github.com/Keysight/Jlsca) - Side-channel analysis toolkit in Julia, geared toward correlation and linear regression attacks over large trace sets.
 * [lascar](https://github.com/Ledger-Donjon/lascar) - Fast Python SCA library from Ledger's hardware wallet security team supporting CPA, DPA, MIA, template attacks, and ML-based attacks with lazy loading for large trace datasets.
+* [pyecsca](https://github.com/J08nY/pyecsca) - Side-channel analysis and reverse engineering toolkit aimed specifically at elliptic curve implementations, where the other tools here are oriented toward AES.
 * [SCALE](https://github.com/danpage/scale) - Side-Channel Attack Lab Exercises providing educational material for learning power analysis attacks with low-cost hardware.
 * [scared](https://github.com/eshard/scared) - Industrial-grade side-channel analysis framework from eShard with best-in-class trace processing performance; supports CPA, DPA, TVLA/NICV leakage assessment, and very large trace datasets.
 
@@ -304,6 +311,12 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [Saleae](https://www.saleae.com/) 💰 - Commercial logic analyzer hardware ($149–$499+) with proprietary software; widely used for decoding SPI, I2C, UART, and other embedded protocols.
 * [Sigrok](https://sigrok.org/) - Portable, cross-platform, Free/Libre/Open-Source signal analysis software suite that supports various device types (e.g. logic analyzers, oscilloscopes, and many more).
+
+### NFC and RFID
+
+* [libnfc](https://github.com/nfc-tools/libnfc) - Platform-independent NFC library covering ISO14443-A/B, FeliCa, and MIFARE, and the foundation most other NFC tooling builds on.
+* [MFCUK](https://github.com/nfc-tools/mfcuk) - Implementation of the Dark Side attack, recovering a first MIFARE Classic key when none is known.
+* [MFOC](https://github.com/nfc-tools/mfoc) - Nested attack that recovers the remaining MIFARE Classic sector keys once one key is known; pairs with MFCUK.
 
 ### RF Tools (Non-SDR)
 
