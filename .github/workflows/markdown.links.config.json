@@ -21,6 +21,9 @@
     },
     {
       "pattern": "^https://www\\.nordicsemi\\.com/"
+    },
+    {
+      "pattern": "^https://trustedcomputinggroup\\.org/"
     }
   ],
   "aliveStatusCodes": [

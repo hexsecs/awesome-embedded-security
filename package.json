@@ -5,12 +5,14 @@
   "description": "Pinned CI tooling for markdown checks",
   "scripts": {
     "lint:awesome": "awesome-lint README.md",
+    "lint:links": "bash scripts/check-links.sh",
     "lint:markdown": "markdownlint-cli2",
     "check:readme": "node scripts/check-readme.js",
     "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {
     "awesome-lint": "2.3.0",
+    "markdown-link-check": "3.15.0",
     "markdownlint-cli2": "0.23.2"
   }
 }
