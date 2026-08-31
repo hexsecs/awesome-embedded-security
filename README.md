@@ -6,52 +6,55 @@ A curated list of embedded security tools, resources, and training for firmware 
 
 Topics covered include firmware extraction and fuzzing, secure boot and root of trust, side-channel analysis, fault injection, JTAG/SWD debugging, RTOS and TEE security, Bluetooth/BLE, Zigbee, and other wireless protocol security, and software-defined radio (SDR).
 
-## Table of Contents
+**Legend:** 💰 commercial or closed-source · 🗄️ archived by its maintainers
 
-* Software Tools
-  * Binary Parsing and Analysis Tools
-  * Disassemblers/Decompilers
-  * Debugging Tools
-  * USB Security
-  * Secure Boot and Firmware Trust
-  * Firmware Supply Chain and SBOM
-  * Fuzzing Tools
-  * Language Specific Decompilers
-  * Security Auditing Frameworks
-  * Firmware Taint Analysis
-  * RTOS Security
-  * TEE/Trusted Execution Environments
-  * Root of Trust and TPM
-  * OTA Update Security
-  * IoT Protocol Security
-  * Bluetooth and BLE Security
-  * Zigbee / Z-Wave Security
-  * Baseband Security
-  * Firmware Malware Analysis
-  * Emulation Tools
-  * MCU Firmware Fuzzing
-* Hardware Tools
-  * Hardware Reverse Engineering Multitools
-  * Hardware Debug Interfaces
-  * USB Analysis and Security
-  * Chip-Off and Memory Forensics
-  * Side-Channel Analysis
-  * Fault Injection
-  * Logic Analyzer
-  * RF Tools (Non-SDR)
-  * Software Defined Radios
-  * Software Defined Radio Software
-  * Wifi Tools
-* Further Learning and Training
-  * Security Assessment and Design Guidance
-* Open Source Intelligence (OSINT)
-* Other Awesome Lists
-* Contribute
+## Contents
+
+* [Software Tools](#software-tools)
+  * [Binary Parsing and Analysis Tools](#binary-parsing-and-analysis-tools)
+  * [Disassemblers/Decompilers](#disassemblersdecompilers)
+  * [Debugging Tools](#debugging-tools)
+  * [USB Security](#usb-security)
+  * [Secure Boot and Firmware Trust](#secure-boot-and-firmware-trust)
+  * [Firmware Supply Chain and SBOM](#firmware-supply-chain-and-sbom)
+  * [Fuzzing Tools](#fuzzing-tools)
+  * [Language Specific Decompilers](#language-specific-decompilers)
+  * [Security Auditing Frameworks](#security-auditing-frameworks)
+  * [Firmware Taint Analysis](#firmware-taint-analysis)
+  * [RTOS Security](#rtos-security)
+  * [TEE/Trusted Execution Environments](#teetrusted-execution-environments)
+  * [Root of Trust and TPM](#root-of-trust-and-tpm)
+  * [OTA Update Security](#ota-update-security)
+  * [IoT Protocol Security](#iot-protocol-security)
+  * [Bluetooth and BLE Security](#bluetooth-and-ble-security)
+  * [Zigbee / Z-Wave Security](#zigbee--z-wave-security)
+  * [Baseband Security](#baseband-security)
+  * [Firmware Malware Analysis](#firmware-malware-analysis)
+  * [Emulation Tools](#emulation-tools)
+  * [MCU Firmware Fuzzing](#mcu-firmware-fuzzing)
+* [Hardware Tools](#hardware-tools)
+  * [Hardware Reverse Engineering Multitools](#hardware-reverse-engineering-multitools)
+  * [Hardware Debug Interfaces](#hardware-debug-interfaces)
+  * [USB Analysis and Security](#usb-analysis-and-security)
+  * [Chip-Off and Memory Forensics](#chip-off-and-memory-forensics)
+  * [Side-Channel Analysis](#side-channel-analysis)
+  * [Fault Injection](#fault-injection)
+  * [Logic Analyzer](#logic-analyzer)
+  * [RF Tools (Non-SDR)](#rf-tools-non-sdr)
+  * [Software Defined Radios](#software-defined-radios)
+  * [Software Defined Radio Software](#software-defined-radio-software)
+  * [Wifi Tools](#wifi-tools)
+* [Further Learning and Training](#further-learning-and-training)
+  * [Security Assessment and Design Guidance](#security-assessment-and-design-guidance)
+* [Open Source Intelligence (OSINT)](#open-source-intelligence-osint)
+* [Other Awesome Lists](#other-awesome-lists)
+* [Contribute](#contribute)
 
 ## Software Tools
 
 ### Binary Parsing and Analysis Tools
-* [argXtract](https://github.com/projectbtle/argXtract) - Statically extracts arguments to SVC calls and HAL functions from stripped ARM Cortex-M BLE firmware without symbol tables, enabling security audits of Nordic and similar binaries. ACSAC 2021.
+
+* [argXtract](https://github.com/projectbtle/argXtract) 🗄️ - Statically extracts arguments to SVC calls and HAL functions from stripped ARM Cortex-M BLE firmware without symbol tables, enabling security audits of Nordic and similar binaries. ACSAC 2021.
 * [Binwalk](https://github.com/ReFirmLabs/binwalk) - Fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 * [checksec](https://github.com/slimm609/checksec.sh) - Shell script to check binary security hardening flags (NX, PIE, RELRO, stack canary, ASLR) on ELF executables extracted from firmware.
 * [cwe_checker](https://github.com/fkie-cad/cwe_checker) - Binary analysis tool that checks ELF binaries for violations of Common Weakness Enumerations (CWEs) using abstract interpretation, with cross-architecture support.
@@ -65,6 +68,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [VulHunt](https://github.com/vulhunt-re/vulhunt) - Lua-rule-based vulnerability detection framework from Binarly's research team that operates across disassembly, IR, and decompiled code simultaneously, with dedicated UEFI module scanning support.
 
 ### Disassemblers/Decompilers
+
 * [Angr](https://github.com/angr/angr) - Platform-agnostic binary analysis framework. Brought to you by the Computer Security Lab at UC Santa Barbara, SEFCOM at Arizona State University, their associated CTF team, Shellphish, the open source community, and @rhelmot.
 * [Angr Management](https://github.com/angr/angr-management) - Multi-architecture binary analysis toolkit, with the capability to perform dynamic symbolic execution (like Mayhem, KLEE, etc.) and various static analyses on binaries. If you'd like to learn how to use it, you're in the right place!
 * [BARF](https://github.com/programa-stic/barf-project) - A binary analysis and reverse engineering framework with support for ROP gadget search and CFG recovery.
@@ -80,6 +84,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Vivisect](https://github.com/vivisect/vivisect) - A combined disassembler/static analysis/symbolic execution/debugger framework.
 
 ### Debugging Tools
+
 * [assembly-repl](https://github.com/pirate/assembly-repl) - Native assembly, LLVM IR, C, C++, and Objective-C REPLs for macOS and Linux.
 * [Black Magic Probe](https://codeberg.org/blackmagic-debug/blackmagic) - An open-source JTAG/SWD debugger with embedded GDB server and automatic target detection.
 * [Frida](https://frida.re/) - Dynamic instrumentation toolkit for injecting JavaScript or native code into running processes on embedded Linux, Android, iOS, and bare-metal targets.
@@ -90,15 +95,18 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [pyOCD](https://pyocd.io) - An open-source Python library for programming and debugging Arm Cortex-M microcontrollers with cross-platform debug probe support.
 
 ### USB Security
+
 * [Facedancer](https://github.com/greatscottgadgets/facedancer) - Python framework for emulating, creating, and tampering with USB devices using compatible hardware such as Cynthion or GreatFET.
 
 ### Secure Boot and Firmware Trust
+
 * [AVB (Android Verified Boot)](https://android.googlesource.com/platform/external/avb/+/master/README.md) - Reference implementation and design guidance for chained trust and verified partitions in embedded Android systems.
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
 * [U-Boot Verified Boot](https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html) - FIT-signature based verified boot support for embedded Linux boot chains.
 * [wolfBoot](https://github.com/wolfSSL/wolfBoot) - Portable secure bootloader for 32-bit MCUs using wolfCrypt for image signature verification (Ed25519, ECC, RSA, post-quantum LMS/XMSS), with delta updates, encrypted images, and explicit voltage-glitch countermeasures.
 
 ### Firmware Supply Chain and SBOM
+
 * [CVE Binary Tool](https://github.com/ossf/cve-bin-tool) - OpenSSF tool that scans binaries directly for 350+ known-vulnerable open source components (OpenSSL, libpng, BusyBox, and more), without requiring a pre-built SBOM; can also generate one from the scan.
 * [Grype](https://github.com/anchore/grype) - Vulnerability scanner that consumes SBOMs to identify known CVEs in firmware dependencies.
 * [in-toto](https://in-toto.io/) - Framework for supply chain integrity that records signed provenance steps and enforces layout verification.
@@ -106,24 +114,27 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Syft](https://github.com/anchore/syft) - SBOM generator for filesystems and artifacts, useful for firmware package/component inventories.
 
 ### Fuzzing Tools
+
 * [AFL++](https://github.com/AFLplusplus/AFLplusplus) - A coverage-guided fuzzer with enhanced mutations, QEMU and Unicorn emulation modes, and custom power schedules.
 * [boofuzz](https://github.com/jtpereyda/boofuzz) - Actively maintained network protocol fuzzer and the spiritual successor to Sulley, with session management, target monitoring, and protocol graph support.
 * [Fuzzowski](https://github.com/nccgroup/fuzzowski) - A network protocol fuzzer based on the Sulley/BooFuzz framework with support for TCP/UDP/SSL protocols.
-* [GDBFuzz](https://github.com/boschresearch/gdbfuzz) - Uses GDB hardware breakpoints as a coverage source for uninstrumented embedded targets — works on any GDB-debuggable MCU with no firmware modification required. Bosch Research / ISSTA 2023.
+* [GDBFuzz](https://github.com/boschresearch/gdbfuzz) 🗄️ - Uses GDB hardware breakpoints as a coverage source for uninstrumented embedded targets — works on any GDB-debuggable MCU with no firmware modification required. Bosch Research / ISSTA 2023.
 * [honggfuzz](https://github.com/google/honggfuzz) - A feedback-driven evolutionary fuzzer supporting hardware-based coverage (Intel BTS/PT) and persistent mode for extreme speed.
 * [libFuzzer](https://llvm.org/docs/LibFuzzer.html) - In-process, coverage-guided, evolutionary fuzzing engine integrated with LLVM.
 * [Peach](https://gitlab.com/peachtech/peach-fuzzer-community) 💰 - A smart fuzzer supporting both generation-based and mutation-based fuzzing via Peach Pit definitions. Community edition is source-available; full product is commercial.
 
 ### Language Specific Decompilers
+
 * Java
   * [JADX](https://github.com/skylot/jadx) - Dex to Java decompiler.
   * [JD-GUI](https://github.com/java-decompiler/jd-gui) - Java decompiler.
 * .NET
-  * [de4dot](https://github.com/de4dot/de4dot) - .NET deobfuscator.
+  * [de4dot](https://github.com/de4dot/de4dot) 🗄️ - Deobfuscator and unpacker for .NET binaries. Archived in 2020; the widely referenced de4dot-cex fork is archived as well.
   * [dnSpy](https://github.com/dnSpyEx/dnSpy) - .NET debugger and assembly editor.
   * [ILSpy](https://github.com/icsharpcode/ILSpy) - .NET Decompiler with support for PDB generation, ReadyToRun, Metadata (&more) - cross-platform!
 
 ### Security Auditing Frameworks
+
 * [EXPLIoT](https://pypi.org/project/expliot/) - Framework for security testing and exploiting IoT products and IoT infrastructure. It provides a set of plugins (test cases) which are used to perform the assessment and can be extended easily with new ones.
 * [Firmware Analysis and Comparison Tool (FACT)](https://fkie-cad.github.io/FACT_core/) - Automated Firmware Security analysis (Router, IoT, UEFI, Webcams, Drones, …). It is easy to use (web UI), extend (plug-in system) and integrate (REST API).
 * [FwAnalyzer (Firmware Analyzer)](https://github.com/cruise-automation/fwanalyzer) - Tool to analyze (ext2/3/4), FAT/VFat, SquashFS, UBIFS filesystem images, cpio archives, and directory content using a set of configurable rules.
@@ -132,11 +143,13 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Metasploit](https://github.com/rapid7/metasploit-framework) - Open source penetration testing framework (BSD licensed) maintained by Rapid7, with modules for exploiting vulnerabilities, scanning, and post-exploitation across embedded Linux and IoT targets.
 
 ### Firmware Taint Analysis
+
 * [EmTaint](https://github.com/kuc001/EmTaint) - Structured symbolic expression-based taint analysis with on-demand alias resolution for embedded Linux firmware; found 151 0-day vulnerabilities across 35 real-world images. ISSTA 2023.
 * [KARONTE](https://github.com/ucsb-seclab/karonte) - Static analysis tool that tracks untrusted input flows across binary boundaries (shared files, sockets, env vars) in embedded Linux firmware using angr-based inter-binary taint propagation. IEEE S&P 2020.
 * [SaTC](https://github.com/NSSL-SJTU/SaTC) - Anchors taint analysis to string literals shared between web front-end and back-end binaries to pinpoint user-controlled input entry points; found 33 unknown bugs in commercial firmware. USENIX Security 2021.
 
 ### RTOS Security
+
 * [FreeRTOS Security](https://www.freertos.org/Security/01-Security-overview) - Security features and documentation for FreeRTOS including MQTT over TLS, PKCS#11, and PSA Certified implementation.
 * [RT-Thread Security](https://github.com/RT-Thread/rt-thread/security) - Security resources and vulnerability reporting for RT-Thread IoT OS.
 * [seL4](https://sel4.systems/) - Formally verified microkernel with machine-checked proofs of functional correctness, integrity, and confidentiality, providing the strongest security guarantees of any production OS kernel.
@@ -144,6 +157,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Zephyr Project Security](https://docs.zephyrproject.org/latest/security/index.html) - Security documentation for the Zephyr RTOS including TF-M integration, verified boot, and security testing.
 
 ### TEE/Trusted Execution Environments
+
 * [AMD SEV](https://developer.amd.com/sev/) - Secure Encrypted Virtualization for encrypting VM memory with AMD-V hardware assistance.
 * [Intel SGX SDK](https://github.com/intel/linux-sgx) - Open-source Linux SDK and Platform Software for Intel Software Guard Extensions, providing the build/install toolchain for developing and deploying hardware-based memory enclave applications.
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
@@ -152,6 +166,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Trusty TEE](https://source.android.com/docs/security/features/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
 
 ### Root of Trust and TPM
+
 * [AMD fTPM Security Guidance](https://www.amd.com/en/resources/product-security/bulletin/amd-sb-4011.html) - AMD guidance and security bulletin coverage related to firmware TPM behavior on supported platforms.
 * [IBM Software TPM](https://sourceforge.net/projects/ibmswtpm2/) - Software TPM 2.0 emulator for testing and development.
 * [Keylime](https://keylime.dev/) - Open source TPM-based remote attestation for cloud and edge.
@@ -161,6 +176,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [tpm2-algtest](https://github.com/crocs-muni/tpm2-algtest) - Tests real TPM 2.0 chips for RNG output quality, key generation timing, algorithm support, and implementation fingerprints across 80+ firmware revisions from 6 vendors. From CRoCS (discoverers of ROCA). CHES 2024.
 
 ### OTA Update Security
+
 * [Mender](https://mender.io/) - Over-the-air software updater for Linux IoT devices with atomic updates and rollback.
 * [RAUC](https://rauc.io/) - Safe and secure firmware update framework for embedded Linux with bundle signing and A/B partitioning.
 * [SUIT](https://datatracker.ietf.org/wg/suit/about/) - Software Update for the Internet of Things (SUIT) working group developing manifest-based firmware update architecture.
@@ -169,6 +185,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Uptane](https://uptane.org/) - Secure software-update framework and standard for automotive systems, designed to resist compromised infrastructure and vehicle-network attacks.
 
 ### IoT Protocol Security
+
 * [CoAP Security](https://datatracker.ietf.org/doc/html/rfc7252) - Constrained Application Protocol (CoAP) security with DTLS.
 * [Cotopaxi](https://github.com/Samsung/cotopaxi) - Multi-protocol IoT security testing toolkit from Samsung R&D covering MQTT, CoAP, AMQP, DTLS, KNX, QUIC, RTSP, SSDP, HTTP/2, gRPC, and more; supports fingerprinting, fuzzing, and known-vulnerability identification across 14 protocols.
 * [KillerBee](https://github.com/riverloopsec/killerbee) - IEEE 802.15.4/ZigBee security research framework for capturing, injecting, and analyzing ZigBee network traffic using compatible radio hardware.
@@ -179,10 +196,11 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [wolfMQTT](https://www.wolfssl.com/products/wolfmqtt/) - MQTT client library with TLS support optimized for embedded systems.
 
 ### Bluetooth and BLE Security
+
 * [Bettercap BLE](https://www.bettercap.org/modules/ble/) - BLE scanning, enumeration, and characteristic read/write module integrated into the bettercap Swiss-army knife framework.
 * [BlueToolkit](https://github.com/sgxgsx/BlueToolkit) - Modular black-box vulnerability testing framework for Bluetooth Classic and BLE with Recon/Exploit/Report modules covering 40+ public exploits (MITM, RCE, DoS); used to uncover 128 vulnerabilities across 22 vehicles from major automakers. USENIX WOOT 2025.
 * [BrakTooth](https://github.com/Matheus-Garbelini/braktooth_esp32_bluetooth_classic_attacks) - Directed exploit suite for Bluetooth Classic LMP layer vulnerabilities, targeting protocol layers inaccessible from standard host stacks; affected 1,400+ products from Intel, Qualcomm, and Broadcom. USENIX Security 2022.
-* [BtleJuice](https://github.com/DigitalSecurity/btlejuice) - Bluetooth Low Energy MITM proxy framework for real-time interception and manipulation of BLE communications.
+* [BtleJuice](https://github.com/DigitalSecurity/btlejuice) 🗄️ - Bluetooth Low Energy MITM proxy framework for real-time interception and manipulation of BLE communications. Archived since 2018; see BtleJack or the WHAD Framework for maintained alternatives.
 * [GATTacker](https://github.com/securing/gattacker) - BLE MITM tool for intercepting and relaying GATT profiles to test BLE device authentication and data integrity.
 * [InternalBlue](https://github.com/seemoo-lab/internalblue) - Bluetooth experimentation framework enabling binary patching, LMP injection, and live monitoring of Broadcom/Cypress firmware on commodity devices (iPhone, Samsung Galaxy, Raspberry Pi) without custom hardware.
 * [nRF Sniffer for Bluetooth LE](https://www.nordicsemi.com/Products/Development-tools/nRF-Sniffer-for-Bluetooth-LE) 💰 - Nordic Semiconductor's BLE packet sniffer for capturing and analyzing Bluetooth Low Energy traffic with Wireshark integration. Wireshark plugin is open source; dongle firmware is a closed binary requiring Nordic hardware.
@@ -190,21 +208,25 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [WHAD Framework](https://github.com/whad-team/whad-client) - Hardware-agnostic multi-protocol wireless security framework (BLE, Zigbee, Enhanced ShockBurst, ANT) using a cheap nRF52840 dongle as a universal attack radio; foundation for Quarkslab's BLE GATT fuzzer. DEF CON 32 (2024).
 
 ### Zigbee / Z-Wave Security
+
 * [VFuzz](https://github.com/CNK2100/VFuzz-public) - The only dedicated open-source Z-Wave security fuzzer; uses a Field Prioritization Algorithm to mutate protocol-valid frames and assess target encryption capabilities. IEEE Access 2022.
 * [Z-Fuzzer](https://github.com/zigbeeprotocol/Z-Fuzzer) - Coverage-guided Zigbee protocol fuzzer using a software simulator with pre-defined peripheral and interrupt configurations; found 6 CVEs in TI Z-Stack. ACM Digital Threats 2022.
 
 ### Baseband Security
+
 * [FirmWire](https://github.com/FirmWire/FirmWire) - Full-system emulation platform for Samsung (Shannon) and MediaTek cellular baseband firmware with AFL++ fuzzing integration, a task-injection ModKit, and dynamic debugging support. Found 7 pre-authentication memory corruptions. NDSS 2022.
 * [OsmocomBB](https://github.com/osmocom/osmocom-bb) - Free Software GSM baseband (Layer 1-3) implementation for TI Calypso-based phones, replacing proprietary baseband firmware entirely and enabling open research into the GSM air interface.
 * [Rayhunter](https://github.com/EFForg/rayhunter) - EFF's open source Rust tool that runs on a cheap mobile hotspot to detect cell-site simulators (IMSI catchers/Stingrays) by monitoring signaling traffic for suspicious behavior like forced 2G downgrades.
 
 ### Firmware Malware Analysis
+
 * [emba](https://github.com/e-m-b-a/emba) - Efficient malware analysis framework for embedded firmware with scanning and reporting.
 * [EMBArk](https://github.com/e-m-b-a/embark) - Enterprise web interface for EMBA providing multi-user scan management, aggregated vulnerability dashboards, and CI/CD integration for continuous firmware security monitoring.
 * [Firmware Analysis Toolkit](https://github.com/attify/firmware-analysis-toolkit) - Automated tool for firmware emulation and vulnerability discovery.
 * [Firmware Security Testing](https://github.com/scriptingxss/owasp-fstm) - OWASP firmware security testing methodology and practical guidance for assessing embedded devices.
 
 ### Emulation Tools
+
 * [Avatar2](https://github.com/avatartwo/avatar2) - Dynamic analysis orchestration framework for binary firmware that coordinates execution across emulators (QEMU, Unicorn) and real hardware targets.
 * [Firmadyne](https://github.com/firmadyne/firmadyne) - Automated system for emulating and analyzing Linux-based embedded firmware; extracts and boots firmware images in QEMU to enable dynamic vulnerability discovery.
 * [FirmAE](https://github.com/pr0v3rbs/FirmAE) - An automated framework for emulation and vulnerability analysis of IoT firmware with an 79% success rate using arbitration techniques.
@@ -216,6 +238,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Unicorn Engine](https://github.com/unicorn-engine/unicorn) - A lightweight multi-architecture CPU emulator framework providing pure CPU emulation for ARM, MIPS, x86, RISC-V, and more.
 
 ### MCU Firmware Fuzzing
+
 * [DICE](https://github.com/RiS3-Lab/DICE-DMA-Emulation) - Automatically identifies and emulates DMA input channels in MCU firmware, enabling fuzzers to exercise DMA-driven code paths that were previously opaque. IEEE S&P 2021.
 * [Fuzzware](https://github.com/fuzzware-fuzzer/fuzzware) - Automatically models MMIO peripheral inputs via symbolic execution to enable coverage-guided fuzzing of ARM Cortex-M firmware with no hardware required. Achieves up to 3.25× coverage over prior approaches. USENIX Security 2022.
 * [Icicle](https://github.com/icicle-emu/icicle-emu) - Rust-based grey-box fuzzer with architecture-agnostic coverage instrumentation, notable for supporting **MSP430 and RISC-V** where AFL++ QEMU mode has no coverage. ISSTA 2023.
@@ -226,22 +249,26 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ## Hardware Tools
 
 ### Hardware Reverse Engineering Multitools
-* [Bus Pirate](https://github.com/ElderlyPirate/Bus_Pirate) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
+
+* [Bus Pirate](https://buspirate.com/) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
 * [Glasgow Interface Explorer](https://glasgow-embedded.org/) - Versatile open-source FPGA-based hardware debugging and reverse engineering tool supporting SPI, I2C, UART, JTAG, and custom protocols with a high-level Python API.
 * [GreatFET](https://greatscottgadgets.com/greatfet/) - Open-source USB host-side hardware security research platform from Great Scott Gadgets with an expandable neighbor board ecosystem for interfacing with embedded targets.
 * [Hydrabus](https://hydrabus.com/) - Open-source multi-protocol hardware hacking tool with support for SPI, I2C, UART, CAN, 1-Wire, and JTAG interfaces, purpose-built for embedded device analysis.
 * [Tiguard](https://github.com/tigard-tools/tigard) - An FTDI FT2232H-based multi-protocol tool for hardware hacking.
 
 ### Hardware Debug Interfaces
+
 * [JTAGenum](https://github.com/cyphunk/JTAGenum) - Enumerates JTAG pinouts on unknown boards by brute-force testing candidate pin mappings.
 * [JTAGulator](https://github.com/grandideastudio/jtagulator) - Automates discovery of JTAG, SWD, and UART debug interfaces on unknown PCBs by brute-forcing pin combinations, with sigrok-compatible logic analyzer mode and direct OpenOCD integration for post-discovery exploitation.
 * [UrJTAG](https://urjtag.sourceforge.io/) - Open-source JTAG toolkit for boundary scan, flash programming, and low-level target interaction.
 
 ### USB Analysis and Security
+
 * [Cynthion](https://greatscottgadgets.com/cynthion/) - FPGA-based USB research tool and high-speed USB 2.0 protocol analyzer for capturing traffic and experimenting with USB devices.
 * [LUNA](https://github.com/greatscottgadgets/luna) - FPGA-based USB analysis and development platform from Great Scott Gadgets, enabling USB sniffing, protocol fuzzing, and custom USB peripheral development via Amaranth HDL.
 
 ### Chip-Off and Memory Forensics
+
 * [CHIPSEC](https://github.com/chipsec/chipsec) - Platform security assessment framework with firmware and chipset checks relevant to offline dump triage.
 * [Flashrom](https://flashrom.org/) - Utility for identifying, reading, writing, and verifying SPI flash chips common in embedded boards.
 * [NANDO](https://github.com/bbogush/nand_programmer) - Open hardware STM32-based parallel NAND flash programmer with chip autodetection, bad block handling, and an extensible chip database; targets the parallel NAND found in older routers, set-top boxes, and automotive ECUs.
@@ -249,22 +276,26 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [The Sleuth Kit](https://www.sleuthkit.org/sleuthkit/) - File system forensic toolkit for carving and examining recovered NAND/eMMC/UFS image dumps.
 
 ### Side-Channel Analysis
+
 * [ChipWhisperer](https://github.com/newaetech/chipwhisperer) - An open-source toolchain for side-channel power analysis and fault injection attacks with complete hardware and software stack.
 * [lascar](https://github.com/Ledger-Donjon/lascar) - Fast Python SCA library from Ledger's hardware wallet security team supporting CPA, DPA, MIA, template attacks, and ML-based attacks with lazy loading for large trace datasets.
 * [SCALE](https://github.com/danpage/scale) - Side-Channel Attack Lab Exercises providing educational material for learning power analysis attacks with low-cost hardware.
 * [scared](https://github.com/eshard/scared) - Industrial-grade side-channel analysis framework from eShard with best-in-class trace processing performance; supports CPA, DPA, TVLA/NICV leakage assessment, and very large trace datasets.
 
 ### Fault Injection
+
 * [EM-Fault-It-Yourself](https://github.com/fgsect/EM-Fault-It-Yourself) - Motorized XYZ-stage EMFI platform targeting desktop and server SoCs (successfully attacked the AMD Secure Processor), with 2.5µm accuracy, 100mm travel, and a web UI for automated scanning campaigns. IEEE HOST 2022.
 * [Faulty Cat](https://github.com/ElectronicCats/faultycat) - Low-cost open hardware EMFI tool from Electronic Cats built on an RP2040, offering both electromagnetic and crowbar voltage-glitching fault injection with single-shot and parameter-sweep campaign modes.
 * [PicoEMP](https://github.com/newaetech/chipshouter-picoemp) - NewAE's open hardware EMFI tool built on a Raspberry Pi Pico and photographic-flash transformer circuit; the community standard entry-level electromagnetic fault injection platform.
 * [PicoGlitcher](https://github.com/MKesenheimer/fault-injection-library) - RP2040/RP2350-based voltage glitching platform with 66A crowbar, sub-10ns pulse resolution via PIO sampling, and a high-level Python (`findus`) API for scripting attack campaigns. Validated by SySS Research.
 
 ### Logic Analyzer
+
 * [Saleae](https://www.saleae.com/) 💰 - Commercial logic analyzer hardware ($149–$499+) with proprietary software; widely used for decoding SPI, I2C, UART, and other embedded protocols.
 * [Sigrok](https://sigrok.org/) - Portable, cross-platform, Free/Libre/Open-Source signal analysis software suite that supports various device types (e.g. logic analyzers, oscilloscopes, and many more).
 
 ### RF Tools (Non-SDR)
+
 * [Awesome Flipper Zero](https://github.com/RogueMaster/awesome-flipperzero-withModules) - A collection of Awesome resources for the Flipper Zero device.
 * [Bruce](https://bruce.computer/) - Powerful open-source ESP32 firmware designed for offensive security and Red Team operations.
 * [ChameleonUltra](https://github.com/RfidResearchGroup/ChameleonUltra) - Pocket friendly powerful LF and HF emulation & manipulation tool which is based on the open-source project ChameleonMini.
@@ -273,21 +304,25 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Yard Stick One](https://greatscottgadgets.com/yardstickone/) - Transmit or receive digital wireless signals at frequencies below 1 GHz. It uses the same radio circuit as the popular IM-Me.
 
 ### Software Defined Radios
+
 * [ADALM-PLUTO (PlutoSDR)](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html) - Active learning module (PlutoSDR) used to explore software-defined radio, RF experimentation, and wireless communications.
 * [HackRF One](https://greatscottgadgets.com/hackrf/) - Software Defined Radio peripheral capable of transmission or reception of radio signals from 1 MHz to 6 GHz.
 * [RTL-SDR](https://www.rtl-sdr.com/) - Very cheap ~$30 USB dongle that can be used as a computer based radio scanner for receiving live radio signals in your area (no internet required).
 
 ### Software Defined Radio Software
+
 * [Future SDR](https://www.futuresdr.org/) - Supports Blocks with synchronous or asynchronous implementations for stream-based or message-based data processing.
 * [Maia SDR](https://maia-sdr.org/) - Open-source FPGA-based SDR project focusing on the ADALM Pluto.
 
 ### Wifi Tools
+
 * [ESP32Maurauder](https://github.com/justcallmekoko/ESP32Marauder) - A suite of WiFi/Bluetooth offensive and defensive tools for the ESP32.
 * [Pwnagotchi](https://pwnagotchi.ai/) - A2C-based “AI” powered by bettercap and running on a Raspberry Pi Zero W that learns from its surrounding WiFi environment in order to maximize the crackable WPA key material it captures.
 
 ## Further Learning and Training
+
 * [DVID](https://github.com/Vulcainreo/DVID) - Damn Vulnerable IoT Device: open hardware ATmega328p board (Gerbers published) purpose-built for practicing UART extraction, firmware dumping, and Bluetooth sniffing attacks on physical hardware.
-* [DVRF](https://github.com/praetorian-inc/DVRF) - Damn Vulnerable Router Firmware: modified Linksys firmware containing intentional MIPS/ARM binary exploitation challenges (buffer overflows, format strings, heap bugs) runnable under QEMU without physical hardware.
+* [DVRF](https://github.com/praetorian-inc/DVRF) 🗄️ - Damn Vulnerable Router Firmware: modified Linksys firmware containing intentional MIPS/ARM binary exploitation challenges (buffer overflows, format strings, heap bugs) runnable under QEMU without physical hardware.
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - Beginners resource on embedded systems security.
 * Fault Injection and Side Channel Attacks
   * [raelize.com - Blog](https://raelize.com/blog) - Great insight into hardware hacking such as fault injection and side-channel attacks.
@@ -299,13 +334,16 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [SecuringHardware.com](https://learn.securinghardware.com/) 💰 - Paid hardware security training courses by Joe Fitz [@securelyfitz](https://x.com/securelyfitz).
 
 ### Security Assessment and Design Guidance
+
 * [OWASP IoT Security Testing Guide](https://github.com/OWASP/owasp-istg) - Methodology and test catalog for repeatable IoT penetration testing and security assessments.
 * [PSA Certified](https://www.psacertified.org/) - IoT security framework, certification scheme, and developer resources for device, silicon, software, and root-of-trust security.
 
 ## Open Source Intelligence (OSINT)
+
 * [Awesome OSINT](https://github.com/jivoi/awesome-osint)
 
 ## Other Awesome Lists
+
 List of security lists.
 
 * Domain Specific
@@ -331,4 +369,5 @@ List of security lists.
   * [lists](https://github.com/jnv/lists)
 
 ## Contribute
+
 Contributions welcome! Read the [contribution guidelines](contributing.md) first.
