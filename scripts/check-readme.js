@@ -17,6 +17,18 @@ const LINK_ITEM_RE = /^\s*\*\s+\[([^\]]*)\]\(([^)]*)\)/;
 // Matches list items that look like a link but have broken bracket/paren
 // pairing (missing `]`, missing `(`, etc.) so they fail LINK_ITEM_RE silently.
 const BROKEN_LINK_ITEM_RE = /^\s*\*\s+\[/;
+// Matches a Table of Contents entry: "* [Name](#anchor)", any nesting depth.
+const TOC_ITEM_RE = /^(\s*)\*\s+\[([^\]]+)\]\(#([^)]*)\)\s*$/;
+
+// GitHub's heading-anchor algorithm: lowercase, drop everything that isn't
+// alphanumeric/underscore/space/hyphen, then spaces become hyphens.
+function slugify(heading) {
+  return heading
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s/g, '-');
+}
 
 function normalizeUrl(url) {
   try {
@@ -29,11 +41,33 @@ function normalizeUrl(url) {
   }
 }
 
-const seenUrls = new Map(); // normalizedUrl -> { lineNo, raw }
 const errors = [];
+
+// --- Locate the Table of Contents ------------------------------------
+// Found up front so the entry scan below can skip it: since the ToC is
+// anchored, its items are markdown links and would otherwise be counted
+// as list entries (and flagged as duplicates of each other).
+
+const tocStart = lines.findIndex((l) => l.trim() === '## Contents');
+const tocEnd =
+  tocStart === -1
+    ? -1
+    : lines.findIndex((l, i) => i > tocStart && /^##\s+/.test(l));
+const tocLast = tocEnd === -1 ? lines.length : tocEnd;
+
+if (tocStart === -1) {
+  errors.push('README.md: could not find "## Contents" heading.');
+}
+
+// --- Entry scan: duplicates and malformed links -----------------------
+
+const seenUrls = new Map(); // normalizedUrl -> { lineNo, raw }
 
 lines.forEach((line, idx) => {
   const lineNo = idx + 1;
+
+  if (tocStart !== -1 && idx > tocStart && idx < tocLast) return;
+
   const linkMatch = line.match(LINK_ITEM_RE);
 
   if (linkMatch) {
@@ -69,30 +103,42 @@ lines.forEach((line, idx) => {
 });
 
 // --- Table of Contents <-> heading sync check -------------------------
-// The ToC is plain text (not anchor links), so this can't be a link
-// checker; instead verify the set of ToC entries matches the set of
-// actual ## / ### headings, including their ## -> ### grouping. Order
-// is intentionally not enforced (the ToC and document order are already
-// allowed to diverge), only presence/absence.
+// Verify that the set of ToC entries matches the set of actual ## / ###
+// headings, including their ## -> ### grouping, and that every anchor
+// actually resolves to the heading it names. Order is intentionally not
+// enforced (the ToC and document order are already allowed to diverge),
+// only presence/absence.
 
-const tocStart = lines.findIndex((l) => l.trim() === '## Table of Contents');
-if (tocStart === -1) {
-  errors.push('README.md: could not find "## Table of Contents" heading.');
-} else {
-  const tocEnd = lines.findIndex(
-    (l, i) => i > tocStart && /^##\s+/.test(l)
-  );
-  const tocLines = lines.slice(tocStart + 1, tocEnd === -1 ? lines.length : tocEnd);
-
+if (tocStart !== -1) {
   const tocSections = new Map(); // top-level name -> Set of nested names
   let currentTop = null;
-  for (const line of tocLines) {
-    const topMatch = line.match(/^\*\s+(.+?)\s*$/);
-    const nestedMatch = line.match(/^\s{2,}\*\s+(.+?)\s*$/);
-    if (nestedMatch) {
-      if (currentTop) tocSections.get(currentTop).add(nestedMatch[1]);
-    } else if (topMatch) {
-      currentTop = topMatch[1];
+
+  for (let i = tocStart + 1; i < tocLast; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+
+    const match = line.match(TOC_ITEM_RE);
+    if (!match) {
+      errors.push(
+        `README.md:${i + 1}: ToC entry is not an anchor link ` +
+          `("* [Name](#anchor)"): "${line.trim()}"`
+      );
+      continue;
+    }
+
+    const [, indent, name, anchor] = match;
+    const expected = slugify(name);
+    if (anchor !== expected) {
+      errors.push(
+        `README.md:${i + 1}: ToC anchor "#${anchor}" does not match ` +
+          `heading "${name}" (expected "#${expected}").`
+      );
+    }
+
+    if (indent.length >= 2) {
+      if (currentTop) tocSections.get(currentTop).add(name);
+    } else {
+      currentTop = name;
       tocSections.set(currentTop, new Set());
     }
   }
@@ -104,7 +150,7 @@ if (tocStart === -1) {
     const h2Match = line.match(/^##\s+(.+?)\s*$/);
     const h3Match = line.match(/^###\s+(.+?)\s*$/);
     if (h2Match) {
-      if (h2Match[1] === 'Table of Contents') {
+      if (h2Match[1] === 'Contents') {
         currentDocTop = null;
         continue;
       }
@@ -152,4 +198,7 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`README.md check passed: ${seenUrls.size} unique entries, ToC matches headings, no duplicates or malformed links.`);
+console.log(
+  `README.md check passed: ${seenUrls.size} unique entries, ` +
+    `ToC anchors resolve, no duplicates or malformed links.`
+);
