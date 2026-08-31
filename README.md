@@ -39,11 +39,11 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
   * [Chip-Off and Memory Forensics](#chip-off-and-memory-forensics)
   * [Side-Channel Analysis](#side-channel-analysis)
   * [Fault Injection](#fault-injection)
-  * [Logic Analyzer](#logic-analyzer)
+  * [Logic Analyzers](#logic-analyzers)
   * [RF Tools (Non-SDR)](#rf-tools-non-sdr)
   * [Software Defined Radios](#software-defined-radios)
   * [Software Defined Radio Software](#software-defined-radio-software)
-  * [Wifi Tools](#wifi-tools)
+  * [Wi-Fi Tools](#wi-fi-tools)
 * [Further Learning and Training](#further-learning-and-training)
   * [Security Assessment and Design Guidance](#security-assessment-and-design-guidance)
 * [Open Source Intelligence (OSINT)](#open-source-intelligence-osint)
@@ -289,7 +289,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [PicoEMP](https://github.com/newaetech/chipshouter-picoemp) - NewAE's open hardware EMFI tool built on a Raspberry Pi Pico and photographic-flash transformer circuit; the community standard entry-level electromagnetic fault injection platform.
 * [PicoGlitcher](https://github.com/MKesenheimer/fault-injection-library) - RP2040/RP2350-based voltage glitching platform with 66A crowbar, sub-10ns pulse resolution via PIO sampling, and a high-level Python (`findus`) API for scripting attack campaigns. Validated by SySS Research.
 
-### Logic Analyzer
+### Logic Analyzers
 
 * [Saleae](https://www.saleae.com/) 💰 - Commercial logic analyzer hardware ($149–$499+) with proprietary software; widely used for decoding SPI, I2C, UART, and other embedded protocols.
 * [Sigrok](https://sigrok.org/) - Portable, cross-platform, Free/Libre/Open-Source signal analysis software suite that supports various device types (e.g. logic analyzers, oscilloscopes, and many more).
@@ -301,20 +301,32 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [ChameleonUltra](https://github.com/RfidResearchGroup/ChameleonUltra) - Pocket friendly powerful LF and HF emulation & manipulation tool which is based on the open-source project ChameleonMini.
 * [Flipper Zero](https://docs.flipper.net/) - Portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more.
 * [Proxmark3](https://github.com/RfidResearchGroup/proxmark3) - Open-source RFID research platform for low-level interaction, analysis, and testing across a wide range of LF and HF tags and systems.
+* [rfcat](https://github.com/atlas0fd00m/rfcat) - Firmware and Python framework for CC1111-based sub-GHz radio dongles, including the Yard Stick One listed below.
+* [rtl_433](https://github.com/merbanan/rtl_433) - Decoder for over 250 ISM-band device protocols covering sensors, utility meters, TPMS, and remotes, built on cheap RTL-SDR hardware.
 * [Yard Stick One](https://greatscottgadgets.com/yardstickone/) - Transmit or receive digital wireless signals at frequencies below 1 GHz. It uses the same radio circuit as the popular IM-Me.
 
 ### Software Defined Radios
 
 * [ADALM-PLUTO (PlutoSDR)](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html) - Active learning module (PlutoSDR) used to explore software-defined radio, RF experimentation, and wireless communications.
+* [Airspy](https://airspy.com/) - Receive-only SDRs with high dynamic range and front-end filtering, covering HF through 1.8 GHz depending on model.
+* [bladeRF](https://www.nuand.com/bladerf-2-0-micro/) - Full-duplex 2x2 MIMO SDR tuning 47 MHz to 6 GHz, with an on-board FPGA for signal processing at the edge.
 * [HackRF One](https://greatscottgadgets.com/hackrf/) - Software Defined Radio peripheral capable of transmission or reception of radio signals from 1 MHz to 6 GHz.
+* [LimeSDR](https://limemicro.com/sdr/) - Open-hardware full-duplex MIMO SDR with open drivers (LimeSuite, SoapySDR), widely used for LTE and 5G experimentation.
 * [RTL-SDR](https://www.rtl-sdr.com/) - Very cheap ~$30 USB dongle that can be used as a computer based radio scanner for receiving live radio signals in your area (no internet required).
+* [SDRplay RSP](https://www.sdrplay.com/) - Wideband 14-bit receivers covering 1 kHz to 2 GHz with tunable preselection filters to reject out-of-band interference.
+* [USRP](https://www.ettus.com/) - Ettus Research SDR family and the UHD driver stack; the platform most published cellular and wireless security research is built on.
 
 ### Software Defined Radio Software
 
 * [Future SDR](https://www.futuresdr.org/) - Supports Blocks with synchronous or asynchronous implementations for stream-based or message-based data processing.
+* [GNU Radio](https://www.gnuradio.org/) - Signal processing framework providing the DSP blocks, scheduler, and flowgraph tooling that most open-source RF analysis and attack tools are built on.
+* [Gqrx](https://www.gqrx.dk/) - General-purpose SDR receiver built on GNU Radio and Qt, with a waterfall display and AM/FM/SSB demodulation for surveying unknown spectrum.
+* [inspectrum](https://github.com/miek/inspectrum) - Offline analyser for captured IQ recordings, with cursors for measuring symbol rates and extracting bits from an unknown modulation.
 * [Maia SDR](https://maia-sdr.org/) - Open-source FPGA-based SDR project focusing on the ADALM Pluto.
+* [SDRangel](https://www.sdrangel.org/) - Multi-mode SDR frontend with transmit support and decoders for ADS-B, AIS, DMR, POCSAG, and other protocols encountered in embedded and IoT radio work.
+* [SigDigger](https://github.com/BatchDrake/SigDigger) - Real-time signal analyser with FSK, PSK, and ASK demodulation and no GNU Radio dependency, aimed at characterising unknown transmissions.
 
-### Wifi Tools
+### Wi-Fi Tools
 
 * [ESP32Maurauder](https://github.com/justcallmekoko/ESP32Marauder) - A suite of WiFi/Bluetooth offensive and defensive tools for the ESP32.
 * [Pwnagotchi](https://pwnagotchi.ai/) - A2C-based “AI” powered by bettercap and running on a Raspberry Pi Zero W that learns from its surrounding WiFi environment in order to maximize the crackable WPA key material it captures.
