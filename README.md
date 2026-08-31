@@ -184,8 +184,8 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Keylime](https://keylime.dev/) - Open source TPM-based remote attestation for cloud and edge.
 * [OpenTitan](https://opentitan.org/) - Open-source silicon root of trust project with security-certified hardware designs and commercial-grade IP blocks.
 * [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
-* [TPM 2.0 TS](https://github.com/tpm2-software/tpm2-tss) - TCG Software Stack for TPM 2.0 providing API for key management and attestation.
 * [tpm2-algtest](https://github.com/crocs-muni/tpm2-algtest) - Tests real TPM 2.0 chips for RNG output quality, key generation timing, algorithm support, and implementation fingerprints across 80+ firmware revisions from 6 vendors. From CRoCS (discoverers of ROCA). CHES 2024.
+* [tpm2-tss](https://github.com/tpm2-software/tpm2-tss) - Reference implementation of the TCG TPM2 Software Stack (TSS2), providing the APIs for key management and attestation.
 
 ### OTA Update Security
 
@@ -269,7 +269,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Glasgow Interface Explorer](https://glasgow-embedded.org/) - Versatile open-source FPGA-based hardware debugging and reverse engineering tool supporting SPI, I2C, UART, JTAG, and custom protocols with a high-level Python API.
 * [GreatFET](https://greatscottgadgets.com/greatfet/) - Open-source USB host-side hardware security research platform from Great Scott Gadgets with an expandable neighbor board ecosystem for interfacing with embedded targets.
 * [Hydrabus](https://hydrabus.com/) - Open-source multi-protocol hardware hacking tool with support for SPI, I2C, UART, CAN, 1-Wire, and JTAG interfaces, purpose-built for embedded device analysis.
-* [Tiguard](https://github.com/tigard-tools/tigard) - An FTDI FT2232H-based multi-protocol tool for hardware hacking.
+* [Tigard](https://github.com/tigard-tools/tigard) - An FTDI FT2232H-based multi-protocol tool for hardware hacking.
 
 ### Hardware Debug Interfaces
 
@@ -352,7 +352,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Wi-Fi Tools
 
-* [ESP32Maurauder](https://github.com/justcallmekoko/ESP32Marauder) - A suite of WiFi/Bluetooth offensive and defensive tools for the ESP32.
+* [ESP32 Marauder](https://github.com/justcallmekoko/ESP32Marauder) - A suite of WiFi/Bluetooth offensive and defensive tools for the ESP32.
 * [Pwnagotchi](https://pwnagotchi.ai/) - A2C-based “AI” powered by bettercap and running on a Raspberry Pi Zero W that learns from its surrounding WiFi environment in order to maximize the crackable WPA key material it captures.
 
 ## Further Learning and Training
