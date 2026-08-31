@@ -6,6 +6,8 @@ A curated list of embedded security tools, resources, and training for firmware 
 
 Topics covered include firmware extraction and fuzzing, secure boot and root of trust, side-channel analysis, fault injection, JTAG/SWD debugging, RTOS and TEE security, Bluetooth/BLE, Zigbee, and other wireless protocol security, and software-defined radio (SDR).
 
+**Legend:** 💰 commercial or closed-source · 🗄️ archived by its maintainers
+
 ## Contents
 
 * [Software Tools](#software-tools)
@@ -52,7 +54,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Binary Parsing and Analysis Tools
 
-* [argXtract](https://github.com/projectbtle/argXtract) - Statically extracts arguments to SVC calls and HAL functions from stripped ARM Cortex-M BLE firmware without symbol tables, enabling security audits of Nordic and similar binaries. ACSAC 2021.
+* [argXtract](https://github.com/projectbtle/argXtract) 🗄️ - Statically extracts arguments to SVC calls and HAL functions from stripped ARM Cortex-M BLE firmware without symbol tables, enabling security audits of Nordic and similar binaries. ACSAC 2021.
 * [Binwalk](https://github.com/ReFirmLabs/binwalk) - Fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 * [checksec](https://github.com/slimm609/checksec.sh) - Shell script to check binary security hardening flags (NX, PIE, RELRO, stack canary, ASLR) on ELF executables extracted from firmware.
 * [cwe_checker](https://github.com/fkie-cad/cwe_checker) - Binary analysis tool that checks ELF binaries for violations of Common Weakness Enumerations (CWEs) using abstract interpretation, with cross-architecture support.
@@ -116,7 +118,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [AFL++](https://github.com/AFLplusplus/AFLplusplus) - A coverage-guided fuzzer with enhanced mutations, QEMU and Unicorn emulation modes, and custom power schedules.
 * [boofuzz](https://github.com/jtpereyda/boofuzz) - Actively maintained network protocol fuzzer and the spiritual successor to Sulley, with session management, target monitoring, and protocol graph support.
 * [Fuzzowski](https://github.com/nccgroup/fuzzowski) - A network protocol fuzzer based on the Sulley/BooFuzz framework with support for TCP/UDP/SSL protocols.
-* [GDBFuzz](https://github.com/boschresearch/gdbfuzz) - Uses GDB hardware breakpoints as a coverage source for uninstrumented embedded targets — works on any GDB-debuggable MCU with no firmware modification required. Bosch Research / ISSTA 2023.
+* [GDBFuzz](https://github.com/boschresearch/gdbfuzz) 🗄️ - Uses GDB hardware breakpoints as a coverage source for uninstrumented embedded targets — works on any GDB-debuggable MCU with no firmware modification required. Bosch Research / ISSTA 2023.
 * [honggfuzz](https://github.com/google/honggfuzz) - A feedback-driven evolutionary fuzzer supporting hardware-based coverage (Intel BTS/PT) and persistent mode for extreme speed.
 * [libFuzzer](https://llvm.org/docs/LibFuzzer.html) - In-process, coverage-guided, evolutionary fuzzing engine integrated with LLVM.
 * [Peach](https://gitlab.com/peachtech/peach-fuzzer-community) 💰 - A smart fuzzer supporting both generation-based and mutation-based fuzzing via Peach Pit definitions. Community edition is source-available; full product is commercial.
@@ -127,7 +129,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
   * [JADX](https://github.com/skylot/jadx) - Dex to Java decompiler.
   * [JD-GUI](https://github.com/java-decompiler/jd-gui) - Java decompiler.
 * .NET
-  * [de4dot](https://github.com/de4dot/de4dot) - .NET deobfuscator.
+  * [de4dot](https://github.com/de4dot/de4dot) 🗄️ - Deobfuscator and unpacker for .NET binaries. Archived in 2020; the widely referenced de4dot-cex fork is archived as well.
   * [dnSpy](https://github.com/dnSpyEx/dnSpy) - .NET debugger and assembly editor.
   * [ILSpy](https://github.com/icsharpcode/ILSpy) - .NET Decompiler with support for PDB generation, ReadyToRun, Metadata (&more) - cross-platform!
 
@@ -198,7 +200,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Bettercap BLE](https://www.bettercap.org/modules/ble/) - BLE scanning, enumeration, and characteristic read/write module integrated into the bettercap Swiss-army knife framework.
 * [BlueToolkit](https://github.com/sgxgsx/BlueToolkit) - Modular black-box vulnerability testing framework for Bluetooth Classic and BLE with Recon/Exploit/Report modules covering 40+ public exploits (MITM, RCE, DoS); used to uncover 128 vulnerabilities across 22 vehicles from major automakers. USENIX WOOT 2025.
 * [BrakTooth](https://github.com/Matheus-Garbelini/braktooth_esp32_bluetooth_classic_attacks) - Directed exploit suite for Bluetooth Classic LMP layer vulnerabilities, targeting protocol layers inaccessible from standard host stacks; affected 1,400+ products from Intel, Qualcomm, and Broadcom. USENIX Security 2022.
-* [BtleJuice](https://github.com/DigitalSecurity/btlejuice) - Bluetooth Low Energy MITM proxy framework for real-time interception and manipulation of BLE communications.
+* [BtleJuice](https://github.com/DigitalSecurity/btlejuice) 🗄️ - Bluetooth Low Energy MITM proxy framework for real-time interception and manipulation of BLE communications. Archived since 2018; see BtleJack or the WHAD Framework for maintained alternatives.
 * [GATTacker](https://github.com/securing/gattacker) - BLE MITM tool for intercepting and relaying GATT profiles to test BLE device authentication and data integrity.
 * [InternalBlue](https://github.com/seemoo-lab/internalblue) - Bluetooth experimentation framework enabling binary patching, LMP injection, and live monitoring of Broadcom/Cypress firmware on commodity devices (iPhone, Samsung Galaxy, Raspberry Pi) without custom hardware.
 * [nRF Sniffer for Bluetooth LE](https://www.nordicsemi.com/Products/Development-tools/nRF-Sniffer-for-Bluetooth-LE) 💰 - Nordic Semiconductor's BLE packet sniffer for capturing and analyzing Bluetooth Low Energy traffic with Wireshark integration. Wireshark plugin is open source; dongle firmware is a closed binary requiring Nordic hardware.
@@ -248,7 +250,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Hardware Reverse Engineering Multitools
 
-* [Bus Pirate](https://github.com/ElderlyPirate/Bus_Pirate) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
+* [Bus Pirate](https://buspirate.com/) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
 * [Glasgow Interface Explorer](https://glasgow-embedded.org/) - Versatile open-source FPGA-based hardware debugging and reverse engineering tool supporting SPI, I2C, UART, JTAG, and custom protocols with a high-level Python API.
 * [GreatFET](https://greatscottgadgets.com/greatfet/) - Open-source USB host-side hardware security research platform from Great Scott Gadgets with an expandable neighbor board ecosystem for interfacing with embedded targets.
 * [Hydrabus](https://hydrabus.com/) - Open-source multi-protocol hardware hacking tool with support for SPI, I2C, UART, CAN, 1-Wire, and JTAG interfaces, purpose-built for embedded device analysis.
@@ -320,7 +322,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ## Further Learning and Training
 
 * [DVID](https://github.com/Vulcainreo/DVID) - Damn Vulnerable IoT Device: open hardware ATmega328p board (Gerbers published) purpose-built for practicing UART extraction, firmware dumping, and Bluetooth sniffing attacks on physical hardware.
-* [DVRF](https://github.com/praetorian-inc/DVRF) - Damn Vulnerable Router Firmware: modified Linksys firmware containing intentional MIPS/ARM binary exploitation challenges (buffer overflows, format strings, heap bugs) runnable under QEMU without physical hardware.
+* [DVRF](https://github.com/praetorian-inc/DVRF) 🗄️ - Damn Vulnerable Router Firmware: modified Linksys firmware containing intentional MIPS/ARM binary exploitation challenges (buffer overflows, format strings, heap bugs) runnable under QEMU without physical hardware.
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - Beginners resource on embedded systems security.
 * Fault Injection and Side Channel Attacks
   * [raelize.com - Blog](https://raelize.com/blog) - Great insight into hardware hacking such as fault injection and side-channel attacks.

@@ -44,6 +44,23 @@ Use this format:
 * [Project Name](https://example.com) - Short description.
 ```
 
+### Markers
+
+Two optional markers go between the link and the dash:
+
+```md
+* [Project Name](https://example.com) 💰 - Short description.
+* [Project Name](https://example.com) 🗄️ - Short description.
+```
+
+- 💰 marks a project that is commercial or closed-source. It is about the
+  licensing, not the price: open-hardware tools you have to buy — HackRF One,
+  Proxmark3, ChipWhisperer — are not marked.
+- 🗄️ marks a repository its maintainers have archived. Archived is not a
+  reason to remove an entry on its own: paper artifacts and vulnerable-by-design
+  teaching targets are expected to be frozen. If a maintained successor exists,
+  name it at the end of the description.
+
 ## Pull Request Notes
 
 In your PR description, include:
