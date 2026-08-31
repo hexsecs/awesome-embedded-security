@@ -15,6 +15,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
   * MCU Firmware Fuzzing
   * Emulation Tools
   * Debugging Tools
+  * USB Security
   * Secure Boot and Firmware Trust
   * Firmware Supply Chain and SBOM
   * Language Specific Decompilers
@@ -86,6 +87,9 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [probe-rs](https://probe.rs/) - Modern Rust-based embedded debug toolkit supporting SWD/JTAG with built-in flashing, RTT logging, and GDB server for ARM and RISC-V targets.
 * [Frida](https://frida.re/) - Dynamic instrumentation toolkit for injecting JavaScript or native code into running processes on embedded Linux, Android, iOS, and bare-metal targets.
 
+### USB Security
+* [Facedancer](https://github.com/greatscottgadgets/facedancer) - Python framework for emulating, creating, and tampering with USB devices using compatible hardware such as Cynthion or GreatFET.
+
 ### Secure Boot and Firmware Trust
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
 * [AVB (Android Verified Boot)](https://android.googlesource.com/platform/external/avb/+/master/README.md) - Reference implementation and design guidance for chained trust and verified partitions in embedded Android systems.
@@ -140,11 +144,13 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### TEE/Trusted Execution Environments
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
 * [Trusty TEE](https://source.android.com/docs/security/features/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
+* [Trusted Firmware-M](https://trustedfirmware-m.readthedocs.io/en/latest/) - Open-source secure firmware for Arm Cortex-M TrustZone systems, providing isolation, secure services, and PSA security APIs.
 * [Intel SGX SDK](https://github.com/intel/linux-sgx) - Open-source Linux SDK and Platform Software for Intel Software Guard Extensions, providing the build/install toolchain for developing and deploying hardware-based memory enclave applications.
 * [AMD SEV](https://developer.amd.com/sev/) - Secure Encrypted Virtualization for encrypting VM memory with AMD-V hardware assistance.
 * [Samsung TrustZone Research Toolkit](https://github.com/quarkslab/samsung-trustzone-research) - Quarkslab's RE toolkit for Samsung Kinibi TrustZone: Ghidra loader for MCLF trustlet binaries, Unicorn-based trustlet emulator for exploit development, and Python bindings for communicating with Trusted Applications.
 
 ### Root of Trust and TPM
+* [OpenTitan](https://opentitan.org/) - Open-source silicon root of trust project with security-certified hardware designs and commercial-grade IP blocks.
 * [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
 * [IBM Software TPM](https://sourceforge.net/projects/ibmswtpm2/) - Software TPM 2.0 emulator for testing and development.
 * [TPM 2.0 TS](https://github.com/tpm2-software/tpm2-tss) - TCG Software Stack for TPM 2.0 providing API for key management and attestation.
@@ -154,9 +160,11 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### OTA Update Security
 * [SUIT](https://datatracker.ietf.org/wg/suit/about/) - Software Update for the Internet of Things (SUIT) working group developing manifest-based firmware update architecture.
+* [The Update Framework (TUF)](https://theupdateframework.io/) - Framework and specification for securing software-update systems against repository and signing-key compromise.
 * [RAUC](https://rauc.io/) - Safe and secure firmware update framework for embedded Linux with bundle signing and A/B partitioning.
 * [Mender](https://mender.io/) - Over-the-air software updater for Linux IoT devices with atomic updates and rollback.
 * [SWUpdate](https://sbabic.github.io/swupdate/) - Linux firmware update agent with image verification and incremental updates.
+* [Uptane](https://uptane.org/) - Secure software-update framework and standard for automotive systems, designed to resist compromised infrastructure and vehicle-network attacks.
 
 ### IoT Protocol Security
 * [TLS for MQTT](https://mqtt.org/faq/) - Overview of TLS implementation for MQTT brokers and clients.
@@ -226,6 +234,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [JTAGenum](https://github.com/cyphunk/JTAGenum) - Enumerates JTAG pinouts on unknown boards by brute-force testing candidate pin mappings.
 * [UrJTAG](https://urjtag.sourceforge.io/) - Open-source JTAG toolkit for boundary scan, flash programming, and low-level target interaction.
 * [LUNA](https://github.com/greatscottgadgets/luna) - FPGA-based USB analysis and development platform from Great Scott Gadgets, enabling USB sniffing, protocol fuzzing, and custom USB peripheral development via Amaranth HDL.
+* [Cynthion](https://greatscottgadgets.com/cynthion/) - FPGA-based USB research tool and high-speed USB 2.0 protocol analyzer for capturing traffic and experimenting with USB devices.
 * [JTAGulator](https://github.com/grandideastudio/jtagulator) - Automates discovery of JTAG, SWD, and UART debug interfaces on unknown PCBs by brute-forcing pin combinations, with sigrok-compatible logic analyzer mode and direct OpenOCD integration for post-discovery exploitation.
 
 ### Chip-Off and Memory Forensics
@@ -261,7 +270,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Software Defined Radios
 * [HackRF One](https://greatscottgadgets.com/hackrf/) - Software Defined Radio peripheral capable of transmission or reception of radio signals from 1 MHz to 6 GHz.
-* [ADALM-PLUTO (PlutoSDR)](https://wiki.analog.com/university/tools/pluto) - Active learning module (PlutoSDR) used to explore software-defined radio, RF experimentation, and wireless communications.
+* [ADALM-PLUTO (PlutoSDR)](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html) - Active learning module (PlutoSDR) used to explore software-defined radio, RF experimentation, and wireless communications.
 * [RTL-SDR](https://www.rtl-sdr.com/) - Very cheap ~$30 USB dongle that can be used as a computer based radio scanner for receiving live radio signals in your area (no internet required).
 
 ### Software Defined Radio Software
@@ -284,6 +293,8 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [DVID](https://github.com/Vulcainreo/DVID) - Damn Vulnerable IoT Device: open hardware ATmega328p board (Gerbers published) purpose-built for practicing UART extraction, firmware dumping, and Bluetooth sniffing attacks on physical hardware.
 * [DVRF](https://github.com/praetorian-inc/DVRF) - Damn Vulnerable Router Firmware: modified Linksys firmware containing intentional MIPS/ARM binary exploitation challenges (buffer overflows, format strings, heap bugs) runnable under QEMU without physical hardware.
 * [HardwareAllTheThings](https://github.com/swisskyrepo/HardwareAllTheThings) - Actively maintained hardware and IoT pentesting wiki by swisskyrepo covering fault injection, JTAG/SWD/UART exploitation, firmware dumping, side-channel attacks, and RF attacks with practical tooling references.
+* [OWASP IoT Security Testing Guide](https://github.com/OWASP/owasp-istg) - Methodology and test catalog for repeatable IoT penetration testing and security assessments.
+* [PSA Certified](https://www.psacertified.org/) - IoT security framework, certification scheme, and developer resources for device, silicon, software, and root-of-trust security.
 
 ## Open Source Intelligence (OSINT)
 * [Awesome OSINT](https://github.com/jivoi/awesome-osint)
