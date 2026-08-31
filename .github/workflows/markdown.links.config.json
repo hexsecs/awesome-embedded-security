@@ -20,6 +20,9 @@
       "pattern": "^https://www\\.analog\\.com/"
     },
     {
+      "pattern": "^https://www\\.gsma\\.com/"
+    },
+    {
       "pattern": "^https://www\\.nordicsemi\\.com/"
     },
     {
