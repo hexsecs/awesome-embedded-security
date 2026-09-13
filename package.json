@@ -8,6 +8,8 @@
     "lint:links": "bash scripts/check-links.sh",
     "lint:markdown": "markdownlint-cli2",
     "check:readme": "node scripts/check-readme.js",
+    "check:staleness": "node scripts/check-staleness.js",
+    "test:staleness": "node --test scripts/check-staleness.test.js",
     "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {

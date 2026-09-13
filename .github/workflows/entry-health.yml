@@ -1,0 +1,46 @@
+name: Entry Health
+
+# Finds the decay a link check cannot: repositories that have been archived,
+# renamed, or abandoned while their URL still returns 200. Reports into a
+# single issue that it rewrites in place, and never edits the list itself.
+#
+# Deliberately separate from markdown-lint.yml. That workflow gates merges
+# and must stay fast and deterministic; this one talks to the GitHub API,
+# is advisory, and should never be able to turn a pull request red.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:00 UTC on the 8th of each month. Offset from the link check on the
+    # 1st so the two do not report on the same morning.
+    - cron: '0 6 8 * *'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: entry-health
+  cancel-in-progress: false
+
+jobs:
+  entry-health:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+
+      # Runs offline against synthetic API responses. Cheap, and it is the
+      # only thing standing between a misread API error and a report telling
+      # someone to delete live entries.
+      - name: Test the checker
+        run: npm run test:staleness
+
+      - name: Check entry health
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run check:staleness -- --report-issue
