@@ -531,7 +531,15 @@ async function main() {
 // exercised offline, so the parsing, classification and rendering that
 // decide what a maintainer is told are tested against synthetic responses
 // instead.
-module.exports = { readEntries, classify, render, lookup, QUIET_MONTHS };
+module.exports = {
+  readEntries,
+  classify,
+  render,
+  lookup,
+  preflight,
+  reportIssue,
+  QUIET_MONTHS,
+};
 
 if (require.main === module) {
   main().catch((err) => {
