@@ -38,6 +38,40 @@ npm run lint:links
 CI runs both, and retries the link check to absorb hosts that intermittently
 drop connections.
 
+### Entry health
+
+A link check only catches URLs that stop resolving. It says nothing about a
+repository that has been archived, renamed, or abandoned while its URL still
+returns 200 — the kind of decay nobody opens a PR about, because from the
+outside the list still looks correct.
+
+The Entry Health workflow covers that gap. It runs on the 8th of each month,
+asks GitHub about every entry hosted there, and files what it finds as a
+single issue that it rewrites in place rather than opening a new one each
+time. It never edits the list itself: what to do about an archived or moved
+project is a judgement call, not something a script should make.
+
+You can run it yourself, though it needs a token with public repository read
+access and one API request per entry:
+
+```bash
+GITHUB_TOKEN=... npm run check:staleness
+```
+
+It reports four things that need a decision — a repository that has gone
+(404), one that has been renamed or transferred, one that is archived but
+missing its 🗄️ marker, and one still carrying 🗄️ after being unarchived —
+and one thing that does not. Repositories with no pushes for two years or
+more are listed separately, under a heading that says no action is implied.
+Quiet is not the same as unmaintained: paper artifacts and
+vulnerable-by-design teaching targets are expected to be frozen, and several
+entries here were added knowing they were dormant, because they remain the
+best option in their niche.
+
+An API error is never reported as a missing repository. A rate-limited or
+rejected request is listed as unchecked instead, because the cost of getting
+that wrong is someone deleting a live entry.
+
 ## Entry Guidelines
 
 When adding or updating an entry:
