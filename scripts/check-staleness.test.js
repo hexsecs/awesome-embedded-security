@@ -19,6 +19,8 @@ const {
   classify,
   render,
   lookup,
+  preflight,
+  reportIssue,
   QUIET_MONTHS,
 } = require('./check-staleness.js');
 
@@ -235,4 +237,154 @@ test('the report names the file and line of each finding', () => {
   const { body } = render(findings, 1);
 
   assert.ok(body.includes('README.md:62'), 'a finding should be locatable');
+});
+
+// --- The preflight ----------------------------------------------------
+
+test('preflight refuses a rejected token before looking anything up', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({ status: 401, ok: false });
+
+  const result = await preflight(150);
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /credentials/);
+});
+
+test('preflight refuses when the remaining quota is short of the run', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    json: async () => ({
+      resources: { core: { remaining: 10, reset: Math.floor(Date.now() / 1000) + 60 } },
+    }),
+  });
+
+  const result = await preflight(150);
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /only 10 API requests remain/);
+});
+
+test('preflight passes when the quota covers the run', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    json: async () => ({ resources: { core: { remaining: 5000, reset: 0 } } }),
+  });
+
+  assert.strictEqual((await preflight(150)).ok, true);
+});
+
+// --- Filing the issue -------------------------------------------------
+// This is the only part that writes to the repository, so each branch is
+// pinned: an all-clear must not open an issue, and a monthly run must not
+// pile up a new one beside the report already open.
+
+function issueHarness(t, { existingIssue }) {
+  const realFetch = global.fetch;
+  const realEnv = { ...process.env };
+  const calls = [];
+
+  global.fetch = async (url, opts = {}) => {
+    const method = opts.method || 'GET';
+    calls.push({ method, url, body: opts.body ? JSON.parse(opts.body) : null });
+
+    if (method === 'GET') {
+      return {
+        status: 200,
+        ok: true,
+        json: async () =>
+          existingIssue
+            ? [{ number: 99, body: '<!-- entry-health-report -->\nprevious' }]
+            : [],
+      };
+    }
+    return { status: method === 'POST' ? 201 : 200, ok: true, json: async () => ({ number: 123 }) };
+  };
+
+  process.env.GITHUB_TOKEN = 'test-token';
+  process.env.GITHUB_REPOSITORY = 'owner/repo';
+
+  t.after(() => {
+    global.fetch = realFetch;
+    process.env = realEnv;
+  });
+
+  return calls;
+}
+
+test('an all-clear with no open report files nothing at all', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Nothing needs doing', 0);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method !== 'GET').length,
+    0,
+    'a clean list must not open an issue'
+  );
+});
+
+test('an all-clear closes the report that was already open', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Nothing needs doing', 0);
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.ok(write, 'the open report should be updated');
+  assert.strictEqual(write.body.state, 'closed');
+  assert.ok(write.url.endsWith('/issues/99'));
+});
+
+test('findings with no open report open one', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  const write = calls.find((c) => c.method === 'POST');
+  assert.ok(write, 'a new report should be opened');
+  assert.strictEqual(write.body.title, 'Entry health report');
+  assert.ok(write.body.body.includes('<!-- entry-health-report -->'));
+});
+
+test('findings rewrite the open report rather than opening a second', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method === 'POST').length,
+    0,
+    'a monthly run must not pile up issues'
+  );
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.ok(write);
+  assert.strictEqual(write.body.state, 'open');
+  assert.ok(write.body.body.includes('Gone (404)'));
+});
+
+test('the marker the run uses to find its own issue is always written', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Gone (404)', 1);
+
+  const write = calls.find((c) => c.method === 'POST');
+  assert.ok(
+    write.body.body.startsWith('<!-- entry-health-report -->'),
+    'without the marker the next run cannot find this issue and would open another'
+  );
 });
