@@ -108,6 +108,8 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### USB Emulation and Fuzzing
 
 * [Facedancer](https://github.com/greatscottgadgets/facedancer) - Python framework for emulating, creating, and tampering with USB devices using compatible hardware such as Cynthion or GreatFET.
+* [Hydradancer](https://github.com/HydraDancer/hydradancer_fw) - Facedancer backend firmware from Quarkslab for the HydraUSB3 board, reaching USB 2.0 High-Speed emulation rates well above the original Facedancer hardware.
+* [umap2](https://github.com/nccgroup/umap2) - Host-side USB security assessment tool from NCC Group that emulates devices to enumerate which classes a host supports, then fuzzes the matching drivers with the Kitty engine.
 
 ### Secure Boot and Firmware Trust
 
@@ -179,6 +181,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Root of Trust and TPM
 
 * [AMD fTPM Security Guidance](https://www.amd.com/en/resources/product-security/bulletin/amd-sb-4011.html) - AMD guidance and security bulletin coverage related to firmware TPM behavior on supported platforms.
+* [Caliptra](https://github.com/chipsalliance/Caliptra) - Apache-2.0 silicon root of trust block for datacenter CPUs, GPUs, and DPUs providing DICE identity, measured boot, and attestation; maintained under CHIPS Alliance, with ML-DSA post-quantum signing added in 2.x.
 * [IBM Software TPM](https://sourceforge.net/projects/ibmswtpm2/) - Software TPM 2.0 emulator for testing and development.
 * [Keylime](https://keylime.dev/) - Open source TPM-based remote attestation for cloud and edge.
 * [OpenTitan](https://opentitan.org/) - Open-source silicon root of trust project with security-certified hardware designs and commercial-grade IP blocks.
@@ -188,6 +191,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### OTA Update Security
 
+* [fwupd](https://github.com/fwupd/fwupd) - System daemon that applies signed firmware updates to peripherals and embedded Linux devices, pulling vendor metadata and payloads from the LVFS and staging updates that must run at boot.
 * [Mender](https://mender.io/) - Over-the-air software updater for Linux IoT devices with atomic updates and rollback.
 * [RAUC](https://rauc.io/) - Safe and secure firmware update framework for embedded Linux with bundle signing and A/B partitioning.
 * [SUIT](https://datatracker.ietf.org/wg/suit/about/) - Software Update for the Internet of Things (SUIT) working group developing manifest-based firmware update architecture.
@@ -238,6 +242,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [EMBArk](https://github.com/e-m-b-a/embark) - Enterprise web interface for EMBA providing multi-user scan management, aggregated vulnerability dashboards, and CI/CD integration for continuous firmware security monitoring.
 * [Firmware Analysis Toolkit](https://github.com/attify/firmware-analysis-toolkit) - Automated tool for firmware emulation and vulnerability discovery.
 * [Firmware Security Testing](https://github.com/scriptingxss/owasp-fstm) - OWASP firmware security testing methodology and practical guidance for assessing embedded devices.
+* [FwHunt](https://github.com/binarly-io/fwhunt-scan) - Scanner from Binarly that checks UEFI modules and whole firmware images against YAML rules describing known-vulnerable and backdoored components, built on Rizin and usable as a library.
 
 ### Emulation Tools
 
@@ -280,6 +285,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [Cynthion](https://greatscottgadgets.com/cynthion/) - FPGA-based USB research tool and high-speed USB 2.0 protocol analyzer for capturing traffic and experimenting with USB devices.
 * [LUNA](https://github.com/greatscottgadgets/luna) - FPGA-based USB analysis and development platform from Great Scott Gadgets, enabling USB sniffing, protocol fuzzing, and custom USB peripheral development via Amaranth HDL.
+* [OpenVizsla](https://github.com/openvizsla/ov_ftdi) - Open hardware USB protocol tracer with an FPGA capture path and host software for sniffing full and high-speed traffic; boards are sold by sysmocom and 3mdeb.
 
 ### Chip-Off and Memory Forensics
 
@@ -296,11 +302,13 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Jlsca](https://github.com/Keysight/Jlsca) - Side-channel analysis toolkit in Julia, geared toward correlation and linear regression attacks over large trace sets.
 * [lascar](https://github.com/Ledger-Donjon/lascar) - Fast Python SCA library from Ledger's hardware wallet security team supporting CPA, DPA, MIA, template attacks, and ML-based attacks with lazy loading for large trace datasets.
 * [pyecsca](https://github.com/J08nY/pyecsca) - Side-channel analysis and reverse engineering toolkit aimed specifically at elliptic curve implementations, where the other tools here are oriented toward AES.
+* [SCAAML](https://github.com/google/scaaml) - Deep-learning side-channel framework from Google built on TensorFlow, shipping the GPAM attack models and the AES and ECC trace datasets behind its published key-recovery results.
 * [SCALE](https://github.com/danpage/scale) - Side-Channel Attack Lab Exercises providing educational material for learning power analysis attacks with low-cost hardware.
 * [scared](https://github.com/eshard/scared) - Industrial-grade side-channel analysis framework from eShard with best-in-class trace processing performance; supports CPA, DPA, TVLA/NICV leakage assessment, and very large trace datasets.
 
 ### Fault Injection
 
+* [ChipSHOUTER](https://github.com/newaetech/ChipSHOUTER) 💰 - Benchtop electromagnetic fault injection platform from NewAE with a documented Python API and published schematic; the hardware itself is not open, unlike the PicoEMP derived from it.
 * [EM-Fault-It-Yourself](https://github.com/fgsect/EM-Fault-It-Yourself) - Motorized XYZ-stage EMFI platform targeting desktop and server SoCs (successfully attacked the AMD Secure Processor), with 2.5µm accuracy, 100mm travel, and a web UI for automated scanning campaigns. IEEE HOST 2022.
 * [Faulty Cat](https://github.com/ElectronicCats/faultycat) - Low-cost open hardware EMFI tool from Electronic Cats built on an RP2040, offering both electromagnetic and crowbar voltage-glitching fault injection with single-shot and parameter-sweep campaign modes.
 * [PicoEMP](https://github.com/newaetech/chipshouter-picoemp) - NewAE's open hardware EMFI tool built on a Raspberry Pi Pico and photographic-flash transformer circuit; the community standard entry-level electromagnetic fault injection platform.
