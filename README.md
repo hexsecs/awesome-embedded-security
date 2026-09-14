@@ -116,6 +116,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
 * [U-Boot Verified Boot](https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html) - FIT-signature based verified boot support for embedded Linux boot chains.
 * [wolfBoot](https://github.com/wolfSSL/wolfBoot) - Portable secure bootloader for 32-bit MCUs using wolfCrypt for image signature verification (Ed25519, ECC, RSA, post-quantum LMS/XMSS), with delta updates, encrypted images, and explicit voltage-glitch countermeasures.
+* [vkey](https://github.com/vaulttec-dev/vaulttec-key) - Worked example of ESP32-C6 Secure Boot v2 and eFuse HMAC binding in a real device: a `no_std` Rust hardware key whose vault key passes through an eFuse-held HMAC key so a flash dump without the chip is useless, with the residual attack surface (open ROM download mode, the unpadded MMU page after the signature, published C3/C6 fault injection) costed in its threat model rather than waved away.
 
 ### Firmware Supply Chain and SBOM
 
