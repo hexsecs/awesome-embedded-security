@@ -118,6 +118,55 @@ the link checker uses, and any non-2xx response, timeout, or bot wall is
 recorded as unchecked rather than as a finding. Whether a URL is actually dead
 is the link check's question, because the cost of getting that wrong is
 someone deleting a live entry.
+### Finding candidates
+
+Every other check here is defensive: it keeps what is already listed from
+rotting. Nothing proposes a change, so the list only grows when a human
+happens to notice a project and opens a PR.
+
+The Discover Candidates workflow closes that gap. It runs on the 22nd of each
+month, searches GitHub for repositories matching this list's subject matter,
+subtracts everything already listed and everything previously declined, ranks
+what is left, and files the top twelve as a single issue it rewrites in place.
+Each candidate comes with a ready-to-paste entry line, the section it probably
+belongs in, and the exact line number and neighbours of its alphabetical
+position — computed with the same sort rules the order check enforces.
+
+It never edits `README.md`, and that is a design decision rather than caution.
+Whether a project belongs here is a judgement about relevance, quality and
+overlap with what is already listed, and a keyword search cannot make it. Every
+candidate is a proposal addressed to you.
+
+```bash
+GITHUB_TOKEN=... npm run find:candidates
+```
+
+A candidate with no drafted description means the repository's own description
+could not be reworded into something that satisfies the two rules awesome-lint
+enforces quietly. That is reported rather than guessed at: a plausible-sounding
+wrong description is worse than a blank one.
+
+#### Declining a candidate
+
+If a proposal does not belong on the list, add it to
+`scripts/declined-candidates.json` and it will never be proposed again:
+
+```json
+{
+  "url": "https://github.com/example/project",
+  "reason": "Desktop OS hardening, not embedded.",
+  "date": "2026-10-15"
+}
+```
+
+`url` is matched after normalization, so http/https, a trailing slash and a
+`www.` prefix are all the same entry. `reason` is required — a decline with no
+reason cannot be revisited later, and a run refuses to start if one is missing.
+To reconsider a project, delete its object.
+
+This file is why the report stays worth reading. Without it, a project you
+already said no to comes back next month and the month after, and by the third
+identical report everyone has muted the issue.
 
 ## Entry Guidelines
 
