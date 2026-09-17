@@ -1204,7 +1204,7 @@ function emulationRepo(name) {
   });
 }
 
-test('two candidates in one section do not both claim the same position', () => {
+test('every neighbour named is a real entry, never another candidate', () => {
   const selection = selectCandidates(
     [ok('q', [faultInjectionRepo('Glitchy'), faultInjectionRepo('Warlock')])],
     list,
@@ -1212,23 +1212,43 @@ test('two candidates in one section do not both claim the same position', () => 
     NOW
   );
 
-  const [first, second] = selection.candidates;
-  assert.strictEqual(first.section, 'Fault Injection');
-  assert.strictEqual(second.section, 'Fault Injection');
-
-  // Glitchy sorts between Fault Tool and Zapper; Warlock after Glitchy. The
-  // second must see the first, not the pristine file.
-  assert.notStrictEqual(
-    `${first.placement.lineNo}/${first.placement.before && first.placement.before.label}`,
-    `${second.placement.lineNo}/${second.placement.before && second.placement.before.label}`,
-    'both candidates claimed an identical position'
+  const proposed = new Set(selection.candidates.map((c) => c.name));
+  const listed = new Set(
+    [...list.sections.values()].flatMap((s) => s.entries.map((e) => e.label))
   );
-  assert.strictEqual(second.placement.after.label, 'Glitchy');
+
+  for (const c of selection.candidates) {
+    for (const side of [c.placement.after, c.placement.before]) {
+      if (!side) continue;
+      assert.ok(
+        listed.has(side.label) && !proposed.has(side.label),
+        `${c.name} is placed against "${side.label}", which is another ` +
+          'candidate rather than an entry that actually exists — a reviewer ' +
+          'who declines it is left with a position anchored to nothing'
+      );
+    }
+  }
+});
+
+// Two candidates that sort into the same gap legitimately share a position:
+// each describes the file as it is now, not as it would be after the other.
+test('siblings in one gap are both placed against the unmodified file', () => {
+  const selection = selectCandidates(
+    [ok('q', [faultInjectionRepo('Glitchy'), faultInjectionRepo('Warlock')])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  for (const c of selection.candidates) {
+    assert.strictEqual(c.placement.after.label, 'Fault Tool');
+    assert.strictEqual(c.placement.before.label, 'Zapper');
+  }
 });
 
 // The strongest available assertion: actually apply the insertions in report
 // order and re-run the alphabetical check over the result.
-test('applying every proposed position leaves the list sorted', () => {
+test('applying every proposed position bottom-up leaves the list sorted', () => {
   const selection = selectCandidates(
     [
       ok('q', [
@@ -1245,13 +1265,20 @@ test('applying every proposed position leaves the list sorted', () => {
 
   assert.strictEqual(selection.candidates.length, 4);
 
-  // Positions describe the finished file, so they are applied in ascending
-  // line order — that reproduces exactly the state they were computed against.
+  // Positions describe the file as it stands, so they are applied bottom-up:
+  // an insertion never shifts the lines above it, which is what makes every
+  // position exact no matter how many are applied.
   const lines = FAKE_README.split('\n');
-  const inOrder = [...selection.candidates].sort(
-    (a, b) => a.placement.lineNo - b.placement.lineNo
+  // Two candidates that sort into the same gap share a line number, so
+  // bottom-up alone leaves their order relative to each other undetermined.
+  // A maintainer settles that the way the list always does — alphabetically,
+  // which check-readme.js enforces — so the tie breaks on sortKey descending.
+  const bottomUp = [...selection.candidates].sort(
+    (a, b) =>
+      b.placement.lineNo - a.placement.lineNo ||
+      sortKey(b.name).localeCompare(sortKey(a.name))
   );
-  for (const c of inOrder) {
+  for (const c of bottomUp) {
     assert.ok(c.placement, `${c.name} should have a position`);
     lines.splice(c.placement.lineNo - 1, 0, entryLine(c));
   }
@@ -1267,17 +1294,61 @@ test('applying every proposed position leaves the list sorted', () => {
     );
   }
 
-  // And every candidate really did land where the report said it would.
+});
+
+// The per-candidate half of the same contract: applied on its own against the
+// file as it stands, each proposal lands exactly on the line it names, between
+// exactly the two entries it names. This is what "positions describe
+// README.md as it is now" actually promises, and it holds for any candidate in
+// any combination — which is why a partial selection stays exact.
+test('each proposal applied alone lands exactly where the report said', () => {
+  const selection = selectCandidates(
+    [
+      ok('q', [
+        faultInjectionRepo('Glitchy'),
+        faultInjectionRepo('Warlock'),
+        faultInjectionRepo('Abacus'),
+        emulationRepo('Rehoster'),
+      ]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+
   for (const c of selection.candidates) {
+    const only = FAKE_README.split('\n');
+    only.splice(c.placement.lineNo - 1, 0, entryLine(c));
+
     assert.match(
-      lines[c.placement.lineNo - 1],
+      only[c.placement.lineNo - 1],
       new RegExp(`\\[${c.name}\\]`),
-      `${c.name} did not land on the line the report promised`
+      `${c.name} did not land on line ${c.placement.lineNo}`
     );
+    if (c.placement.after) {
+      assert.match(
+        only[c.placement.lineNo - 2],
+        new RegExp(`\\[${c.placement.after.label}\\]`),
+        `${c.name} does not sit directly after ${c.placement.after.label}`
+      );
+    }
+    if (c.placement.before) {
+      assert.match(
+        only[c.placement.lineNo],
+        new RegExp(`\\[${c.placement.before.label}\\]`),
+        `${c.name} does not sit directly before ${c.placement.before.label}`
+      );
+    }
+
+    // ...and the section it went into is still correctly ordered.
+    const section = readList(only).sections.get(c.section);
+    const labels = section.entries.map((e) => e.label);
+    const sorted = [...labels].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+    assert.deepStrictEqual(labels, sorted, `"${c.section}" unsorted after ${c.name}`);
   }
 });
 
-test('an insertion shifts the line numbers of sections below it', () => {
+test('positions are computed independently, with no cross-section shift', () => {
   const selection = selectCandidates(
     [ok('q', [faultInjectionRepo('Abacus'), emulationRepo('Rehoster')])],
     list,
@@ -1289,12 +1360,11 @@ test('an insertion shifts the line numbers of sections below it', () => {
   const emul = selection.candidates.find((c) => c.section === 'Emulation Tools');
   assert.ok(fault && emul);
 
-  // Qiling sits at line 17 in the pristine fixture. Abacus goes in above it
-  // (line 11, ahead of ChipSHOUTER), pushing Qiling to 18; Rehoster sorts
-  // after Qiling, so it lands at 19. Without the cross-section shift this
-  // would read 18.
+  // Qiling sits at line 17 in the fixture, so Rehoster follows it at 18 —
+  // unaffected by Abacus going in at line 11, because that insertion has not
+  // been applied. Under the old cumulative scheme this read 19.
   assert.strictEqual(fault.placement.lineNo, 11);
-  assert.strictEqual(emul.placement.lineNo, 19);
+  assert.strictEqual(emul.placement.lineNo, 18);
 });
 
 test('placement does not mutate the caller\'s section index', () => {
@@ -1384,5 +1454,51 @@ test('a rate_limit body with no quota block refuses the run', async (t) => {
       `${JSON.stringify(body)} must not authorise 15 blind searches`
     );
     assert.match(result.reason, /quota|unknown/i);
+  }
+});
+
+// The property pristine semantics were chosen for: a maintainer who accepts
+// only some proposals — the normal outcome, which is why declined-candidates
+// .json exists — still gets an exact position for every one they take, as
+// long as they work bottom-up. Cumulative numbering could never promise this.
+test('any subset applied bottom-up lands exactly, not just the whole set', () => {
+  const selection = selectCandidates(
+    [
+      ok('q', [
+        faultInjectionRepo('Glitchy'),
+        faultInjectionRepo('Abacus'),
+        faultInjectionRepo('Warlock'),
+        emulationRepo('Rehoster'),
+      ]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+  assert.strictEqual(selection.candidates.length, 4);
+
+  // Every one of the 16 accept/decline combinations.
+  for (let mask = 0; mask < 1 << selection.candidates.length; mask++) {
+    const taken = selection.candidates.filter((_, i) => mask & (1 << i));
+    if (taken.length === 0) continue;
+
+    const lines = FAKE_README.split('\n');
+    const bottomUp = [...taken].sort(
+      (a, b) =>
+        b.placement.lineNo - a.placement.lineNo ||
+        sortKey(b.name).localeCompare(sortKey(a.name))
+    );
+    for (const c of bottomUp) lines.splice(c.placement.lineNo - 1, 0, entryLine(c));
+
+    const after = readList(lines);
+    for (const [name, section] of after.sections) {
+      const labels = section.entries.map((e) => e.label);
+      const sorted = [...labels].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+      assert.deepStrictEqual(
+        labels,
+        sorted,
+        `"${name}" is unsorted after accepting ${taken.map((c) => c.name).join(', ')}`
+      );
+    }
   }
 });

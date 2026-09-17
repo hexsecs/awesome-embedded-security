@@ -635,7 +635,7 @@ function selectCandidates(results, list, declined, now = new Date()) {
       continue;
     }
 
-    kept.push(buildCandidate(repo, queries));
+    kept.push(buildCandidate(repo, queries, list));
   }
 
   // Ranking, kept deliberately simple so a maintainer can read a score off
@@ -648,7 +648,7 @@ function selectCandidates(results, list, declined, now = new Date()) {
   kept.sort((a, b) => b.score - a.score || b.stars - a.stars);
 
   return {
-    candidates: placeAll(kept.slice(0, MAX_CANDIDATES), list),
+    candidates: kept.slice(0, MAX_CANDIDATES),
     considered: byFullName.size,
     keptCount: kept.length,
     rejected,
@@ -657,93 +657,7 @@ function selectCandidates(results, list, declined, now = new Date()) {
   };
 }
 
-// Places every candidate in the order the report lists them, against a
-// README that accumulates the ones above it.
-//
-// Placing each candidate independently against the pristine file is wrong the
-// moment two land in the same section: both compute the same line number and
-// the same pair of neighbours, so applying the first invalidates the second.
-// With a twelve-candidate cap and a keyword table that funnels into a handful
-// of sections, two in one section is the ordinary case, not the edge case —
-// and an exact position is the main thing this report offers over "here is a
-// repository, go find somewhere for it".
-//
-// Note an insertion shifts every line below it in the *whole* file, not just
-// within its own section, so the offsets are applied across all sections.
-function placeAll(candidates, list) {
-  // A deep-enough copy that the caller's section index is left pristine.
-  const working = new Map();
-  for (const [name, section] of list.sections) {
-    working.set(name, {
-      name: section.name,
-      headingLine: section.headingLine,
-      entries: section.entries.map((entry) => ({ ...entry })),
-    });
-  }
-
-  for (const candidate of candidates) {
-    const section = candidate.section ? working.get(candidate.section) : null;
-    if (!section) {
-      candidate.placement = null;
-      continue;
-    }
-
-    const placement = placeInSection(section, candidate.name);
-    candidate.placement = placement;
-
-    // Everything at or below the insertion point moves down one line...
-    const at = placement.lineNo;
-    for (const other of working.values()) {
-      if (other.headingLine >= at) other.headingLine++;
-      for (const entry of other.entries) {
-        if (entry.lineNo >= at) entry.lineNo++;
-      }
-    }
-
-    // ...and the new entry takes the line it was placed at, so a later
-    // candidate in the same section sorts against it by name too.
-    const idx = section.entries.findIndex((entry) => entry.lineNo > at);
-    section.entries.splice(idx === -1 ? section.entries.length : idx, 0, {
-      label: candidate.name,
-      lineNo: at,
-      ref: candidate,
-    });
-  }
-
-  // Second pass: restate every position against the *finished* file.
-  //
-  // The positions computed above are each correct at the moment that
-  // candidate is inserted, and stale immediately afterwards — a later
-  // candidate that sorts higher (Abacus, after Glitchy has been placed)
-  // shifts the earlier one down and can slot between it and the neighbour it
-  // was promised. Reporting those first-pass numbers would reintroduce the
-  // bug one layer down.
-  //
-  // So every candidate is restated against the state with all of them
-  // applied. That makes the whole report internally consistent: apply them
-  // all and every line number and neighbour pair is exactly right. A
-  // neighbour may itself be another candidate, which is worth seeing.
-  for (const candidate of candidates) {
-    if (!candidate.placement) continue;
-    const section = working.get(candidate.section);
-    const entries = section.entries;
-    const i = entries.findIndex((entry) => entry.ref === candidate);
-    if (i === -1) continue;
-
-    const plain = (entry) =>
-      entry ? { label: entry.label, lineNo: entry.lineNo } : null;
-
-    candidate.placement = {
-      lineNo: entries[i].lineNo,
-      after: i > 0 ? plain(entries[i - 1]) : null,
-      before: i < entries.length - 1 ? plain(entries[i + 1]) : null,
-    };
-  }
-
-  return candidates;
-}
-
-function buildCandidate(repo, queries) {
+function buildCandidate(repo, queries, list) {
   const topics = repo.topics || [];
   const topicHits = topics.filter((t) => TOPIC_SIGNALS.has(t));
   const stars = repo.stargazers_count || 0;
@@ -753,6 +667,7 @@ function buildCandidate(repo, queries) {
   const name = repo.name;
   const description = draftDescription(name, repo);
   const section = proposeSection(repo);
+  const known = section ? list.sections.get(section.name) : null;
 
   return {
     name,
@@ -768,7 +683,14 @@ function buildCandidate(repo, queries) {
     description,
     section: section ? section.name : null,
     sectionMatches: section ? section.matched : [],
-    placement: null, // filled in by placeAll once the cap is known
+    // Positions are computed against README.md exactly as it stands, each
+    // independently of the others. Applying a subset bottom-up (descending
+    // line number) is then always exact, because an insertion never shifts
+    // the lines above it — and a subset is the normal outcome here, since
+    // most proposals get declined. Numbering them cumulatively instead would
+    // be exact only for a reviewer who accepted every candidate in order, and
+    // would drift by however many they skipped.
+    placement: known ? placeInSection(known, name) : null,
     markerHint: markerHint(repo),
   };
 }
@@ -793,10 +715,9 @@ function render(selection) {
   out.push('');
   if (candidates.length > 1) {
     out.push(
-      '_Positions describe the list with every proposal below applied, so ' +
-        'a neighbour may itself be another candidate. Take them all and ' +
-        'each line number is exact; take only some and the neighbours still ' +
-        'hold while the line numbers shift by however many you skipped._'
+      '_Line numbers refer to `README.md` as it stands right now. If you ' +
+        'are applying several, work bottom-up — highest line number first — ' +
+        'so each insertion does not shift the ones below it._'
     );
     out.push('');
   }
