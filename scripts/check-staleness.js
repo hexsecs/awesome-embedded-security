@@ -9,13 +9,25 @@
 // with --report-issue, files its findings as a single GitHub issue that it
 // rewrites in place on each run rather than opening a new one every month.
 //
+// Three of those findings have exactly one correct edit, and --fix applies
+// them to README.md in memory; --open-pr commits the result and opens a
+// pull request. See the "Apply the deterministic fixes" section for what is
+// in scope and, more importantly, what is not.
+//
+// The flags compose into a single run — CI passes all three — because the
+// sweep is the expensive part: one request per entry, preflighted against
+// the quota up front. Running the check once to report and again to fix
+// would double that budget and rewrite the issue twice.
+//
 // Exits 0 even when it finds problems: this reports, it does not gate. The
 // link check in markdown-lint.yml is what fails a build.
 
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const README_PATH = path.join(__dirname, '..', 'README.md');
 
@@ -59,7 +71,14 @@ function apiHeaders() {
 // rather than projects.
 
 function readEntries() {
-  const lines = fs.readFileSync(README_PATH, 'utf8').split('\n');
+  return parseEntries(fs.readFileSync(README_PATH, 'utf8'));
+}
+
+// Split out from readEntries so the fix mode and its tests can work on a
+// string. The tests must never be able to reach the real README.md: a test
+// that rewrites the list is a test that can corrupt it.
+function parseEntries(text) {
+  const lines = text.split('\n');
 
   const tocStart = lines.findIndex((l) => l.trim() === '## Contents');
   const tocEnd =
@@ -272,16 +291,40 @@ function monthsSince(iso) {
 
 // --- Render -----------------------------------------------------------
 
-function render(findings, checked) {
+// `applied` is the result of a fix run that actually landed — the edits that
+// are now sitting in a pull request. Findings covered by one are dropped
+// from the report and pointed at the pull request instead, so the issue only
+// ever holds what still needs a human to decide. Called without it (a dry
+// run, or a fix run that failed), nothing is filtered and the report is the
+// same one it has always been.
+function render(findings, checked, applied) {
   const out = [];
+  const edits = (applied && applied.edits) || [];
+  const handled = new Set(edits.map((e) => `${e.kind}:${e.lineNo}`));
+  const notApplied = new Map(
+    ((applied && applied.skipped) || []).map((s) => [`${s.kind}:${s.lineNo}`, s.reason])
+  );
+  const remaining = (kind) =>
+    findings[kind].filter((f) => !handled.has(`${kind}:${f.lineNo}`));
+
+  const renamed = remaining('renamed');
+  const needsMarker = remaining('needsMarker');
+  const staleMarker = remaining('staleMarker');
+
   const actionable =
-    findings.missing.length +
-    findings.renamed.length +
-    findings.needsMarker.length +
-    findings.staleMarker.length;
+    findings.missing.length + renamed.length + needsMarker.length + staleMarker.length;
 
   out.push(`Checked ${checked} GitHub-hosted entries in README.md.`);
   out.push('');
+
+  if (edits.length > 0) {
+    out.push(
+      `${edits.length} finding(s) had exactly one correct edit and were ` +
+        `applied in ${applied.prUrl || 'a pull request'}. They are not ` +
+        'listed below; review the pull request instead.'
+    );
+    out.push('');
+  }
 
   if (findings.missing.length > 0) {
     out.push('## Gone (404)');
@@ -298,7 +341,7 @@ function render(findings, checked) {
     out.push('');
   }
 
-  if (findings.renamed.length > 0) {
+  if (renamed.length > 0) {
     out.push('## Moved');
     out.push('');
     out.push(
@@ -307,17 +350,19 @@ function render(findings, checked) {
         'transferred. Worth updating before the redirect stops.'
     );
     out.push('');
-    for (const f of findings.renamed) {
+    for (const f of renamed) {
       const suffix = f.deepPath ? ' (link points inside the repository)' : '';
+      const reason = notApplied.get(`renamed:${f.lineNo}`);
       out.push(
         `- **${f.name}** — \`${f.owner}/${f.repo}\` is now ` +
-          `\`${f.fullName}\`${suffix} (README.md:${f.lineNo})`
+          `\`${f.fullName}\`${suffix} (README.md:${f.lineNo})` +
+          (reason ? ` — not fixed automatically: ${reason}` : '')
       );
     }
     out.push('');
   }
 
-  if (findings.needsMarker.length > 0) {
+  if (needsMarker.length > 0) {
     out.push('## Archived, and missing the 🗄️ marker');
     out.push('');
     out.push(
@@ -326,19 +371,27 @@ function render(findings, checked) {
         'successor be named at the end of the description if one exists.'
     );
     out.push('');
-    for (const f of findings.needsMarker) {
-      out.push(`- **${f.name}** — \`${f.url}\` (README.md:${f.lineNo})`);
+    for (const f of needsMarker) {
+      const reason = notApplied.get(`needsMarker:${f.lineNo}`);
+      out.push(
+        `- **${f.name}** — \`${f.url}\` (README.md:${f.lineNo})` +
+          (reason ? ` — not fixed automatically: ${reason}` : '')
+      );
     }
     out.push('');
   }
 
-  if (findings.staleMarker.length > 0) {
+  if (staleMarker.length > 0) {
     out.push('## Marked 🗄️ but no longer archived');
     out.push('');
     out.push('These have been unarchived upstream. The marker should come off.');
     out.push('');
-    for (const f of findings.staleMarker) {
-      out.push(`- **${f.name}** — \`${f.url}\` (README.md:${f.lineNo})`);
+    for (const f of staleMarker) {
+      const reason = notApplied.get(`staleMarker:${f.lineNo}`);
+      out.push(
+        `- **${f.name}** — \`${f.url}\` (README.md:${f.lineNo})` +
+          (reason ? ` — not fixed automatically: ${reason}` : '')
+      );
     }
     out.push('');
   }
@@ -391,6 +444,217 @@ function render(findings, checked) {
   }
 
   return { body: out.join('\n').trimEnd(), actionable };
+}
+
+// --- Apply the deterministic fixes ------------------------------------
+// Guards against a report nobody transcribes. Three of the findings have
+// exactly one correct edit — add the marker, remove the marker, repoint the
+// URL — and asking a human to retype them by hand is how a report sits open
+// for months while the list rots. Those three are applied here.
+//
+// `missing` and `quiet` are deliberately absent, and must stay absent.
+// Deleting an entry is never automated: a 404 can be a repository briefly
+// made private, and quiet is explicitly not the same as unmaintained. The
+// entry's display label is left alone for the same reason — renaming
+// "GDBFuzz" because the repository moved is a judgement call.
+//
+// Edits are line-addressed and surgical. The file is never reserialized:
+// only the lines the findings name are rebuilt, from the pieces of the line
+// that was already there, so the output differs from the input in exactly
+// those places and nowhere else.
+
+// The byte sequence the existing entries use, which is not the same as
+// ARCHIVED_MARKER: the entries follow U+1F5C4 with the U+FE0F variation
+// selector, and an inserted marker that omits it renders as a different
+// glyph beside its neighbours.
+const ARCHIVED_MARKER_FULL = `${ARCHIVED_MARKER}\uFE0F`;
+
+// Splits an entry line into "* [Name](", the URL, ")", the marker segment,
+// and the dash onwards, so one piece can be rewritten and the rest passed
+// through untouched.
+const ENTRY_PARTS_RE = /^(\s*\*\s+\[[^\]]+\]\()([^)]+)(\))([^-]*)(-.*)$/;
+
+// Mirrors normalizeUrl in scripts/check-readme.js. Not imported: that script
+// runs its checks at require time and calls process.exit, so loading it here
+// would end this process. The duplicate is deliberate and small; the real
+// check still runs over the result in verifyReadme below.
+function normalizeUrl(url) {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase().replace(/^www\./, '');
+    const pathName = u.pathname.replace(/\/+$/, '');
+    return `${host}${pathName}${u.search}`;
+  } catch {
+    return url.trim().replace(/\/+$/, '');
+  }
+}
+
+// One space on each side of the markers, which is what every entry in the
+// list already looks like — and with no markers left, exactly one space
+// between the closing paren and the dash.
+function markerSegment(tokens) {
+  return tokens.length === 0 ? ' ' : ` ${tokens.join(' ')} `;
+}
+
+// The canonical URL for a renamed repository, keeping anything the link
+// pointed at inside it: "…/old-owner/old-repo/tree/main/docs" has to come
+// out as "…/new-owner/new-repo/tree/main/docs", not as the repository root.
+function renamedUrl(entry) {
+  if (!entry.htmlUrl) return null;
+
+  let linked;
+  let canonical;
+  try {
+    linked = new URL(entry.url);
+    canonical = new URL(entry.htmlUrl);
+  } catch {
+    return null;
+  }
+
+  const suffix = linked.pathname.split('/').filter(Boolean).slice(2);
+  const base = canonical.pathname.split('/').filter(Boolean);
+  const pathName = `/${[...base, ...suffix].join('/')}`;
+  const trailing = linked.pathname.endsWith('/') && pathName !== '/' ? '/' : '';
+
+  return `${canonical.origin}${pathName}${trailing}${linked.search}${linked.hash}`;
+}
+
+// Returns the rewritten content, the edits that were made, and the edits
+// that were refused with the reason why — the caller reports those as still
+// needing a human rather than silently dropping them.
+function applyFixes(content, findings) {
+  const lines = content.split('\n');
+  const edits = [];
+  const skipped = [];
+
+  // Every URL already in the list, so a rename onto a target that is listed
+  // somewhere else is caught before it is written rather than by
+  // check-readme.js afterwards, when the whole run would have to be thrown
+  // away over one entry.
+  const urlLines = new Map();
+  lines.forEach((line, idx) => {
+    const parts = line.match(ENTRY_PARTS_RE);
+    if (parts && !urlLines.has(normalizeUrl(parts[2].trim()))) {
+      urlLines.set(normalizeUrl(parts[2].trim()), idx + 1);
+    }
+  });
+
+  // Markers first, renames last: a rename rewrites the URL that the marker
+  // edits match the line on, and an entry can be both archived and moved.
+  const planned = [
+    ...findings.needsMarker.map((finding) => ({ kind: 'needsMarker', finding })),
+    ...findings.staleMarker.map((finding) => ({ kind: 'staleMarker', finding })),
+    ...findings.renamed.map((finding) => ({ kind: 'renamed', finding })),
+  ];
+
+  for (const { kind, finding } of planned) {
+    // The overriding rule of this script: an entry the API could not answer
+    // for is never edited. classify() already keeps errors out of these
+    // buckets — this is the second lock on the same door, because the cost
+    // of getting it wrong is an automated commit that breaks a live entry.
+    if (finding.status !== 'ok') continue;
+
+    const idx = finding.lineNo - 1;
+    const parts = idx >= 0 && idx < lines.length ? lines[idx].match(ENTRY_PARTS_RE) : null;
+
+    // The line numbers came from the same read as the findings, so a
+    // mismatch means the file changed underneath the run. Refuse rather
+    // than rewrite a line nobody looked at.
+    if (!parts || parts[2].trim() !== finding.url) {
+      skipped.push({
+        kind,
+        name: finding.name,
+        lineNo: finding.lineNo,
+        reason: 'the line no longer holds the entry this finding was raised on',
+      });
+      continue;
+    }
+
+    const before = lines[idx];
+    let after = null;
+    let note = null;
+
+    if (kind === 'needsMarker') {
+      const tokens = parts[4].trim().split(/\s+/).filter(Boolean);
+      if (tokens.some((t) => t.includes(ARCHIVED_MARKER))) continue;
+      // Appended, so it lands after a 💰 when one is already there, which is
+      // the order contributing.md documents.
+      tokens.push(ARCHIVED_MARKER_FULL);
+      after = parts[1] + parts[2] + parts[3] + markerSegment(tokens) + parts[5];
+      note = 'archived upstream — added the 🗄️ marker';
+    } else if (kind === 'staleMarker') {
+      const tokens = parts[4]
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .filter((t) => !t.includes(ARCHIVED_MARKER));
+      after = parts[1] + parts[2] + parts[3] + markerSegment(tokens) + parts[5];
+      note = 'no longer archived upstream — removed the 🗄️ marker';
+    } else {
+      const target = renamedUrl(finding);
+      if (!target) {
+        skipped.push({
+          kind,
+          name: finding.name,
+          lineNo: finding.lineNo,
+          reason: 'the API did not return a usable canonical URL',
+        });
+        continue;
+      }
+
+      const key = normalizeUrl(target);
+      const clash = urlLines.get(key);
+      if (clash !== undefined && clash !== finding.lineNo) {
+        skipped.push({
+          kind,
+          name: finding.name,
+          lineNo: finding.lineNo,
+          reason:
+            `\`${target}\` is already listed at README.md:${clash}, so ` +
+            'repointing this entry would duplicate it — one of the two ' +
+            'entries has to go, and which one is a judgement call',
+        });
+        continue;
+      }
+
+      urlLines.delete(normalizeUrl(parts[2].trim()));
+      urlLines.set(key, finding.lineNo);
+      after = parts[1] + target + parts[3] + parts[4] + parts[5];
+      note = `moved to \`${finding.fullName}\` — updated the link`;
+    }
+
+    if (after === before) continue;
+
+    lines[idx] = after;
+    edits.push({ kind, name: finding.name, lineNo: finding.lineNo, before, after, note });
+  }
+
+  return { content: lines.join('\n'), edits, skipped };
+}
+
+// Runs the real scripts/check-readme.js over the rewritten content before
+// anything is committed. The fix logic knows about duplicate URLs, but the
+// check also enforces alphabetical order and Table of Contents sync, and an
+// automated commit that fails the check that gates every pull request would
+// block the whole repository. The copy into a temporary directory is what
+// lets the check run against content that is not on disk yet, without this
+// script needing to know anything about how the check works.
+function verifyReadme(content) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'entry-health-'));
+  try {
+    const script = path.join(dir, 'scripts', 'check-readme.js');
+    fs.mkdirSync(path.join(dir, 'scripts'));
+    fs.copyFileSync(path.join(__dirname, 'check-readme.js'), script);
+    fs.writeFileSync(path.join(dir, 'README.md'), content);
+
+    const run = spawnSync(process.execPath, [script], { encoding: 'utf8' });
+    return {
+      ok: run.status === 0,
+      output: `${run.stdout || ''}${run.stderr || ''}`.trim(),
+    };
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 // --- File the report as an issue --------------------------------------
@@ -491,7 +755,255 @@ async function reportIssue(body, actionable) {
   console.log(`Opened issue #${created.number} with ${actionable} finding(s).`);
 }
 
+// --- Open the pull request --------------------------------------------
+// Guards against the monthly rerun stacking a pull request on top of last
+// month's: one branch name, reused, force-updated, and the open pull request
+// on it edited in place. The alternative — a fresh branch each run — leaves
+// a queue of near-identical pull requests that each need closing by hand,
+// which is exactly the manual work this is supposed to remove.
+//
+// Driven through the `gh` CLI rather than a third-party action. Every action
+// in this repository is pinned by SHA, and taking on a new dependency to
+// save a dozen lines of shelling out is a bigger decision than this
+// warrants; `gh` is already on every GitHub-hosted runner.
+
+const PR_BRANCH = 'entry-health/automated-fixes';
+const PR_MARKER = '<!-- entry-health-fixes -->';
+const PR_TITLE = 'Entry health: apply the deterministic fixes';
+
+function run(command, args, options = {}) {
+  const result = spawnSync(command, args, { encoding: 'utf8', ...options });
+  return {
+    ok: result.status === 0,
+    stdout: (result.stdout || '').trim(),
+    stderr: (result.stderr || (result.error && result.error.message) || '').trim(),
+  };
+}
+
+function prBody(edits, skipped, issueUrl) {
+  const out = [
+    PR_MARKER,
+    `Opened by \`scripts/check-staleness.js --fix\`. Branch \`${PR_BRANCH}\` ` +
+      'is reused and force-updated each month, so this pull request is ' +
+      'rewritten in place rather than replaced.',
+    '',
+    'Only the three findings with exactly one correct edit are applied here: ' +
+      'a missing 🗄️ marker, a 🗄️ marker left behind after an unarchive, and ' +
+      'a link to a repository that has since moved. A repository that has ' +
+      'gone (404) or fallen quiet is never touched — deleting an entry is a ' +
+      'judgement call. Entry labels are left alone for the same reason.',
+    '',
+    `The result was checked with \`node scripts/check-readme.js\` before this ` +
+      'branch was pushed.',
+    '',
+    '## What changed',
+    '',
+  ];
+
+  for (const e of edits) {
+    out.push(`- \`README.md:${e.lineNo}\` **${e.name}** — ${e.note}.`);
+  }
+
+  if (skipped.length > 0) {
+    out.push('');
+    out.push('## Left for a human');
+    out.push('');
+    for (const s of skipped) {
+      out.push(`- \`README.md:${s.lineNo}\` **${s.name}** — ${s.reason}.`);
+    }
+  }
+
+  if (issueUrl) {
+    out.push('');
+    out.push(`Findings that still need a decision stay in ${issueUrl}.`);
+  }
+
+  return out.join('\n');
+}
+
+// Writes the file, pushes the branch, and opens or updates the pull request.
+// Returns { ok, url } and never throws: the caller has already filed a
+// report that a failure here must not take down with it.
+function openPullRequest(content, edits, skipped, issueUrl) {
+  if (!token()) {
+    return { ok: false, reason: 'no GITHUB_TOKEN; cannot push a branch or open a pull request' };
+  }
+
+  const base = process.env.GITHUB_REF_NAME || run('git', ['branch', '--show-current']).stdout;
+  if (!base) {
+    return { ok: false, reason: 'cannot determine the base branch' };
+  }
+
+  fs.writeFileSync(README_PATH, content);
+
+  // Only ever this one path. The runner's checkout is clean, but a local
+  // run is not, and a fix run must not sweep up whatever else is in the
+  // working tree.
+  const steps = [
+    ['git', ['config', 'user.name', 'github-actions[bot]']],
+    ['git', ['config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com']],
+    ['git', ['checkout', '-B', PR_BRANCH]],
+    ['git', ['add', '--', 'README.md']],
+    ['git', ['commit', '-m', `${PR_TITLE}\n\n${edits.length} entry-health fix(es) applied automatically.`, '--', 'README.md']],
+    // Force: the branch is generated, holds nothing but this commit, and is
+    // rebuilt from the base branch on every run.
+    ['git', ['push', '--force', 'origin', PR_BRANCH]],
+  ];
+
+  for (const [command, args] of steps) {
+    const result = run(command, args);
+    if (!result.ok) {
+      return { ok: false, reason: `${command} ${args[0]} failed: ${result.stderr || result.stdout}` };
+    }
+  }
+
+  const bodyFile = path.join(
+    fs.mkdtempSync(path.join(os.tmpdir(), 'entry-health-pr-')),
+    'body.md'
+  );
+  fs.writeFileSync(bodyFile, prBody(edits, skipped, issueUrl));
+
+  const env = { ...process.env, GH_TOKEN: token() };
+  const existing = run('gh', [
+    'pr', 'list', '--head', PR_BRANCH, '--state', 'open', '--json', 'url', '--jq', '.[0].url',
+  ], { env });
+
+  if (existing.ok && existing.stdout) {
+    const edited = run('gh', ['pr', 'edit', existing.stdout, '--title', PR_TITLE, '--body-file', bodyFile], { env });
+    return edited.ok
+      ? { ok: true, url: existing.stdout, updated: true }
+      : { ok: false, reason: `gh pr edit failed: ${edited.stderr}` };
+  }
+
+  const created = run('gh', [
+    'pr', 'create',
+    '--base', base,
+    '--head', PR_BRANCH,
+    '--title', PR_TITLE,
+    '--body-file', bodyFile,
+  ], { env });
+
+  return created.ok
+    ? { ok: true, url: created.stdout.split('\n').pop(), updated: false }
+    : { ok: false, reason: `gh pr create failed: ${created.stderr}` };
+}
+
+// The report issue, so the pull request can point back at what is left. A
+// failure to find it is not a failure to fix anything, so it degrades to no
+// link rather than aborting.
+async function reportIssueUrl() {
+  const [owner, repo] = (process.env.GITHUB_REPOSITORY || '').split('/');
+  if (!owner || !repo || !token()) return null;
+  try {
+    const issue = await findExistingIssue(owner, repo);
+    return issue ? issue.html_url : null;
+  } catch {
+    return null;
+  }
+}
+
 // --- Main -------------------------------------------------------------
+
+// Returns what render() needs to drop the handled findings, or null if
+// nothing landed — a dry run, nothing to fix, a rewrite that failed the
+// README check, or a pull request that could not be opened. Null means the
+// report keeps every finding, which is the safe direction to fail in: a
+// finding reported twice costs someone a minute, a finding silently dropped
+// because a pull request was assumed to exist costs the list an entry.
+//
+// Nothing in here sets process.exitCode. A pull request that could not be
+// opened is logged and left for next month; the findings are all still in
+// the report, which is where they were before any of this existed. Only a
+// failure to file that report is worth a red run.
+async function runFixMode(findings, openPr) {
+  const original = fs.readFileSync(README_PATH, 'utf8');
+  const { content, edits, skipped } = applyFixes(original, findings);
+
+  for (const s of skipped) {
+    console.log(`Not fixing ${s.name} (README.md:${s.lineNo}): ${s.reason}`);
+  }
+
+  if (edits.length === 0) {
+    console.log('No finding had an edit that could be applied automatically.');
+    return null;
+  }
+
+  for (const e of edits) {
+    console.log(`README.md:${e.lineNo} — ${e.note}`);
+    console.log(`  - ${e.before}`);
+    console.log(`  + ${e.after}`);
+  }
+
+  const check = verifyReadme(content);
+  if (!check.ok) {
+    console.error(
+      'The rewritten README.md does not pass scripts/check-readme.js, so ' +
+        'nothing was written:'
+    );
+    console.error(check.output);
+    return null;
+  }
+
+  if (!openPr) {
+    console.log(
+      `\n${edits.length} edit(s) would be applied. --fix does not write; ` +
+        'add --open-pr to commit them and open a pull request.'
+    );
+    return null;
+  }
+
+  const issueUrl = await reportIssueUrl();
+  const pr = openPullRequest(content, edits, skipped, issueUrl);
+  if (!pr.ok) {
+    console.error(`Could not open the pull request: ${pr.reason}`);
+    return null;
+  }
+
+  console.log(`\n${pr.updated ? 'Updated' : 'Opened'} ${pr.url} with ${edits.length} edit(s).`);
+  return { edits, skipped, prUrl: pr.url };
+}
+
+// One sweep, three steps, in this order — the order is the safety property.
+// The fix is attempted first so the report can point at the pull request it
+// opened, and the report is filed last from whatever the fix actually
+// achieved. If the fix crashed, refused, or could not push, `applied` is
+// null, render() produces precisely the report it would have produced had
+// the fix never run, and that report is still filed. That is what lets CI
+// run this as a single step without ignoring its exit status: the fix path
+// cannot throw out of here, and cannot take the report down with it.
+//
+// `deps` exists for the test that pins exactly that: it is the only way to
+// drive a failing pull request offline.
+async function checkAndReport(findings, checked, argv, deps = {}) {
+  const fix = deps.runFixMode || runFixMode;
+  const file = deps.reportIssue || reportIssue;
+
+  const openPr = argv.includes('--open-pr');
+  let applied = null;
+
+  if (openPr || argv.includes('--fix')) {
+    console.log('');
+    try {
+      applied = await fix(findings, openPr);
+    } catch (err) {
+      // A throw from the fix path is a bug in it, not a reason to lose the
+      // report that the rest of this run has already earned.
+      console.error(`Fix mode failed: ${err.message}`);
+    }
+    console.log('');
+  }
+
+  const { body, actionable } = render(findings, checked, applied);
+
+  console.log(body);
+
+  if (argv.includes('--report-issue')) {
+    console.log('');
+    await file(body, actionable);
+  }
+
+  return { body, actionable, applied };
+}
 
 async function main() {
   const entries = readEntries();
@@ -515,16 +1027,13 @@ async function main() {
     return;
   }
 
+  // The one sweep. Every path below works from these results; a second
+  // invocation to fix what this one found would double an already
+  // preflighted 150-request budget for nothing.
   const results = await lookupAll(entries);
   const findings = classify(results);
-  const { body, actionable } = render(findings, entries.length);
 
-  console.log(body);
-
-  if (process.argv.includes('--report-issue')) {
-    console.log('');
-    await reportIssue(body, actionable);
-  }
+  await checkAndReport(findings, entries.length, process.argv);
 }
 
 // Exported for scripts/check-staleness.test.js. The live API path cannot be
@@ -533,11 +1042,18 @@ async function main() {
 // instead.
 module.exports = {
   readEntries,
+  parseEntries,
   classify,
   render,
   lookup,
   preflight,
   reportIssue,
+  applyFixes,
+  verifyReadme,
+  checkAndReport,
+  prBody,
+  ARCHIVED_MARKER_FULL,
+  PR_BRANCH,
   QUIET_MONTHS,
 };
 

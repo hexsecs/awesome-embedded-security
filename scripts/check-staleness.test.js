@@ -16,11 +16,18 @@ const assert = require('node:assert');
 
 const {
   readEntries,
+  parseEntries,
   classify,
   render,
   lookup,
   preflight,
   reportIssue,
+  applyFixes,
+  verifyReadme,
+  checkAndReport,
+  prBody,
+  ARCHIVED_MARKER_FULL,
+  PR_BRANCH,
   QUIET_MONTHS,
 } = require('./check-staleness.js');
 
@@ -387,4 +394,493 @@ test('the marker the run uses to find its own issue is always written', async (t
     write.body.body.startsWith('<!-- entry-health-report -->'),
     'without the marker the next run cannot find this issue and would open another'
   );
+});
+
+// --- Applying the deterministic fixes ---------------------------------
+// The fix mode is the only part of this script that rewrites the list, so
+// every test below drives it with the fixture string underneath rather than
+// the real README.md. A test that writes to README.md is a test that can
+// corrupt the thing it is checking.
+//
+// What is pinned here: the exact bytes of an inserted marker, the spacing
+// left behind by a removed one, that a rename keeps a deep path and leaves
+// the display label alone, that a rename onto an entry already in the list
+// is refused instead of applied, that every other line comes through
+// untouched, and — the rule that outranks the rest — that an entry the API
+// could not answer for never produces an edit.
+
+const FIXTURE = [
+  '# Awesome Fixture',
+  '',
+  '## Contents',
+  '',
+  '* [Tools](#tools)',
+  '',
+  '## Tools',
+  '',
+  '* [Alpha](https://github.com/acme/alpha) - Does a thing.',
+  '* [Bravo](https://github.com/acme/bravo) 💰 - Sells another thing.',
+  '* [Charlie](https://github.com/acme/charlie/tree/main/security) - Points inside a repository.',
+  '* [Delta](https://github.com/acme/delta) 🗄️ - Was archived once.',
+  '',
+].join('\n');
+
+const ALPHA_LINE = 9;
+const BRAVO_LINE = 10;
+const CHARLIE_LINE = 11;
+const DELTA_LINE = 12;
+
+// Builds a lookup result for one fixture entry, so the line numbers the fix
+// is addressed by are the ones the parser actually found.
+function fixtureEntry(name, overrides) {
+  const parsed = parseEntries(FIXTURE).find((e) => e.name === name);
+  assert.ok(parsed, `the fixture has no entry named ${name}`);
+  return {
+    status: 'ok',
+    archived: false,
+    pushedAt: recent,
+    ...parsed,
+    fullName: `${parsed.owner}/${parsed.repo}`,
+    ...overrides,
+  };
+}
+
+function linesOf(content) {
+  return content.split('\n');
+}
+
+test('the fixture the fix tests run against is itself a valid list', () => {
+  const check = verifyReadme(FIXTURE);
+  assert.strictEqual(check.ok, true, check.output);
+});
+
+test('an archived entry with no markers gains the 🗄️ marker', () => {
+  const findings = classify([fixtureEntry('Alpha', { archived: true })]);
+  const { content, edits, skipped } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 1);
+  assert.strictEqual(skipped.length, 0);
+  assert.strictEqual(edits[0].kind, 'needsMarker');
+  assert.strictEqual(edits[0].lineNo, ALPHA_LINE);
+  assert.strictEqual(
+    linesOf(content)[ALPHA_LINE - 1],
+    `* [Alpha](https://github.com/acme/alpha) ${ARCHIVED_MARKER_FULL} - Does a thing.`
+  );
+});
+
+test('the inserted marker is byte-identical to the one the list already uses', () => {
+  const findings = classify([fixtureEntry('Alpha', { archived: true })]);
+  const { content } = applyFixes(FIXTURE, findings);
+
+  const inserted = linesOf(content)[ALPHA_LINE - 1].match(/\)\s+(\S+)\s+-/)[1];
+  const existing = linesOf(FIXTURE)[DELTA_LINE - 1].match(/\)\s+(\S+)\s+-/)[1];
+
+  assert.strictEqual(
+    Buffer.from(inserted).toString('hex'),
+    Buffer.from(existing).toString('hex'),
+    'U+1F5C4 without the U+FE0F variation selector renders as a different glyph'
+  );
+  assert.strictEqual(Buffer.from(inserted).toString('hex'), 'f09f9784efb88f');
+});
+
+test('the marker goes after a 💰 that is already there', () => {
+  const findings = classify([fixtureEntry('Bravo', { archived: true })]);
+  const { content, edits } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 1);
+  assert.strictEqual(
+    linesOf(content)[BRAVO_LINE - 1],
+    `* [Bravo](https://github.com/acme/bravo) 💰 ${ARCHIVED_MARKER_FULL} - Sells another thing.`
+  );
+});
+
+test('an unarchived entry loses the marker, leaving one space before the dash', () => {
+  const findings = classify([fixtureEntry('Delta', { archived: false })]);
+  const { content, edits } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 1);
+  assert.strictEqual(edits[0].kind, 'staleMarker');
+  assert.strictEqual(
+    linesOf(content)[DELTA_LINE - 1],
+    '* [Delta](https://github.com/acme/delta) - Was archived once.'
+  );
+  assert.ok(
+    !/\)\s{2,}-/.test(linesOf(content)[DELTA_LINE - 1]),
+    'removing the marker must not leave its whitespace behind'
+  );
+});
+
+test('a rename rewrites the URL and leaves the display label alone', () => {
+  const findings = classify([
+    fixtureEntry('Alpha', {
+      fullName: 'acme/alpha-ng',
+      htmlUrl: 'https://github.com/acme/alpha-ng',
+    }),
+  ]);
+  const { content, edits } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 1);
+  assert.strictEqual(edits[0].kind, 'renamed');
+  assert.strictEqual(
+    linesOf(content)[ALPHA_LINE - 1],
+    '* [Alpha](https://github.com/acme/alpha-ng) - Does a thing.',
+    'renaming the label is a judgement call and stays with the human'
+  );
+});
+
+test('a rename of a link pointing inside a repository keeps the deep path', () => {
+  const findings = classify([
+    fixtureEntry('Charlie', {
+      fullName: 'acme/charlie-ng',
+      htmlUrl: 'https://github.com/acme/charlie-ng',
+    }),
+  ]);
+  const { content, edits } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 1);
+  assert.strictEqual(
+    linesOf(content)[CHARLIE_LINE - 1],
+    '* [Charlie](https://github.com/acme/charlie-ng/tree/main/security) ' +
+      '- Points inside a repository.'
+  );
+});
+
+test('a rename onto a URL already in the list is refused, not applied', () => {
+  const findings = classify([
+    fixtureEntry('Alpha', {
+      fullName: 'acme/delta',
+      htmlUrl: 'https://github.com/acme/delta',
+    }),
+  ]);
+  const { content, edits, skipped } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 0, 'the fix must not create a duplicate URL');
+  assert.strictEqual(content, FIXTURE);
+  assert.strictEqual(skipped.length, 1);
+  assert.match(skipped[0].reason, new RegExp(`already listed at README.md:${DELTA_LINE}`));
+  assert.strictEqual(verifyReadme(content).ok, true);
+});
+
+test('the check that gates pull requests would catch a duplicate that slipped through', () => {
+  const broken = FIXTURE.replace(
+    'https://github.com/acme/alpha',
+    'https://github.com/acme/delta'
+  );
+  const check = verifyReadme(broken);
+
+  assert.strictEqual(check.ok, false);
+  assert.match(check.output, /duplicate URL/);
+});
+
+test('every line the findings do not name comes through byte-identical', () => {
+  const findings = classify([
+    fixtureEntry('Alpha', { archived: true }),
+    fixtureEntry('Delta', { archived: false }),
+  ]);
+  const { content, edits } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 2);
+
+  const before = linesOf(FIXTURE);
+  const after = linesOf(content);
+  const touched = new Set(edits.map((e) => e.lineNo));
+
+  assert.strictEqual(after.length, before.length);
+  before.forEach((line, idx) => {
+    if (touched.has(idx + 1)) return;
+    assert.strictEqual(after[idx], line, `line ${idx + 1} must not be rewritten`);
+  });
+  assert.ok(content.endsWith('\n'), 'the trailing newline must survive');
+  assert.strictEqual(verifyReadme(content).ok, true);
+});
+
+test('nothing to fix leaves the content exactly as it was', () => {
+  const findings = classify([fixtureEntry('Alpha'), fixtureEntry('Bravo')]);
+  const { content, edits, skipped } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 0);
+  assert.strictEqual(skipped.length, 0);
+  assert.strictEqual(content, FIXTURE);
+});
+
+test('an entry the API could not be asked about never produces an edit', () => {
+  const broken = fixtureEntry('Alpha', {
+    status: 'error',
+    detail: 'GitHub API rate limit exhausted',
+    archived: true,
+  });
+
+  // Through classify, which is what the script does: an error lands in
+  // errors and in no other bucket, so there is nothing to apply.
+  const viaClassify = applyFixes(FIXTURE, classify([broken]));
+  assert.strictEqual(viaClassify.edits.length, 0);
+  assert.strictEqual(viaClassify.content, FIXTURE);
+
+  // And directly, with the error smuggled into a fixable bucket, because a
+  // false "this repository changed" committed to the list is the one
+  // mistake this script must not make.
+  const forced = applyFixes(FIXTURE, {
+    missing: [],
+    renamed: [{ ...broken, fullName: 'acme/gone', htmlUrl: 'https://github.com/acme/gone' }],
+    needsMarker: [broken],
+    staleMarker: [],
+    quiet: [],
+    errors: [],
+  });
+  assert.strictEqual(forced.edits.length, 0, 'an API error must never be edited into the list');
+  assert.strictEqual(forced.content, FIXTURE);
+});
+
+test('a finding whose line has moved is refused rather than guessed at', () => {
+  const findings = classify([
+    fixtureEntry('Alpha', { archived: true, lineNo: BRAVO_LINE }),
+  ]);
+  const { content, edits, skipped } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 0);
+  assert.strictEqual(content, FIXTURE);
+  assert.match(skipped[0].reason, /no longer holds the entry/);
+});
+
+test('a 404 or a quiet repository is never edited', () => {
+  const findings = classify([
+    fixtureEntry('Alpha', { status: 'missing' }),
+    fixtureEntry('Bravo', { pushedAt: ancient }),
+  ]);
+  const { content, edits } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(findings.missing.length, 1);
+  assert.strictEqual(findings.quiet.length, 1);
+  assert.strictEqual(edits.length, 0, 'deleting an entry is never automated');
+  assert.strictEqual(content, FIXTURE);
+});
+
+// --- The report once the pull request exists --------------------------
+
+test('the report stops listing the findings the pull request applied', () => {
+  const findings = classify([
+    entry({ name: 'Archived', archived: true, lineNo: 9 }),
+    entry({ name: 'Dead', status: 'missing', lineNo: 20 }),
+  ]);
+  const applied = {
+    edits: [{ kind: 'needsMarker', name: 'Archived', lineNo: 9, note: 'added the marker' }],
+    skipped: [],
+    prUrl: 'https://github.com/owner/repo/pull/7',
+  };
+
+  const { body, actionable } = render(findings, 2, applied);
+
+  assert.ok(!body.includes('missing the 🗄️ marker'), 'the fixed finding is gone');
+  assert.ok(body.includes('https://github.com/owner/repo/pull/7'));
+  assert.ok(body.includes('## Gone (404)'), 'what still needs a human stays');
+  assert.strictEqual(actionable, 1, 'only the unfixed finding still counts');
+});
+
+test('a finding the fix refused is still reported, with the reason', () => {
+  const findings = classify([entry({ name: 'Moved', fullName: 'acme/taken', lineNo: 9 })]);
+  const applied = {
+    edits: [],
+    skipped: [{ kind: 'renamed', name: 'Moved', lineNo: 9, reason: 'it would duplicate another entry' }],
+    prUrl: null,
+  };
+
+  const { body, actionable } = render(findings, 1, applied);
+
+  assert.ok(body.includes('## Moved'));
+  assert.ok(body.includes('not fixed automatically: it would duplicate another entry'));
+  assert.strictEqual(actionable, 1);
+});
+
+test('missing, quiet and unchecked entries report identically with a fix in flight', () => {
+  const findings = classify([
+    entry({ name: 'Dead', status: 'missing', lineNo: 20 }),
+    entry({ name: 'Broken', status: 'error', detail: 'GitHub API rate limit exhausted', lineNo: 21 }),
+    entry({ name: 'Dormant', pushedAt: ancient, lineNo: 22 }),
+    entry({ name: 'Archived', archived: true, lineNo: 9 }),
+  ]);
+  const applied = {
+    edits: [{ kind: 'needsMarker', name: 'Archived', lineNo: 9, note: 'added the marker' }],
+    skipped: [],
+    prUrl: 'https://github.com/owner/repo/pull/7',
+  };
+
+  const withFix = render(findings, 4, applied).body;
+  const withoutFix = render(findings, 4).body;
+
+  for (const section of ['## Gone (404)', '## Could not be checked', `## Quiet for ${QUIET_MONTHS}+ months`]) {
+    assert.ok(withFix.includes(section), `${section} must survive the fix run`);
+  }
+  for (const line of withoutFix.split('\n')) {
+    if (/^- \*\*(Dead|Broken|Dormant)\*\*/.test(line)) {
+      assert.ok(withFix.includes(line), 'these findings must be rendered unchanged');
+    }
+  }
+});
+
+test('a report with nothing left for a human closes, and points at the pull request', () => {
+  const findings = classify([entry({ name: 'Archived', archived: true, lineNo: 9 })]);
+  const applied = {
+    edits: [{ kind: 'needsMarker', name: 'Archived', lineNo: 9, note: 'added the marker' }],
+    skipped: [],
+    prUrl: 'https://github.com/owner/repo/pull/7',
+  };
+
+  const { body, actionable } = render(findings, 1, applied);
+
+  assert.strictEqual(actionable, 0, 'an issue with nothing left in it should close');
+  assert.ok(body.includes('Nothing needs doing'));
+  assert.ok(body.includes('/pull/7'));
+});
+
+test('the report is unchanged when no fix ran', () => {
+  const findings = classify([entry({ name: 'Archived', archived: true, lineNo: 9 })]);
+
+  assert.strictEqual(render(findings, 1).body, render(findings, 1, null).body);
+  assert.strictEqual(render(findings, 1).actionable, 1);
+});
+
+// --- The pull request body --------------------------------------------
+
+test('the pull request body explains each edit on its own line', () => {
+  const body = prBody(
+    [
+      { kind: 'needsMarker', name: 'Alpha', lineNo: 9, note: 'archived upstream — added the 🗄️ marker' },
+      { kind: 'renamed', name: 'Charlie', lineNo: 11, note: 'moved to `acme/charlie-ng` — updated the link' },
+    ],
+    [{ kind: 'renamed', name: 'Bravo', lineNo: 10, reason: 'it would duplicate another entry' }],
+    'https://github.com/owner/repo/issues/3'
+  );
+
+  assert.ok(body.startsWith('<!-- entry-health-fixes -->'));
+  assert.ok(body.includes(PR_BRANCH), 'the reused branch should be named');
+  assert.ok(body.includes('`README.md:9` **Alpha** — archived upstream'));
+  assert.ok(body.includes('`README.md:11` **Charlie** — moved to `acme/charlie-ng`'));
+  assert.ok(body.includes('## Left for a human'));
+  assert.ok(body.includes('https://github.com/owner/repo/issues/3'));
+});
+
+// --- One sweep, and the report survives the fix ------------------------
+// The whole run is a single invocation: the sweep costs an API request per
+// entry, so checking in one process and fixing in another would spend that
+// budget twice and rewrite the report issue twice. What makes that single
+// invocation safe is the order inside it — fix first, report last, from
+// whatever the fix actually achieved — and these tests pin exactly that.
+// Without them, a future edit could reorder the two and silently lose the
+// report on every month where the pull request fails to open.
+
+function reportHarness(t, runFixModeImpl) {
+  const filed = [];
+  const exitCode = process.exitCode;
+  t.after(() => {
+    process.exitCode = exitCode;
+  });
+  return {
+    filed,
+    deps: {
+      runFixMode: runFixModeImpl,
+      reportIssue: async (body, actionable) => filed.push({ body, actionable }),
+    },
+  };
+}
+
+const FIX_ARGV = ['node', 'check-staleness.js', '--fix', '--open-pr', '--report-issue'];
+
+test('the report is still filed when the pull request could not be opened', async (t) => {
+  const findings = classify([
+    entry({ name: 'Archived', archived: true, lineNo: 9 }),
+    entry({ name: 'Dead', status: 'missing', lineNo: 20 }),
+  ]);
+  // What openPullRequest returns when `gh` or the push fails: runFixMode
+  // logs it and yields nothing applied.
+  const { filed, deps } = reportHarness(t, async () => null);
+
+  const result = await checkAndReport(findings, 2, FIX_ARGV, deps);
+
+  assert.strictEqual(filed.length, 1, 'a failed pull request must not cost the run its report');
+  assert.strictEqual(filed[0].body, render(findings, 2).body);
+  assert.strictEqual(filed[0].actionable, 2, 'nothing was fixed, so both findings still count');
+  assert.strictEqual(result.applied, null);
+  assert.ok(filed[0].body.includes('missing the 🗄️ marker'));
+  assert.ok(filed[0].body.includes('## Gone (404)'));
+});
+
+test('a fix path that throws is swallowed and the report goes out unchanged', async (t) => {
+  const findings = classify([entry({ name: 'Archived', archived: true, lineNo: 9 })]);
+  const { filed, deps } = reportHarness(t, async () => {
+    throw new Error('gh: command not found');
+  });
+
+  const result = await checkAndReport(findings, 1, FIX_ARGV, deps);
+
+  assert.strictEqual(filed.length, 1);
+  assert.strictEqual(filed[0].body, render(findings, 1).body);
+  assert.strictEqual(result.applied, null);
+});
+
+test('a failed pull request does not fail the run, but a failed report does', async (t) => {
+  const findings = classify([entry({ name: 'Archived', archived: true, lineNo: 9 })]);
+  const { deps } = reportHarness(t, async () => null);
+
+  process.exitCode = 0;
+  await checkAndReport(findings, 1, FIX_ARGV, deps);
+  assert.strictEqual(process.exitCode, 0, 'advisory automation must not turn the run red');
+
+  // reportIssue is the part that sets a non-zero exit code, and it still
+  // does: a report nobody notices is missing is the worse failure.
+  await checkAndReport(findings, 1, FIX_ARGV, {
+    runFixMode: async () => null,
+    reportIssue: async () => {
+      process.exitCode = 1;
+    },
+  });
+  assert.strictEqual(process.exitCode, 1);
+});
+
+test('a pull request that opened is reported once, pointing at itself', async (t) => {
+  const findings = classify([
+    entry({ name: 'Archived', archived: true, lineNo: 9 }),
+    entry({ name: 'Dead', status: 'missing', lineNo: 20 }),
+  ]);
+  const { filed, deps } = reportHarness(t, async () => ({
+    edits: [{ kind: 'needsMarker', name: 'Archived', lineNo: 9, note: 'added the marker' }],
+    skipped: [],
+    prUrl: 'https://github.com/owner/repo/pull/7',
+  }));
+
+  await checkAndReport(findings, 2, FIX_ARGV, deps);
+
+  assert.strictEqual(filed.length, 1, 'one invocation writes the issue exactly once');
+  assert.ok(filed[0].body.includes('https://github.com/owner/repo/pull/7'));
+  assert.ok(!filed[0].body.includes('missing the 🗄️ marker'));
+  assert.ok(filed[0].body.includes('## Gone (404)'));
+  assert.strictEqual(filed[0].actionable, 1);
+});
+
+test('the fix is not attempted at all without a fix flag', async (t) => {
+  const findings = classify([entry({ name: 'Archived', archived: true, lineNo: 9 })]);
+  let attempted = false;
+  const { filed, deps } = reportHarness(t, async () => {
+    attempted = true;
+    return null;
+  });
+
+  await checkAndReport(findings, 1, ['node', 'check-staleness.js', '--report-issue'], deps);
+
+  assert.strictEqual(attempted, false, '--report-issue alone must stay read-only');
+  assert.strictEqual(filed.length, 1);
+  assert.strictEqual(filed[0].body, render(findings, 1).body);
+});
+
+test('a dry run reports nothing and files nothing', async (t) => {
+  const findings = classify([entry({ name: 'Archived', archived: true, lineNo: 9 })]);
+  let sawOpenPr = null;
+  const { filed, deps } = reportHarness(t, async (_findings, openPr) => {
+    sawOpenPr = openPr;
+    return null;
+  });
+
+  await checkAndReport(findings, 1, ['node', 'check-staleness.js', '--fix'], deps);
+
+  assert.strictEqual(sawOpenPr, false, '--fix alone must not open a pull request');
+  assert.strictEqual(filed.length, 0, 'and must not touch the issue either');
 });

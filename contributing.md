@@ -71,8 +71,22 @@ outside the list still looks correct.
 The Entry Health workflow covers that gap. It runs on the 8th of each month,
 asks GitHub about every entry hosted there, and files what it finds as a
 single issue that it rewrites in place rather than opening a new one each
-time. It never edits the list itself: what to do about an archived or moved
-project is a judgement call, not something a script should make.
+time.
+
+Three of those findings have exactly one correct edit — an archived repository
+missing its 🗄️ marker, a 🗄️ marker left behind after an unarchive, and a link
+to a repository that has since moved — and the workflow applies those itself,
+in a pull request on the reused `entry-health/automated-fixes` branch that is
+rewritten each month rather than stacked. The rewritten file is checked with
+`scripts/check-readme.js` before the branch is pushed, and a rename that would
+collide with an entry already in the list is refused and reported instead.
+
+Everything else stays a judgement call. A repository that has gone (404) or
+fallen quiet is never edited, because deleting an entry is not something a
+script should decide, and entry labels are left alone even when the repository
+behind them was renamed. The issue lists only what is left for a human and
+links the pull request for the rest. To see what it would change without
+writing anything: `GITHUB_TOKEN=... npm run fix:staleness`.
 
 You can run it yourself, though it needs a token with public repository read
 access and one API request per entry:

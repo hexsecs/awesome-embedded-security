@@ -17,6 +17,7 @@
     "flake:aggregate": "node scripts/link-flake.js aggregate",
     "test:pr-guidance": "node --test scripts/explain-ci-failure.test.js",
     "test:flake": "node --test scripts/link-flake.test.js",
+    "fix:staleness": "node scripts/check-staleness.js --fix",
     "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {
