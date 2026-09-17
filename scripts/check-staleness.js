@@ -168,7 +168,21 @@ async function lookup(entry) {
     return { ...entry, status: 'error', detail: `HTTP ${response.status}` };
   }
 
-  const data = await response.json();
+  // Same reasoning as the status codes above, one step later: a 200 whose
+  // body will not parse, or parses to something that is not a repository
+  // object, tells us nothing about the repository. Degrade to unchecked.
+  // Reading `data.archived` off a non-object would throw out of the worker
+  // pool and take the whole sweep with it.
+  let data;
+  try {
+    data = await response.json();
+  } catch (err) {
+    return { ...entry, status: 'error', detail: `unreadable response body: ${err.message}` };
+  }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return { ...entry, status: 'error', detail: 'the GitHub API returned no repository object' };
+  }
+
   return {
     ...entry,
     status: 'ok',
@@ -203,7 +217,16 @@ async function preflight(needed) {
     return { ok: false, reason: `the GitHub API returned HTTP ${response.status}.` };
   }
 
-  const data = await response.json();
+  let data;
+  try {
+    data = await response.json();
+  } catch (err) {
+    return { ok: false, reason: `the rate limit response could not be read: ${err.message}` };
+  }
+  if (!data || typeof data !== 'object') {
+    return { ok: false, reason: 'the rate limit response was not an object.' };
+  }
+
   const core = data.resources && data.resources.core;
   if (core && core.remaining < needed) {
     const resetAt = new Date(core.reset * 1000).toISOString();
@@ -667,19 +690,61 @@ function verifyReadme(content) {
 const ISSUE_MARKER = '<!-- entry-health-report -->';
 const ISSUE_TITLE = 'Entry health report';
 
+// Three outcomes, and they have to stay distinguishable: the report issue
+// was found, the lookup succeeded and there is no report issue, or the
+// lookup could not be done at all. A 5xx, a revoked token or a rate limit
+// is the third, and collapsing it into the second sends the caller down the
+// creation path — which opens a *second* report issue beside the one this
+// whole design assumes is unique. Same rule as everywhere else in this
+// script: an API error is never evidence about the thing being checked.
 async function findExistingIssue(owner, repo) {
-  const response = await fetch(
-    `${API_ROOT}/repos/${owner}/${repo}/issues?state=open&per_page=100`,
-    { headers: apiHeaders() }
-  );
-  if (!response.ok) return null;
+  let response;
+  try {
+    response = await fetch(
+      `${API_ROOT}/repos/${owner}/${repo}/issues?state=open&per_page=100`,
+      { headers: apiHeaders() }
+    );
+  } catch (err) {
+    return { ok: false, reason: `cannot reach the GitHub API: ${err.message}` };
+  }
 
-  const issues = await response.json();
-  return (
-    issues.find(
-      (issue) => !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
-    ) || null
-  );
+  if (!response.ok) {
+    return {
+      ok: false,
+      reason: `the GitHub API returned HTTP ${response.status} when looking for it`,
+    };
+  }
+
+  let issues;
+  try {
+    issues = await response.json();
+  } catch (err) {
+    return { ok: false, reason: `could not read the issue list: ${err.message}` };
+  }
+
+  // A 200 carrying an object rather than a list is how GitHub answers some
+  // secondary rate limits and abuse-detection trips: `{"message": …}`, with
+  // a 2xx status. It parses, so the catch above never fires, and calling
+  // .find on it throws a TypeError out of here and kills the run — after
+  // the fix step may already have force-pushed a branch and opened a pull
+  // request. It is the same "I could not find out" as any other failure
+  // and has to be answered the same way.
+  if (!Array.isArray(issues)) {
+    return {
+      ok: false,
+      reason:
+        'the GitHub API returned a 200 that was not a list of issues ' +
+        `(${JSON.stringify(issues).slice(0, 120)})`,
+    };
+  }
+
+  return {
+    ok: true,
+    issue:
+      issues.find(
+        (issue) => issue && !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
+      ) || null,
+  };
 }
 
 async function reportIssue(body, actionable) {
@@ -705,7 +770,24 @@ async function reportIssue(body, actionable) {
     body,
   ].join('\n');
 
-  const existing = await findExistingIssue(owner, repo);
+  const lookup = await findExistingIssue(owner, repo);
+
+  // Not knowing whether the report is already open is not the same as
+  // knowing it is not. Decline to post: a duplicate report issue is worse
+  // than a month with no report, because from then on neither issue is the
+  // one that gets rewritten. The non-zero exit code is deliberate — a run
+  // that could not report should be visible, unlike a run that could not
+  // open a pull request.
+  if (!lookup.ok) {
+    console.error(
+      `Cannot tell whether a report issue is already open: ${lookup.reason}. ` +
+        'Nothing filed, rather than risk opening a duplicate.'
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  const existing = lookup.issue;
 
   // Nothing to do and no open report: stay quiet rather than opening an
   // issue that says everything is fine.
@@ -751,8 +833,21 @@ async function reportIssue(body, actionable) {
     process.exitCode = 1;
     return;
   }
-  const created = await response.json();
-  console.log(`Opened issue #${created.number} with ${actionable} finding(s).`);
+  // The issue exists by now; a body we cannot read changes nothing except
+  // how precisely this line can be worded. Crashing here would report a
+  // failure for a call that succeeded.
+  let created = null;
+  try {
+    created = await response.json();
+  } catch {
+    created = null;
+  }
+  const number = created && typeof created === 'object' ? created.number : null;
+  console.log(
+    number
+      ? `Opened issue #${number} with ${actionable} finding(s).`
+      : `Opened the report issue with ${actionable} finding(s).`
+  );
 }
 
 // --- Open the pull request --------------------------------------------
@@ -785,7 +880,9 @@ function prBody(edits, skipped, issueUrl) {
     PR_MARKER,
     `Opened by \`scripts/check-staleness.js --fix\`. Branch \`${PR_BRANCH}\` ` +
       'is reused and force-updated each month, so this pull request is ' +
-      'rewritten in place rather than replaced.',
+      'rewritten in place rather than replaced — and closed, rather than ' +
+      'left open proposing a stale edit, by the first run that finds ' +
+      'nothing left to fix.',
     '',
     'Only the three findings with exactly one correct edit are applied here: ' +
       'a missing 🗄️ marker, a 🗄️ marker left behind after an unarchive, and ' +
@@ -821,20 +918,81 @@ function prBody(edits, skipped, issueUrl) {
   return out.join('\n');
 }
 
+// What is open on the generated branch, if anything, and whether it is ours.
+// Three outcomes again, for the same reason findExistingIssue has three: a
+// lookup that failed is not a branch with no pull request on it. Treating it
+// as one opens a second pull request proposing the same edit as the first.
+//
+// The marker is what makes a pull request ours. Only this script pushes the
+// branch, but a human can open a pull request from anything, and rewriting
+// or closing someone else's work is not a call an advisory job gets to make.
+function findGeneratedPullRequest(exec, env) {
+  const found = exec(
+    'gh',
+    ['pr', 'list', '--head', PR_BRANCH, '--state', 'open', '--json', 'url,baseRefName,body'],
+    { env }
+  );
+
+  if (!found.ok) {
+    return { ok: false, reason: `gh pr list failed: ${found.stderr || found.stdout}` };
+  }
+
+  let list;
+  try {
+    list = JSON.parse(found.stdout || '[]');
+  } catch (err) {
+    return { ok: false, reason: `could not read the gh pr list output: ${err.message}` };
+  }
+  // Parseable but not a list — the same trap as the issue lookup, and the
+  // same answer: not knowing is never reported as "there is none".
+  if (!Array.isArray(list)) {
+    return { ok: false, reason: 'gh pr list returned something that was not a list' };
+  }
+
+  const mine = list.find((pr) => pr && (pr.body || '').includes(PR_MARKER));
+  return { ok: true, pr: mine || null, foreign: list.length > 0 && !mine };
+}
+
 // Writes the file, pushes the branch, and opens or updates the pull request.
-// Returns { ok, url } and never throws: the caller has already filed a
-// report that a failure here must not take down with it.
-function openPullRequest(content, edits, skipped, issueUrl) {
+// Returns { ok, url } and never throws: the caller has a report to file that
+// a failure here must not take down with it.
+//
+// `deps` is a test seam. Every branch below either shells out or writes to
+// README.md, so without it none of this could be covered offline — and an
+// untested `gh` argument list is how a pull request ends up pointing at the
+// wrong base for a month.
+function openPullRequest(content, edits, skipped, issueUrl, deps = {}) {
+  const exec = deps.run || run;
+  const write = deps.write || ((text) => fs.writeFileSync(README_PATH, text));
+
   if (!token()) {
     return { ok: false, reason: 'no GITHUB_TOKEN; cannot push a branch or open a pull request' };
   }
 
-  const base = process.env.GITHUB_REF_NAME || run('git', ['branch', '--show-current']).stdout;
+  const base = process.env.GITHUB_REF_NAME || exec('git', ['branch', '--show-current']).stdout;
   if (!base) {
     return { ok: false, reason: 'cannot determine the base branch' };
   }
 
-  fs.writeFileSync(README_PATH, content);
+  const env = { ...process.env, GH_TOKEN: token() };
+
+  // Looked up before anything is written or pushed, so a lookup this run
+  // cannot do costs nothing: it stops here having touched neither the
+  // working tree nor the remote, and next month tries again.
+  const existing = findGeneratedPullRequest(exec, env);
+  if (!existing.ok) {
+    return { ok: false, reason: existing.reason };
+  }
+  if (existing.foreign) {
+    return {
+      ok: false,
+      reason:
+        `a pull request is open on \`${PR_BRANCH}\` that this script did not ` +
+        'write. Leaving it alone rather than force-pushing over it',
+    };
+  }
+
+  write(content);
 
   // Only ever this one path. The runner's checkout is clean, but a local
   // run is not, and a fix run must not sweep up whatever else is in the
@@ -851,7 +1009,7 @@ function openPullRequest(content, edits, skipped, issueUrl) {
   ];
 
   for (const [command, args] of steps) {
-    const result = run(command, args);
+    const result = exec(command, args);
     if (!result.ok) {
       return { ok: false, reason: `${command} ${args[0]} failed: ${result.stderr || result.stdout}` };
     }
@@ -863,29 +1021,89 @@ function openPullRequest(content, edits, skipped, issueUrl) {
   );
   fs.writeFileSync(bodyFile, prBody(edits, skipped, issueUrl));
 
-  const env = { ...process.env, GH_TOKEN: token() };
-  const existing = run('gh', [
-    'pr', 'list', '--head', PR_BRANCH, '--state', 'open', '--json', 'url', '--jq', '.[0].url',
-  ], { env });
-
-  if (existing.ok && existing.stdout) {
-    const edited = run('gh', ['pr', 'edit', existing.stdout, '--title', PR_TITLE, '--body-file', bodyFile], { env });
-    return edited.ok
-      ? { ok: true, url: existing.stdout, updated: true }
-      : { ok: false, reason: `gh pr edit failed: ${edited.stderr}` };
+  if (existing.pr) {
+    // --base on every update, not only when it differs. The head branch is
+    // rebuilt from whatever base this run checked out, so the pull request's
+    // base has to follow it: a workflow_dispatch from a topic branch opens
+    // the pull request against that branch, and the next scheduled run
+    // force-pushes the same branch built from the default branch. Without
+    // this, the pull request keeps comparing against a base its head was
+    // never built from, and shows a diff nobody should act on. Retargeting
+    // is right rather than refusing to reuse, because the alternative
+    // leaves the stale pull request open — which is the problem, not the
+    // fix.
+    const edited = exec(
+      'gh',
+      ['pr', 'edit', existing.pr.url, '--base', base, '--title', PR_TITLE, '--body-file', bodyFile],
+      { env }
+    );
+    if (!edited.ok) {
+      return { ok: false, reason: `gh pr edit failed: ${edited.stderr}` };
+    }
+    return {
+      ok: true,
+      url: existing.pr.url,
+      updated: true,
+      retargetedFrom: existing.pr.baseRefName !== base ? existing.pr.baseRefName : null,
+    };
   }
 
-  const created = run('gh', [
-    'pr', 'create',
-    '--base', base,
-    '--head', PR_BRANCH,
-    '--title', PR_TITLE,
-    '--body-file', bodyFile,
-  ], { env });
+  const created = exec(
+    'gh',
+    ['pr', 'create', '--base', base, '--head', PR_BRANCH, '--title', PR_TITLE, '--body-file', bodyFile],
+    { env }
+  );
 
   return created.ok
     ? { ok: true, url: created.stdout.split('\n').pop(), updated: false }
     : { ok: false, reason: `gh pr create failed: ${created.stderr}` };
+}
+
+// Closes the generated pull request when a sweep finds nothing left to fix.
+//
+// The promise is one pull request, rewritten each month. A month where the
+// findings were resolved by hand on the base branch breaks it: the sweep
+// finds nothing, returns early, and last month's pull request stays open
+// proposing an edit that may now be wrong against contents nobody will
+// force-push again. An automation that leaves stale proposals lying around
+// is one people learn to ignore, which costs more than it ever saved.
+function retireStalePullRequest(deps = {}) {
+  const exec = deps.run || run;
+
+  if (!token()) {
+    return { ok: false, reason: 'no GITHUB_TOKEN; cannot look for an open pull request' };
+  }
+
+  const env = { ...process.env, GH_TOKEN: token() };
+  const existing = findGeneratedPullRequest(exec, env);
+  if (!existing.ok) {
+    return { ok: false, reason: existing.reason };
+  }
+  if (!existing.pr) {
+    return { ok: true, closed: null };
+  }
+
+  // --delete-branch as well: the branch exists only to carry this pull
+  // request, its contents are stale by definition here, and the next sweep
+  // that finds something recreates it from the base branch.
+  const closed = exec(
+    'gh',
+    [
+      'pr', 'close', existing.pr.url,
+      '--comment',
+      'Closing: this run found nothing left to fix, so every edit this pull ' +
+        'request proposed has either landed or is no longer the right one. ' +
+        'The next monthly sweep opens a fresh pull request if the list decays ' +
+        'again — see the entry health report issue for anything still waiting ' +
+        'on a human.',
+      '--delete-branch',
+    ],
+    { env }
+  );
+
+  return closed.ok
+    ? { ok: true, closed: existing.pr.url }
+    : { ok: false, reason: `gh pr close failed: ${closed.stderr}` };
 }
 
 // The report issue, so the pull request can point back at what is left. A
@@ -895,8 +1113,8 @@ async function reportIssueUrl() {
   const [owner, repo] = (process.env.GITHUB_REPOSITORY || '').split('/');
   if (!owner || !repo || !token()) return null;
   try {
-    const issue = await findExistingIssue(owner, repo);
-    return issue ? issue.html_url : null;
+    const lookup = await findExistingIssue(owner, repo);
+    return lookup.ok && lookup.issue ? lookup.issue.html_url : null;
   } catch {
     return null;
   }
@@ -915,7 +1133,7 @@ async function reportIssueUrl() {
 // opened is logged and left for next month; the findings are all still in
 // the report, which is where they were before any of this existed. Only a
 // failure to file that report is worth a red run.
-async function runFixMode(findings, openPr) {
+async function runFixMode(findings, openPr, deps = {}) {
   const original = fs.readFileSync(README_PATH, 'utf8');
   const { content, edits, skipped } = applyFixes(original, findings);
 
@@ -925,6 +1143,18 @@ async function runFixMode(findings, openPr) {
 
   if (edits.length === 0) {
     console.log('No finding had an edit that could be applied automatically.');
+
+    // Nothing to propose is exactly when a pull request left over from a
+    // month when there was something becomes misleading, so this is where
+    // it gets closed rather than where the run quietly ends.
+    if (openPr) {
+      const retired = retireStalePullRequest(deps);
+      if (!retired.ok) {
+        console.error(`Could not retire the open pull request: ${retired.reason}`);
+      } else if (retired.closed) {
+        console.log(`Closed ${retired.closed}: nothing left for it to propose.`);
+      }
+    }
     return null;
   }
 
@@ -953,13 +1183,16 @@ async function runFixMode(findings, openPr) {
   }
 
   const issueUrl = await reportIssueUrl();
-  const pr = openPullRequest(content, edits, skipped, issueUrl);
+  const pr = openPullRequest(content, edits, skipped, issueUrl, deps);
   if (!pr.ok) {
     console.error(`Could not open the pull request: ${pr.reason}`);
     return null;
   }
 
   console.log(`\n${pr.updated ? 'Updated' : 'Opened'} ${pr.url} with ${edits.length} edit(s).`);
+  if (pr.retargetedFrom) {
+    console.log(`Retargeted it from ${pr.retargetedFrom}, which its head is no longer built from.`);
+  }
   return { edits, skipped, prUrl: pr.url };
 }
 
@@ -984,7 +1217,7 @@ async function checkAndReport(findings, checked, argv, deps = {}) {
   if (openPr || argv.includes('--fix')) {
     console.log('');
     try {
-      applied = await fix(findings, openPr);
+      applied = await fix(findings, openPr, deps);
     } catch (err) {
       // A throw from the fix path is a bug in it, not a reason to lose the
       // report that the rest of this run has already earned.
@@ -1051,6 +1284,10 @@ module.exports = {
   applyFixes,
   verifyReadme,
   checkAndReport,
+  runFixMode,
+  openPullRequest,
+  retireStalePullRequest,
+  PR_MARKER,
   prBody,
   ARCHIVED_MARKER_FULL,
   PR_BRANCH,

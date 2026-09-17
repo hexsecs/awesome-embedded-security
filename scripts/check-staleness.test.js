@@ -25,6 +25,10 @@ const {
   applyFixes,
   verifyReadme,
   checkAndReport,
+  runFixMode,
+  openPullRequest,
+  retireStalePullRequest,
+  PR_MARKER,
   prBody,
   ARCHIVED_MARKER_FULL,
   PR_BRANCH,
@@ -300,9 +304,10 @@ test('preflight passes when the quota covers the run', async (t) => {
 // pinned: an all-clear must not open an issue, and a monthly run must not
 // pile up a new one beside the report already open.
 
-function issueHarness(t, { existingIssue }) {
+function issueHarness(t, { existingIssue, lookup = 'ok' }) {
   const realFetch = global.fetch;
   const realEnv = { ...process.env };
+  const realExitCode = process.exitCode;
   const calls = [];
 
   global.fetch = async (url, opts = {}) => {
@@ -310,6 +315,32 @@ function issueHarness(t, { existingIssue }) {
     calls.push({ method, url, body: opts.body ? JSON.parse(opts.body) : null });
 
     if (method === 'GET') {
+      // `lookup` is how the tests below distinguish "there is no report
+      // issue" from "I could not find out", which is the whole point of
+      // that code path.
+      if (lookup === 'throw') throw new Error('ECONNRESET');
+      if (lookup === 'fail') return { status: 500, ok: false, json: async () => ({}) };
+      // A 200 carrying an object, which is what a secondary rate limit or
+      // an abuse-detection trip looks like.
+      if (lookup === 'object') {
+        return {
+          status: 200,
+          ok: true,
+          json: async () => ({
+            message: 'You have exceeded a secondary rate limit',
+            documentation_url: 'https://docs.github.com/…',
+          }),
+        };
+      }
+      if (lookup === 'unparseable') {
+        return {
+          status: 200,
+          ok: true,
+          json: async () => {
+            throw new SyntaxError('Unexpected token < in JSON');
+          },
+        };
+      }
       return {
         status: 200,
         ok: true,
@@ -328,6 +359,7 @@ function issueHarness(t, { existingIssue }) {
   t.after(() => {
     global.fetch = realFetch;
     process.env = realEnv;
+    process.exitCode = realExitCode;
   });
 
   return calls;
@@ -883,4 +915,397 @@ test('a dry run reports nothing and files nothing', async (t) => {
 
   assert.strictEqual(sawOpenPr, false, '--fix alone must not open a pull request');
   assert.strictEqual(filed.length, 0, 'and must not touch the issue either');
+});
+
+// --- Not knowing is not the same as knowing there is nothing -----------
+// Both lookups this script does — "is the report issue already open?" and
+// "is the generated pull request already open?" — used to answer a failed
+// request with "no". That is how a monthly job ends up with two report
+// issues, or two pull requests proposing the same edit, and from then on
+// neither one is the one that gets rewritten. These pin the distinction.
+
+test('a report-issue lookup that fails files nothing rather than risk a duplicate', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false, lookup: 'fail' });
+  process.exitCode = 0;
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method !== 'GET').length,
+    0,
+    'an HTTP 500 is not evidence that no report issue exists'
+  );
+  assert.strictEqual(process.exitCode, 1, 'a failure to report must stay visible');
+});
+
+test('a network failure during the report-issue lookup files nothing either', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false, lookup: 'throw' });
+  process.exitCode = 0;
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0);
+  assert.strictEqual(process.exitCode, 1);
+});
+
+test('a lookup that succeeds and finds nothing still opens the report', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+  process.exitCode = 0;
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  assert.ok(calls.find((c) => c.method === 'POST'), 'a real 200-with-no-match must still file');
+  assert.strictEqual(process.exitCode, 0);
+});
+
+// --- The generated pull request ---------------------------------------
+// Everything here shells out to git and gh, so it is driven through the
+// dependency seam. README.md is never written: the write is stubbed, and
+// each test asserts what was handed to it rather than letting it reach the
+// real file.
+
+const OUR_PR = {
+  url: 'https://github.com/owner/repo/pull/12',
+  baseRefName: 'main',
+  body: `${PR_MARKER}\nlast month's edits`,
+};
+
+function prHarness(t, { overrides = {}, ref = 'main' } = {}) {
+  const realEnv = { ...process.env };
+  process.env.GITHUB_TOKEN = 'test-token';
+  process.env.GITHUB_REF_NAME = ref;
+  t.after(() => {
+    process.env = realEnv;
+  });
+
+  const calls = [];
+  const written = [];
+
+  const exec = (command, args) => {
+    calls.push({ command, args, line: [command, ...args].join(' ') });
+    const key = `${command} ${args.slice(0, 2).join(' ')}`.trim();
+    if (Object.prototype.hasOwnProperty.call(overrides, key)) return overrides[key];
+    if (key === 'gh pr list') return { ok: true, stdout: '[]', stderr: '' };
+    return { ok: true, stdout: '', stderr: '' };
+  };
+
+  const called = (key) => calls.filter((c) => `${c.command} ${c.args.slice(0, 2).join(' ')}`.trim() === key);
+
+  return { calls, written, called, deps: { run: exec, write: (c) => written.push(c) } };
+}
+
+const EDIT = { kind: 'needsMarker', name: 'Alpha', lineNo: 9, note: 'added the marker' };
+
+test('the first run opens the pull request against the branch it ran from', (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr create': { ok: true, stdout: 'https://github.com/owner/repo/pull/1', stderr: '' } },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.updated, false);
+  assert.strictEqual(result.url, 'https://github.com/owner/repo/pull/1');
+  assert.deepStrictEqual(h.written, ['new content\n'], 'the rewritten list is what gets written');
+
+  const create = h.called('gh pr create')[0];
+  assert.ok(create.line.includes('--base main'));
+  assert.ok(create.line.includes(`--head ${PR_BRANCH}`));
+});
+
+test('a rerun updates the open pull request instead of opening a second', (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: JSON.stringify([OUR_PR]), stderr: '' } },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.updated, true);
+  assert.strictEqual(result.url, OUR_PR.url);
+  assert.strictEqual(result.retargetedFrom, null, 'the base was already right');
+  assert.strictEqual(h.called('gh pr create').length, 0, 'a monthly run must not stack pull requests');
+  assert.strictEqual(h.called('gh pr edit').length, 1);
+});
+
+test('a pull request left targeting another base is retargeted, not left pointing at it', (t) => {
+  // What a workflow_dispatch from a topic branch leaves behind: the pull
+  // request was opened against that branch, and this scheduled run has just
+  // force-pushed the same head built from the default branch.
+  const h = prHarness(t, {
+    ref: 'main',
+    overrides: {
+      'gh pr list': {
+        ok: true,
+        stdout: JSON.stringify([{ ...OUR_PR, baseRefName: 'feature/topic' }]),
+        stderr: '',
+      },
+    },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.retargetedFrom, 'feature/topic');
+
+  const edit = h.called('gh pr edit')[0];
+  assert.ok(
+    edit.line.includes('--base main'),
+    'without --base the pull request compares against a base its head was never built from'
+  );
+});
+
+test('a pull request on the branch that this script did not write is left alone', (t) => {
+  const h = prHarness(t, {
+    overrides: {
+      'gh pr list': {
+        ok: true,
+        stdout: JSON.stringify([{ url: 'https://github.com/owner/repo/pull/5', baseRefName: 'main', body: 'opened by hand' }]),
+        stderr: '',
+      },
+    },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /did not write/);
+  assert.strictEqual(h.written.length, 0, 'nothing is written when the run refuses');
+  assert.strictEqual(h.called('git push').length, 0, "and someone else's branch is not force-pushed");
+  assert.strictEqual(h.called('gh pr edit').length, 0);
+});
+
+test('a pull-request lookup that fails pushes nothing and opens nothing', (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: false, stdout: '', stderr: 'HTTP 500' } },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /gh pr list failed/);
+  assert.strictEqual(h.called('gh pr create').length, 0, 'a failed lookup must not open a second pull request');
+  assert.strictEqual(h.called('git push').length, 0, 'and must cost the remote nothing');
+  assert.strictEqual(h.written.length, 0, 'and must not touch README.md');
+});
+
+test('unreadable gh output is a failure, not an empty list', (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: 'not json', stderr: '' } },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, false);
+  assert.strictEqual(h.called('gh pr create').length, 0);
+});
+
+// --- Retiring the pull request when there is nothing left --------------
+// The promise in the pull request body and in contributing.md is one pull
+// request, rewritten each month. A month where a maintainer fixed the
+// findings by hand used to break it silently: the sweep found nothing,
+// returned early, and left last month's pull request open proposing an edit
+// that no longer applied.
+
+test('a sweep with nothing to fix closes the pull request it opened last month', async (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: JSON.stringify([OUR_PR]), stderr: '' } },
+  });
+
+  const applied = await runFixMode(classify([]), true, h.deps);
+
+  assert.strictEqual(applied, null, 'nothing was applied, so nothing is marked as handled');
+  const close = h.called('gh pr close')[0];
+  assert.ok(close, 'the stale pull request should be closed');
+  assert.strictEqual(close.args[2], OUR_PR.url);
+  assert.ok(close.args.includes('--delete-branch'));
+  assert.ok(
+    close.args.some((a) => a.includes('nothing left to fix')),
+    'closing it silently would read as the automation giving up'
+  );
+});
+
+test('a sweep with nothing to fix and no pull request open touches nothing', async (t) => {
+  const h = prHarness(t);
+
+  await runFixMode(classify([]), true, h.deps);
+
+  assert.strictEqual(h.called('gh pr close').length, 0);
+  assert.strictEqual(h.written.length, 0);
+});
+
+test('a sweep with nothing to fix leaves a pull request it did not write open', (t) => {
+  const h = prHarness(t, {
+    overrides: {
+      'gh pr list': {
+        ok: true,
+        stdout: JSON.stringify([{ url: 'https://github.com/owner/repo/pull/5', baseRefName: 'main', body: 'opened by hand' }]),
+        stderr: '',
+      },
+    },
+  });
+
+  const result = retireStalePullRequest(h.deps);
+
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.closed, null);
+  assert.strictEqual(h.called('gh pr close').length, 0);
+});
+
+test('a lookup failure closes nothing and is reported, not thrown', (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: false, stdout: '', stderr: 'HTTP 502' } },
+  });
+
+  const result = retireStalePullRequest(h.deps);
+
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /gh pr list failed/);
+  assert.strictEqual(h.called('gh pr close').length, 0);
+});
+
+test('a dry run never reaches gh at all', async (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: JSON.stringify([OUR_PR]), stderr: '' } },
+  });
+
+  await runFixMode(classify([]), false, h.deps);
+
+  assert.strictEqual(h.calls.length, 0, '--fix alone must not touch the remote');
+});
+
+// --- A 200 is not proof that the body is what was asked for ------------
+// GitHub answers some secondary rate limits and abuse-detection trips with
+// a JSON *object* and a 2xx status. It parses, so a try/catch around
+// response.json() never fires; calling .find on it throws a TypeError from
+// outside any handler, which kills the run — possibly after the fix step
+// has already pushed a branch and opened a pull request. Dying halfway is
+// worse than the duplicate issue this lookup was hardened against, so the
+// shape of the body is checked, not just its parseability.
+
+test('a 200 that is not a list of issues files nothing and stays visible', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false, lookup: 'object' });
+  process.exitCode = 0;
+
+  await assert.doesNotReject(
+    () => reportIssue('## Gone (404)\n\n- **Dead**', 1),
+    'a secondary rate limit must degrade, not throw out of the run'
+  );
+
+  assert.strictEqual(
+    calls.filter((c) => c.method !== 'GET').length,
+    0,
+    'an unreadable answer is not evidence that no report issue exists'
+  );
+  assert.strictEqual(process.exitCode, 1, 'a failure to report must stay visible');
+});
+
+test('a 200 whose body will not parse is treated the same way', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false, lookup: 'unparseable' });
+  process.exitCode = 0;
+
+  await assert.doesNotReject(() => reportIssue('## Gone (404)\n\n- **Dead**', 1));
+
+  assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0);
+  assert.strictEqual(process.exitCode, 1);
+});
+
+test('a repository lookup answered with a non-object degrades to unchecked', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  for (const body of [{ json: async () => ['not', 'a', 'repository'] }, { json: async () => null }]) {
+    global.fetch = async () => ({ status: 200, ok: true, headers: { get: () => null }, ...body });
+
+    const result = await lookup(entry());
+    assert.strictEqual(result.status, 'error', 'an unreadable body is never a finding');
+    assert.match(result.detail, /no repository object/);
+  }
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    headers: { get: () => null },
+    json: async () => {
+      throw new SyntaxError('Unexpected token <');
+    },
+  });
+
+  const result = await lookup(entry());
+  assert.strictEqual(result.status, 'error');
+  assert.match(result.detail, /unreadable response body/);
+
+  // And it must not be classified into anything a human or the fixer acts on.
+  const findings = classify([result]);
+  assert.strictEqual(findings.errors.length, 1);
+  assert.strictEqual(findings.missing.length, 0);
+  assert.strictEqual(applyFixes(FIXTURE, findings).edits.length, 0);
+});
+
+test('a rate-limit preflight answered with a non-object refuses the run', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({ status: 200, ok: true, json: async () => null });
+  const nonObject = await preflight(150);
+  assert.strictEqual(nonObject.ok, false);
+  assert.match(nonObject.reason, /not an object/);
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    json: async () => {
+      throw new SyntaxError('Unexpected token <');
+    },
+  });
+  const unreadable = await preflight(150);
+  assert.strictEqual(unreadable.ok, false);
+  assert.match(unreadable.reason, /could not be read/);
+});
+
+test('gh output that parses to an object is a failed lookup, not an empty one', (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: '{"message":"rate limited"}', stderr: '' } },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /not a list/);
+  assert.strictEqual(h.called('gh pr create').length, 0, 'a failed lookup must not open a second pull request');
+  assert.strictEqual(h.called('git push').length, 0);
+  assert.strictEqual(h.written.length, 0);
+});
+
+test('an issue that was created but answered unreadably is not reported as a failure', async (t) => {
+  const realFetch = global.fetch;
+  const realEnv = { ...process.env };
+  const realExitCode = process.exitCode;
+  t.after(() => {
+    global.fetch = realFetch;
+    process.env = realEnv;
+    process.exitCode = realExitCode;
+  });
+
+  process.env.GITHUB_TOKEN = 'test-token';
+  process.env.GITHUB_REPOSITORY = 'owner/repo';
+  process.exitCode = 0;
+
+  global.fetch = async (url, opts = {}) => {
+    if ((opts.method || 'GET') === 'GET') return { status: 200, ok: true, json: async () => [] };
+    return {
+      status: 201,
+      ok: true,
+      json: async () => {
+        throw new SyntaxError('Unexpected end of JSON input');
+      },
+    };
+  };
+
+  await assert.doesNotReject(() => reportIssue('## Gone (404)', 1));
+  assert.strictEqual(process.exitCode, 0, 'the issue was created; that call did not fail');
 });

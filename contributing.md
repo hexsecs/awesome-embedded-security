@@ -77,7 +77,9 @@ Three of those findings have exactly one correct edit — an archived repository
 missing its 🗄️ marker, a 🗄️ marker left behind after an unarchive, and a link
 to a repository that has since moved — and the workflow applies those itself,
 in a pull request on the reused `entry-health/automated-fixes` branch that is
-rewritten each month rather than stacked. The rewritten file is checked with
+rewritten each month rather than stacked, and the first sweep that finds
+nothing left to fix closes it rather than leaving it open proposing an edit
+that has since been made by hand. The rewritten file is checked with
 `scripts/check-readme.js` before the branch is pushed, and a rename that would
 collide with an entry already in the list is refused and reported instead.
 
