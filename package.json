@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Pinned CI tooling for markdown checks",
   "scripts": {
-    "lint:awesome": "awesome-lint README.md",
+    "lint:awesome": "bash scripts/lint-awesome.sh",
     "lint:links": "bash scripts/check-links.sh",
     "lint:markdown": "markdownlint-cli2",
     "check:readme": "node scripts/check-readme.js",
@@ -14,6 +14,9 @@
     "test:web-health": "node --test scripts/check-web-health.test.js",
     "find:candidates": "node scripts/find-candidates.js",
     "test:candidates": "node --test scripts/find-candidates.test.js",
+    "flake:aggregate": "node scripts/link-flake.js aggregate",
+    "test:pr-guidance": "node --test scripts/explain-ci-failure.test.js",
+    "test:flake": "node --test scripts/link-flake.test.js",
     "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {

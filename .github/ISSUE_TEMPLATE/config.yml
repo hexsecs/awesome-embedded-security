@@ -1,0 +1,15 @@
+# blank_issues_enabled stays true: the two forms cover the common cases, and
+# anything else — a question about scope, a workflow problem — should not have
+# to be squeezed into a form built for entries.
+#
+# The security link is here because a private report has to be routed before
+# it is typed, not after.
+
+blank_issues_enabled: true
+contact_links:
+  - name: Contributing guide
+    url: https://github.com/hexsecs/awesome-embedded-security/blob/main/contributing.md
+    about: Entry format, the markers, and the two awesome-lint errors that point at the wrong thing.
+  - name: Report a security problem
+    url: https://github.com/hexsecs/awesome-embedded-security/blob/main/SECURITY.md
+    about: For a vulnerability in this repository itself. Do not open a public issue for anything that needs embargoed handling.

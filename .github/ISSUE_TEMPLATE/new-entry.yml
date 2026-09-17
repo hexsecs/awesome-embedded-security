@@ -1,0 +1,102 @@
+# Collects exactly what an entry needs, in the format the checks demand.
+#
+# The format rules live in the field descriptions rather than behind a link
+# to contributing.md, because the failure mode this guards against is an
+# entry arriving in a shape that fails CI and needs a round trip to fix —
+# and the guide that would have prevented it is read after the failure, not
+# before.
+
+name: New entry
+description: Suggest a tool, reference, or learning resource for the list.
+title: "New entry: "
+body:
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: The official project page or repository. Not a mirror, a shortener, or a tracking link.
+      placeholder: https://github.com/owner/project
+    validations:
+      required: true
+
+  - type: dropdown
+    id: section
+    attributes:
+      label: Section
+      description: Where it belongs. Entries are kept in alphabetical order within their section.
+      options:
+        - Software Tools → Binary Parsing and Analysis Tools
+        - Software Tools → Disassemblers/Decompilers
+        - Software Tools → Debugging Tools
+        - Software Tools → USB Emulation and Fuzzing
+        - Software Tools → Secure Boot and Firmware Trust
+        - Software Tools → Firmware Supply Chain and SBOM
+        - Software Tools → Fuzzing Tools
+        - Software Tools → Language Specific Decompilers
+        - Software Tools → Security Auditing Frameworks
+        - Software Tools → Firmware Taint Analysis
+        - Software Tools → RTOS Security
+        - Software Tools → TEE/Trusted Execution Environments
+        - Software Tools → Root of Trust and TPM
+        - Software Tools → OTA Update Security
+        - Software Tools → IoT Protocol Security
+        - Software Tools → Bluetooth and BLE Security
+        - Software Tools → Zigbee / Z-Wave Security
+        - Software Tools → Baseband Security
+        - Software Tools → Firmware Malware Analysis
+        - Software Tools → Emulation Tools
+        - Software Tools → MCU Firmware Fuzzing
+        - Hardware Tools → Hardware Reverse Engineering Multitools
+        - Hardware Tools → Hardware Debug Interfaces
+        - Hardware Tools → USB Protocol Analysis
+        - Hardware Tools → Chip-Off and Memory Forensics
+        - Hardware Tools → Side-Channel Analysis
+        - Hardware Tools → Fault Injection
+        - Hardware Tools → Logic Analyzers
+        - Hardware Tools → NFC and RFID
+        - Hardware Tools → RF Tools (Non-SDR)
+        - Hardware Tools → Software Defined Radios
+        - Hardware Tools → Software Defined Radio Software
+        - Hardware Tools → Wi-Fi Tools
+        - Further Learning and Training → Security Assessment and Design Guidance
+        - Further Learning and Training → Standards and Regulation
+        - Further Learning and Training (top level, no subsection)
+        - Other Awesome Lists
+        - Not sure — please place it
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: Entry name
+      description: Whatever the project calls itself, spelled exactly that way. A misspelled name still resolves, so nothing catches it, and nobody searching for the real name will find it.
+      placeholder: ChipWhisperer
+    validations:
+      required: true
+
+  - type: input
+    id: description
+    attributes:
+      label: One-line description
+      description: "One sentence, factual and non-promotional, starting with a capital letter and not with the entry name. Rendered as: * [Name](url) - Your description."
+      placeholder: Open source toolchain for side-channel power analysis and glitching attacks.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: markers
+    attributes:
+      label: Markers
+      description: "💰 is about licensing, not price — open-hardware tools you have to buy are not marked. 🗄️ means the maintainers have archived the repository; if a maintained successor exists, name it at the end of the description."
+      options:
+        - label: "💰 Commercial or closed-source"
+        - label: "🗄️ Archived upstream"
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why it belongs
+      description: What it does that the entries already listed do not. If it overlaps with one, say why both are worth listing.
+    validations:
+      required: true

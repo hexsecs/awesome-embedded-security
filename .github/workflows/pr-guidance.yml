@@ -1,0 +1,112 @@
+name: PR Guidance
+
+# Turns the Validate Markdown failures whose messages point at the wrong
+# thing into one pull request comment, rewritten in place on each push.
+# contributing.md already documents them, but a guide only reaches the
+# contributor who read it before failing.
+#
+# workflow_run rather than pull_request, deliberately: a pull request from a
+# fork gets a read-only GITHUB_TOKEN, so a pull_request-triggered workflow
+# cannot comment at all — and first-time contributors, the people this exists
+# for, open from forks. workflow_run runs in the base repository with a
+# writable token.
+#
+# The cost of that token is that everything reaching this job is untrusted.
+# The producer job does not merely get tampered with in theory: it runs
+# `npm ci` and `npm run validate` against the pull request's merge ref, so a
+# fork's package.json defines what `validate` is and can write anything it
+# likes into the artifact before it is uploaded.
+#
+# So the artifact is treated as evidence, never as instruction:
+#   - it says which errors occurred; it does not get to say which pull
+#     request to write to. The target is derived from the triggering run's
+#     head SHA — trusted workflow_run metadata — via the API, and
+#     pr-number.txt is only a cross-check that must agree.
+#   - nothing in it is executed, and every fragment quoted from it is
+#     wrapped in a code span so it cannot author markdown under the bot's
+#     identity.
+#   - the checkout is pinned to the base repository's default branch, so no
+#     fork-authored file is ever on disk beside the script.
+#
+# Advisory, and not a required check. The download is allowed to fail
+# quietly, the script exits 0 on every path, and no result here can change
+# whether the pull request passes.
+
+on:
+  workflow_run:
+    workflows: ['Validate Markdown']
+    types: [completed]
+
+permissions:
+  contents: read
+  # Reading a build artifact that belongs to a different workflow run.
+  actions: read
+  # Posting and updating the comment.
+  pull-requests: write
+
+concurrency:
+  # Keyed on the branch the checks ran against, so a quick second push
+  # supersedes the guidance for the first rather than racing it.
+  group: >-
+    pr-guidance-${{ github.event.workflow_run.head_repository.full_name }}-${{
+    github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  explain:
+    # Only pull requests, and only a run that reached a verdict — there is
+    # nothing to say about one that was cancelled or skipped.
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      contains(fromJSON('["success", "failure"]'), github.event.workflow_run.conclusion)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Spelled out rather than left to default. This job holds a token
+          # that can write to the pull request, so which tree it runs must
+          # not be inferred from an event the head commit influences.
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+
+      - name: Download the checked run's context
+        id: context
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: pr-guidance
+          path: pr-guidance
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Explain what failed
+        if: steps.context.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_GUIDANCE_DIR: pr-guidance
+          RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          # The trusted half. These two decide which pull request gets
+          # written to; the artifact only gets to agree with them.
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+        run: node scripts/explain-ci-failure.js
+
+      # If the artifact never arrived there is nothing to classify, but a
+      # comment from an earlier push may still be sitting on the pull request
+      # describing errors nobody can now confirm. Retiring it is the only
+      # safe move; this never creates a comment, only rewrites one that is
+      # already there.
+      - name: Retire stale guidance when the context is unavailable
+        if: steps.context.outcome != 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+        run: node scripts/explain-ci-failure.js --retire-only

@@ -38,6 +38,29 @@ npm run lint:links
 CI runs both, and retries the link check to absorb hosts that intermittently
 drop connections.
 
+### "Awesome list must reside in a valid git repository"
+
+Your repository is fine. `awesome-lint` works out the repository's remote by
+asking git for the current branch and then for `branch.<name>.remote`. On a
+branch you have just created and not yet pushed, that config key does not
+exist, the lookup exits non-zero, and the rule reports it as an invalid
+repository. So `npm run validate` fails on your very first branch, before you
+have changed anything, and the message points at the wrong thing entirely. It
+also stops the run before the other checks, so nothing else gets reported that
+time.
+
+Any one of these clears it:
+
+```bash
+git push -u origin <your-branch>
+git branch --set-upstream-to=origin/main
+git config branch.<your-branch>.remote origin
+```
+
+`npm run lint:awesome` prints this same note after the error whenever it
+detects the condition. CI is unaffected: it builds from a detached HEAD, where
+the rule resolves `origin` instead.
+
 ### Entry health
 
 A link check only catches URLs that stop resolving. It says nothing about a
@@ -218,6 +241,33 @@ Both of these fail CI with messages that don't obviously point at the fix:
   description must be separated with a dash`, which points at the wrong thing
   entirely — if you see that error on an entry that plainly has its dash, check
   the casing. `* [de4dot](...) 🗄️ - .NET deobfuscator.` fails this way.
+
+### When CI tells you the wrong thing
+
+If the markdown checks fail on a pull request, a bot comment explains the
+errors whose messages point at the wrong thing — most of all the dash error
+that is really a casing error on a 💰 or 🗄️ entry. It updates that one comment
+on each push rather than adding another, and it says nothing at all when the
+failure is not one it recognises, so a comment from it always means something.
+It runs after the checks finish, in the base repository, so it reaches pull
+requests opened from a fork.
+
+The link check also records which URLs failed on which attempt and whether a
+retry got them, and uploads it as the `link-check-report` build artifact. The
+retry works well enough to hide its own evidence: a host that fails attempt 1
+and passes attempt 2, month after month, was invisible. To find the hosts that
+are chronically flaky rather than genuinely dead, collect a few runs and
+aggregate them:
+
+```bash
+gh run download <run-id> -n link-check-report -D flake/<run-id>
+npm run flake:aggregate flake
+```
+
+It prints candidate `ignorePatterns` entries for hosts that failed in three or
+more runs and recovered on a retry each time. Ignoring a host means a genuinely
+dead link on it is never caught again, so the suggestion is an argument, not a
+decision.
 
 ## Pull Request Notes
 

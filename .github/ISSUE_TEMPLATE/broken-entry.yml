@@ -1,0 +1,44 @@
+# For the decay the automation cannot see.
+#
+# The link check catches a URL that stops resolving, and the Entry Health
+# workflow catches a GitHub repository that was archived or renamed. Neither
+# notices a project that quietly became something else, a description that
+# stopped being true, or an entry filed under the wrong heading — from the
+# outside the list still looks correct, so nobody reports it unless there is
+# somewhere obvious to report it.
+
+name: Broken or wrong entry
+description: Report an entry that is dead, has moved, or no longer describes what it points at.
+title: "Broken entry: "
+body:
+  - type: input
+    id: entry
+    attributes:
+      label: Entry
+      description: The name as it appears in README.md, and the line number if you have it.
+      placeholder: Binwalk (README.md:59)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: problem
+    attributes:
+      label: What is wrong
+      options:
+        - The link is dead
+        - The project moved to a new home
+        - The description is inaccurate or out of date
+        - It is archived upstream and missing the 🗄️ marker
+        - It is commercial or closed-source and missing the 💰 marker
+        - It is filed under the wrong section
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: Details
+      description: What you saw, and the replacement URL or corrected description if you have one. If the project moved, say whether the old link still redirects.
+    validations:
+      required: true

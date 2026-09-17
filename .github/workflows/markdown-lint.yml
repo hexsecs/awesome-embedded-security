@@ -48,8 +48,37 @@ jobs:
       - name: Install pinned markdown tooling
         run: |
           npm ci
+      # The log is kept so pr-guidance.yml can translate the errors whose
+      # messages point at the wrong thing. tee does not change the result:
+      # the default shell already runs with `set -o pipefail`, so the
+      # pipeline reports npm's status and not tee's.
       - name: Run markdown quality checks
-        run: npm run validate
+        run: |
+          mkdir -p .pr-guidance
+          npm run validate 2>&1 | tee .pr-guidance/validate.log
+
+      # The pull request's own README.md travels with the log. pr-guidance.yml
+      # runs on workflow_run against the base branch and cannot see the head
+      # commit, and telling a marker/casing error apart from a genuinely
+      # missing dash means reading the line the linter pointed at.
+      - name: Collect pull request context
+        if: always() && github.event_name == 'pull_request'
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          mkdir -p .pr-guidance
+          echo "$PR_NUMBER" > .pr-guidance/pr-number.txt
+          cp README.md .pr-guidance/README.md
+
+      - name: Upload pull request context
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pr-guidance
+          path: .pr-guidance/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
 
   markdown-link-check:
     runs-on: ubuntu-24.04
@@ -66,3 +95,19 @@ jobs:
         run: npm ci
       - name: Check links
         run: npm run lint:links
+
+      # Uploaded whatever the outcome. A failed run is exactly the one worth
+      # keeping, and the recovered-on-retry case only exists in a run that
+      # passed — the summary is useless if it survives only one of the two.
+      # Unzip several of these into one directory and run
+      # `node scripts/link-flake.js aggregate <dir>` to find the hosts that
+      # deserve an ignorePatterns entry, instead of recalling them.
+      - name: Upload link flake summary
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: link-check-report
+          path: .link-check/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 90
