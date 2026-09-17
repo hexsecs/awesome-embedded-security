@@ -26,6 +26,9 @@
       "pattern": "^https://www\\.nordicsemi\\.com/"
     },
     {
+      "pattern": "^https://www\\.sdrangel\\.org/"
+    },
+    {
       "pattern": "^https://trustedcomputinggroup\\.org/"
     }
   ],
