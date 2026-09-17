@@ -2,7 +2,8 @@ name: Entry Health
 
 # Finds the decay a link check cannot: repositories that have been archived,
 # renamed, or abandoned while their URL still returns 200. Reports into a
-# single issue that it rewrites in place, and never edits the list itself.
+# single issue that it rewrites in place, and opens a pull request for the
+# subset of those findings that has exactly one correct edit.
 #
 # Deliberately separate from markdown-lint.yml. That workflow gates merges
 # and must stay fast and deterministic; this one talks to the GitHub API,
@@ -16,8 +17,11 @@ on:
     - cron: '0 6 8 * *'
 
 permissions:
-  contents: read
+  # contents/pull-requests are for the fix: it pushes a generated branch and
+  # opens one pull request against it. issues is for the report.
+  contents: write
   issues: write
+  pull-requests: write
 
 concurrency:
   group: entry-health
@@ -40,7 +44,29 @@ jobs:
       - name: Test the checker
         run: npm run test:staleness
 
-      - name: Check entry health
+      # One step, one sweep. The check costs a GitHub API request per entry
+      # and preflights that budget up front, so checking in one invocation
+      # and fixing in another would spend it twice and rewrite the report
+      # issue twice — a duplicate notification for every watcher, the first
+      # one listing findings the pull request is about to take over.
+      #
+      # The three flags run in a fixed order inside that one invocation:
+      # sweep, then attempt the fix and the pull request, then file the
+      # report from whatever the fix actually achieved. A fix that refuses
+      # or a push that fails leaves nothing marked as handled, so the issue
+      # is exactly the report this workflow filed before any of this
+      # existed. That ordering, not a step split, is what protects the
+      # report — which is why this needs no continue-on-error: the fix path
+      # cannot fail the run, while a failure to file the report still turns
+      # it red, because a report nobody notices is missing is the worse
+      # failure of the two.
+      #
+      # The pull request is authored by GITHUB_TOKEN, so the checks in
+      # markdown-lint.yml will not run on it automatically — close and
+      # reopen it, or push to the branch, to get them. The run checks the
+      # rewritten file with scripts/check-readme.js before pushing, so the
+      # one check that would catch a bad edit has already run.
+      - name: Check entry health, fix what can be fixed, and report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run check:staleness -- --report-issue
+        run: npm run check:staleness -- --fix --open-pr --report-issue
