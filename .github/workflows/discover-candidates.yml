@@ -1,0 +1,71 @@
+name: Discover Candidates
+
+# The one workflow here that proposes additions rather than defending what is
+# already listed. Searches GitHub for projects matching this list's subject
+# matter, subtracts everything already listed and everything previously
+# declined, and files the top candidates as a single issue it rewrites in
+# place.
+#
+# It never edits README.md. Whether a project belongs on this list is a
+# judgement about topical relevance, quality and overlap, and a keyword
+# search cannot make it — every candidate is a proposal addressed to a human.
+#
+# Deliberately separate from markdown-lint.yml, for the same reason
+# entry-health.yml is: that workflow gates merges and must stay fast and
+# deterministic; this one talks to the GitHub API, is advisory, and should
+# never be able to turn a pull request red.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:00 UTC on the 22nd of each month. The link check runs on the 1st,
+    # entry health on the 8th and web health on the 15th, so the 22nd
+    # continues that weekly stagger: the four never land on the same
+    # morning, they never contend for the same API quota, and a maintainer
+    # opening the repository on any given week has at most one
+    # machine-written report waiting.
+    - cron: '0 6 22 * *'
+
+permissions:
+  contents: read
+  # The only write this workflow performs. It files and rewrites one issue and
+  # nothing else — README.md is read-only here by design, not by omission.
+  issues: write
+
+concurrency:
+  group: discover-candidates
+  cancel-in-progress: false
+
+jobs:
+  discover-candidates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+
+      # Runs offline against synthetic API responses, before a single live
+      # search. Cheap, and it is the only thing standing between a misread
+      # search failure and a report that quietly says "nothing to add" — a
+      # discovery pass that has stopped discovering looks exactly like a list
+      # with nothing missing.
+      - name: Test the discovery pass
+        run: npm run test:candidates
+
+      # scripts/find-candidates.js runs its own rate-limit preflight before
+      # issuing any search, and refuses the run rather than half-completing
+      # it. That check matters more here than in entry-health.yml: the GitHub
+      # *search* API is metered separately from the core API and far more
+      # tightly — 30 requests per minute authenticated against core's 5000
+      # per hour — so one run's worth of queries is a meaningful fraction of
+      # the budget, and a spent quota would otherwise render as an all-clear.
+      #
+      # GITHUB_TOKEN is the automatic workflow token. No additional secret is
+      # required, and none should be added: this stays deterministic.
+      - name: Search for candidates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run find:candidates -- --report-issue

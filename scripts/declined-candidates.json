@@ -1,0 +1,34 @@
+{
+  "_format": [
+    "Projects a maintainer has looked at and decided not to list.",
+    "",
+    "scripts/find-candidates.js reads this file every run and subtracts it from",
+    "the search results, so anything here is never proposed again. Without it a",
+    "rejected project comes back next month and the month after, and by the",
+    "third identical report everybody has muted the issue. That is why this is",
+    "committed to the repository rather than kept in workflow state.",
+    "",
+    "Each element of \"declined\" is an object:",
+    "  url    (required) the repository or project URL, as it appeared in the",
+    "         report. Matched after normalization, so http vs https, a trailing",
+    "         slash, and a www. prefix are all the same entry.",
+    "  reason (required) why it was declined, in a sentence. Required on",
+    "         purpose: a decline with no reason cannot be revisited later, and",
+    "         a run refuses to start if one is missing.",
+    "  date   (conventional) ISO date of the decision, so a decline made under",
+    "         old circumstances can be found and reconsidered.",
+    "",
+    "To decline a candidate: copy its Repository URL out of the discovery issue,",
+    "add an object here, and commit. To un-decline one, delete its object.",
+    "",
+    "JSON has no comments, which is why this key exists. It is ignored by the",
+    "script, which reads only \"declined\"."
+  ],
+  "declined": [
+    {
+      "url": "https://github.com/hexsecs/awesome-embedded-security",
+      "reason": "This list itself. It matches most of the search terms and would otherwise be proposed for inclusion in itself.",
+      "date": "2026-09-17"
+    }
+  ]
+}

@@ -1,0 +1,829 @@
+#!/usr/bin/env node
+// Tests for find-candidates.js, using node:test so nothing new is added to
+// package.json. Run with `npm run test:candidates`.
+//
+// The live search cannot be exercised here, so what is tested is everything
+// that decides what a maintainer is shown: the diff against the list and the
+// declined file, the thresholds, the cap, the drafted description, the
+// computed alphabetical position, and that a failed search degrades to
+// "unchecked" rather than to an all-clear.
+//
+// The mistake this script must not make is the mirror of check-staleness's.
+// There, a misread API error would send someone deleting a live entry. Here,
+// a misread API error would render as "nothing to add" — a discovery pass
+// that silently stops discovering is indistinguishable from a list with
+// nothing missing, which is exactly the failure it exists to prevent.
+
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert');
+
+const {
+  sortKey,
+  normalizeUrl,
+  readList,
+  parseDeclined,
+  readDeclined,
+  proposeSection,
+  placeInSection,
+  draftDescription,
+  markerHint,
+  selectCandidates,
+  buildQuery,
+  searchRepositories,
+  preflight,
+  render,
+  entryLine,
+  reportIssue,
+  SEARCH_TERMS,
+  MIN_STARS,
+  PUSHED_WITHIN_MONTHS,
+  MAX_CANDIDATES,
+} = require('./find-candidates.js');
+
+const NOW = new Date('2026-09-17T00:00:00Z');
+const MONTH = 1000 * 60 * 60 * 24 * 30.44;
+const recent = new Date(NOW.getTime() - 2 * MONTH).toISOString();
+const dormant = new Date(
+  NOW.getTime() - (PUSHED_WITHIN_MONTHS + 6) * MONTH
+).toISOString();
+
+// A synthetic GitHub search result item, shaped like the real API's.
+function repo(overrides = {}) {
+  return {
+    full_name: 'acme/glitchkit',
+    name: 'GlitchKit',
+    html_url: 'https://github.com/acme/glitchkit',
+    homepage: null,
+    description: 'Toolkit for voltage glitching attacks against microcontrollers.',
+    topics: ['fault-injection', 'glitching'],
+    stargazers_count: 900,
+    pushed_at: recent,
+    archived: false,
+    fork: false,
+    license: { spdx_id: 'MIT' },
+    ...overrides,
+  };
+}
+
+function ok(query, items) {
+  return { query, status: 'ok', items };
+}
+
+// A minimal README, laid out like the real one so the placement maths has
+// real line numbers to work with.
+const FAKE_README = [
+  '# Awesome Embedded Security', // 1
+  '', // 2
+  '## Contents', // 3
+  '', // 4
+  '* [Software Tools](#software-tools)', // 5
+  '', // 6
+  '## Software Tools', // 7
+  '', // 8
+  '### Fault Injection', // 9
+  '', // 10
+  '* [ChipSHOUTER](https://github.com/newaetech/chipshouter) - EMFI platform.', // 11
+  '* [Fault Tool](https://example.com/fault/) - Glitching harness.', // 12
+  '* [Zapper](https://github.com/acme/zapper) - Laser fault rig.', // 13
+  '', // 14
+  '### Emulation Tools', // 15
+  '', // 16
+  '* [Qiling](https://github.com/qilingframework/qiling) - Emulation framework.', // 17
+  '', // 18
+  '### Wi-Fi Tools', // 19
+  '', // 20
+].join('\n');
+
+const list = readList(FAKE_README.split('\n'));
+const noDeclines = new Map();
+
+// --- Normalization agrees with check-readme.js ------------------------
+
+test('URL normalization collapses the differences the duplicate check ignores', () => {
+  const canonical = normalizeUrl('https://github.com/acme/glitchkit');
+
+  assert.strictEqual(normalizeUrl('https://github.com/acme/glitchkit/'), canonical);
+  assert.strictEqual(normalizeUrl('https://www.github.com/acme/glitchkit'), canonical);
+  assert.strictEqual(normalizeUrl('https://GitHub.com/acme/glitchkit//'), canonical);
+});
+
+test('sort keys drop leading punctuation only', () => {
+  assert.strictEqual(sortKey('.NET decompiler'), 'net decompiler');
+  assert.strictEqual(sortKey('EM-Fault-It-Yourself'), 'em-fault-it-yourself');
+});
+
+// --- Reading the list -------------------------------------------------
+
+test('the Table of Contents is not mistaken for entries', () => {
+  assert.ok(!list.urls.has('#software-tools'));
+  assert.ok(!list.names.has(sortKey('Software Tools')));
+});
+
+test('sections carry their entries with real line numbers', () => {
+  const section = list.sections.get('Fault Injection');
+  assert.deepStrictEqual(
+    section.entries.map((e) => [e.label, e.lineNo]),
+    [
+      ['ChipSHOUTER', 11],
+      ['Fault Tool', 12],
+      ['Zapper', 13],
+    ]
+  );
+});
+
+test('the real declined file parses and every entry carries a reason', () => {
+  const declined = readDeclined();
+  assert.ok(declined.size > 0, 'the file ships seeded');
+  for (const reason of declined.values()) {
+    assert.ok(reason.length > 0);
+  }
+});
+
+test('a declined entry without a reason is refused rather than ignored', () => {
+  assert.throws(
+    () => parseDeclined('{"declined":[{"url":"https://example.com"}]}'),
+    /reason/
+  );
+});
+
+test('a malformed declined file is fatal, not silently empty', () => {
+  assert.throws(() => parseDeclined('{not json'), /not valid JSON/);
+  assert.throws(() => parseDeclined('{"nope":[]}'), /"declined" array/);
+});
+
+// --- Subtracting what is already known --------------------------------
+
+test('a repository already listed by URL is excluded', () => {
+  const results = [
+    ok('topic:fault-injection', [
+      repo({
+        full_name: 'newaetech/chipshouter',
+        name: 'ChipSHOUTER-Other',
+        html_url: 'https://github.com/newaetech/chipshouter',
+      }),
+    ]),
+  ];
+
+  const selection = selectCandidates(results, list, noDeclines, NOW);
+  assert.strictEqual(selection.candidates.length, 0);
+  assert.strictEqual(selection.rejected.listed, 1);
+});
+
+// The whole point of borrowing normalizeUrl from check-readme.js: without
+// it, a trailing slash or a www. turns a listed project into a phantom
+// candidate, and the report starts proposing things the list already has.
+test('a listed repository is still excluded when only the URL spelling differs', () => {
+  for (const url of [
+    'https://github.com/newaetech/chipshouter/',
+    'https://www.github.com/newaetech/chipshouter',
+  ]) {
+    const selection = selectCandidates(
+      [ok('q', [repo({ full_name: 'newaetech/chipshouter', name: 'Unseen', html_url: url })])],
+      list,
+      noDeclines,
+      NOW
+    );
+    assert.strictEqual(
+      selection.candidates.length,
+      0,
+      `${url} should have matched the listed entry`
+    );
+  }
+});
+
+test('a repository listed under its homepage rather than its repo is excluded', () => {
+  const selection = selectCandidates(
+    [
+      ok('q', [
+        repo({
+          full_name: 'someone/fault-tool',
+          name: 'Something Else',
+          html_url: 'https://github.com/someone/fault-tool',
+          homepage: 'https://example.com/fault',
+        }),
+      ]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.candidates.length, 0);
+  assert.strictEqual(selection.rejected.listed, 1);
+});
+
+test('a repository listed under a different URL but the same name is excluded', () => {
+  const selection = selectCandidates(
+    [ok('q', [repo({ full_name: 'fork/zapper', name: 'Zapper', html_url: 'https://github.com/fork/zapper' })])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.candidates.length, 0);
+  assert.strictEqual(selection.rejected.listed, 1);
+});
+
+test('a declined project never comes back', () => {
+  const declined = new Map([
+    [normalizeUrl('https://github.com/acme/glitchkit/'), 'Out of scope.'],
+  ]);
+
+  const selection = selectCandidates([ok('q', [repo()])], list, declined, NOW);
+
+  assert.strictEqual(selection.candidates.length, 0);
+  assert.strictEqual(selection.rejected.declined, 1);
+});
+
+test('the declined match survives a www. or trailing-slash difference', () => {
+  const declined = new Map([
+    [normalizeUrl('http://www.github.com/acme/glitchkit'), 'Out of scope.'],
+  ]);
+
+  const selection = selectCandidates([ok('q', [repo()])], list, declined, NOW);
+  assert.strictEqual(selection.rejected.declined, 1);
+});
+
+// --- Thresholds -------------------------------------------------------
+
+test('thresholds are enforced in the script, not only in the query', () => {
+  const cases = [
+    [{ full_name: 'a/a', name: 'A', html_url: 'https://github.com/a/a', stargazers_count: MIN_STARS - 1 }, 'lowStars'],
+    [{ full_name: 'b/b', name: 'B', html_url: 'https://github.com/b/b', pushed_at: dormant }, 'dormant'],
+    [{ full_name: 'c/c', name: 'C', html_url: 'https://github.com/c/c', archived: true }, 'archived'],
+    [{ full_name: 'd/d', name: 'D', html_url: 'https://github.com/d/d', fork: true }, 'fork'],
+  ];
+
+  for (const [overrides, bucket] of cases) {
+    const selection = selectCandidates(
+      [ok('q', [repo(overrides)])],
+      list,
+      noDeclines,
+      NOW
+    );
+    assert.strictEqual(selection.candidates.length, 0, `${bucket} should be filtered`);
+    assert.strictEqual(selection.rejected[bucket], 1);
+  }
+});
+
+test('a repository exactly on the star threshold is kept', () => {
+  const selection = selectCandidates(
+    [ok('q', [repo({ stargazers_count: MIN_STARS })])],
+    list,
+    noDeclines,
+    NOW
+  );
+  assert.strictEqual(selection.candidates.length, 1);
+});
+
+test('an archived repository is never proposed as a new entry', () => {
+  const selection = selectCandidates(
+    [ok('q', [repo({ archived: true })])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  const { body } = render(selection);
+  assert.strictEqual(selection.candidates.length, 0);
+  assert.ok(!body.includes('GlitchKit'), 'an archived project should not appear at all');
+});
+
+test('the same repository found by several queries is counted once', () => {
+  const selection = selectCandidates(
+    [ok('topic:fault-injection', [repo()]), ok('glitching', [repo()])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.candidates.length, 1);
+  assert.strictEqual(selection.candidates[0].queries.length, 2);
+});
+
+// --- Rank and cap -----------------------------------------------------
+
+test('the report is capped at a reviewable number', () => {
+  const many = Array.from({ length: MAX_CANDIDATES + 25 }, (_, i) =>
+    repo({
+      full_name: `acme/tool${i}`,
+      name: `Tool${i}`,
+      html_url: `https://github.com/acme/tool${i}`,
+      stargazers_count: 200 + i,
+    })
+  );
+
+  const selection = selectCandidates([ok('q', many)], list, noDeclines, NOW);
+
+  assert.strictEqual(selection.candidates.length, MAX_CANDIDATES);
+  assert.strictEqual(selection.keptCount, MAX_CANDIDATES + 25);
+  assert.ok(render(selection).body.includes('fell outside the top'));
+});
+
+test('ranking prefers the project two queries found over the one with more stars', () => {
+  const broad = repo({
+    full_name: 'acme/popular',
+    name: 'Popular',
+    html_url: 'https://github.com/acme/popular',
+    stargazers_count: 40000,
+    topics: [],
+  });
+  const focused = repo({
+    full_name: 'acme/focused',
+    name: 'Focused',
+    html_url: 'https://github.com/acme/focused',
+    stargazers_count: 400,
+  });
+
+  const selection = selectCandidates(
+    [ok('topic:fault-injection', [broad, focused]), ok('glitching', [focused])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.candidates[0].name, 'Focused');
+});
+
+// --- Drafting the entry line ------------------------------------------
+
+test('a description that opens with the project name is reworded', () => {
+  const drafted = draftDescription('GlitchKit', {
+    description: 'GlitchKit is a toolkit for voltage glitching attacks against MCUs.',
+  });
+
+  assert.ok(drafted.text, drafted.problem || '');
+  assert.ok(
+    !drafted.text.toLowerCase().startsWith('glitchkit'),
+    'awesome-lint rejects a description starting with the entry name'
+  );
+  assert.match(drafted.text, /^[A-Z]/);
+  assert.match(drafted.text, /\.$/);
+});
+
+test('the name is stripped however it is punctuated', () => {
+  const drafted = draftDescription('OP-TEE', {
+    description: 'OP TEE: open portable trusted execution environment for ARM TrustZone.',
+  });
+
+  assert.ok(drafted.text, drafted.problem || '');
+  assert.match(drafted.text, /^Open portable trusted/);
+});
+
+test('a description that is only the project name gets no draft', () => {
+  const drafted = draftDescription('GlitchKit', { description: 'GlitchKit' });
+
+  assert.strictEqual(drafted.text, null);
+  assert.match(drafted.problem, /project name/);
+});
+
+test('a missing description is reported, never invented', () => {
+  const drafted = draftDescription('GlitchKit', { description: null });
+
+  assert.strictEqual(drafted.text, null);
+  assert.match(drafted.problem, /no description of its own/);
+});
+
+// Uppercasing "probe-rs" into "Probe-rs" would silently rename a project,
+// and contributing.md is explicit that a misspelled name is the one thing no
+// checker can catch because the URL still resolves.
+test('a lowercase identifier is handed back rather than capitalized', () => {
+  const drafted = draftDescription('Some Tool', {
+    description: 'probe-rs backend that adds SWD tracing.',
+  });
+
+  assert.strictEqual(drafted.text, null);
+  assert.match(drafted.problem, /case-sensitive identifier/);
+});
+
+test('a plain lowercase word is capitalized', () => {
+  const drafted = draftDescription('Some Tool', {
+    description: 'library for parsing UEFI capsule updates',
+  });
+
+  assert.strictEqual(drafted.text, 'Library for parsing UEFI capsule updates.');
+});
+
+test('emoji and markdown links are stripped out of the drafted description', () => {
+  const drafted = draftDescription('Some Tool', {
+    description: '🔥 Fuzzer for [MCU](https://example.com) firmware images.',
+  });
+
+  assert.strictEqual(drafted.text, 'Fuzzer for MCU firmware images.');
+});
+
+test('the drafted line matches the house format', () => {
+  const selection = selectCandidates([ok('q', [repo()])], list, noDeclines, NOW);
+  const line = entryLine(selection.candidates[0]);
+
+  assert.match(line, /^\* \[[^\]]+\]\(https:\/\/[^)]+\) - [A-Z].*\.$/);
+});
+
+test('a missing license is surfaced as a 💰 question rather than an answer', () => {
+  assert.strictEqual(markerHint({ license: { spdx_id: 'Apache-2.0' } }), null);
+  assert.match(markerHint({ license: null }), /💰/);
+  assert.match(markerHint({ license: { spdx_id: 'NOASSERTION' } }), /💰/);
+});
+
+// --- Section and alphabetical position --------------------------------
+
+test('a section is proposed from the repository\'s own topics', () => {
+  assert.strictEqual(proposeSection(repo()).name, 'Fault Injection');
+  assert.strictEqual(
+    proposeSection({ name: 'x', description: 'QEMU-based firmware rehosting.', topics: [] }).name,
+    'Emulation Tools'
+  );
+});
+
+test('keyword matching is whole-word, so short keywords do not match inside words', () => {
+  const section = proposeSection({
+    name: 'pipeline-helper',
+    description: 'Continuous integration pipeline helper for makefiles.',
+    topics: [],
+  });
+  assert.strictEqual(section, null);
+});
+
+test('an unrecognisable project gets no section rather than a wrong one', () => {
+  const selection = selectCandidates(
+    [
+      ok('q', [
+        repo({
+          full_name: 'acme/mystery',
+          name: 'Mystery',
+          html_url: 'https://github.com/acme/mystery',
+          description: 'Assorted utilities.',
+          topics: [],
+        }),
+      ]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.candidates[0].section, null);
+  assert.ok(render(selection).body.includes('no suggestion'));
+});
+
+test('the alphabetical position lands between the right two entries', () => {
+  const section = list.sections.get('Fault Injection');
+
+  // ChipSHOUTER(11) < Fault Tool(12) < GlitchKit < Zapper(13)
+  const middle = placeInSection(section, 'GlitchKit');
+  assert.strictEqual(middle.lineNo, 13);
+  assert.strictEqual(middle.after.label, 'Fault Tool');
+  assert.strictEqual(middle.before.label, 'Zapper');
+});
+
+test('a first and a last entry are placed at the ends of the section', () => {
+  const section = list.sections.get('Fault Injection');
+
+  const first = placeInSection(section, 'Anvil');
+  assert.strictEqual(first.lineNo, 11);
+  assert.strictEqual(first.after, null);
+  assert.strictEqual(first.before.label, 'ChipSHOUTER');
+
+  const last = placeInSection(section, 'Zeta');
+  assert.strictEqual(last.lineNo, 14);
+  assert.strictEqual(last.after.label, 'Zapper');
+  assert.strictEqual(last.before, null);
+});
+
+test('placement ignores leading punctuation, as the order check does', () => {
+  const section = list.sections.get('Fault Injection');
+  const placed = placeInSection(section, '.glitch');
+
+  assert.strictEqual(
+    placed.after.label,
+    'Fault Tool',
+    '".glitch" must file under G, not ahead of everything'
+  );
+});
+
+test('an empty section places the first entry under its heading', () => {
+  const section = list.sections.get('Wi-Fi Tools');
+  const placed = placeInSection(section, 'Anything');
+
+  assert.strictEqual(placed.lineNo, section.headingLine + 2);
+  assert.strictEqual(placed.after, null);
+  assert.strictEqual(placed.before, null);
+});
+
+test('the rendered report names the section and the exact line', () => {
+  const selection = selectCandidates([ok('q', [repo()])], list, noDeclines, NOW);
+  const { body, actionable } = render(selection);
+
+  assert.strictEqual(actionable, 1);
+  assert.ok(body.includes('### Fault Injection'));
+  assert.ok(body.includes('README.md:13'));
+  assert.ok(body.includes('between **Fault Tool** and **Zapper**'));
+});
+
+// --- The failure that matters ----------------------------------------
+// A search that failed is not evidence that nothing exists. If a run
+// rendered a rate-limited search as "nothing to propose", the discovery loop
+// would quietly stop discovering and look exactly like success.
+
+test('a failed search is unchecked, never an all-clear', () => {
+  const selection = selectCandidates(
+    [{ query: 'topic:fault-injection', status: 'error', detail: 'GitHub search rate limit exhausted' }],
+    list,
+    noDeclines,
+    NOW
+  );
+  const { body, actionable } = render(selection);
+
+  assert.strictEqual(actionable, 0);
+  assert.strictEqual(selection.unchecked.length, 1);
+  assert.ok(body.includes('Could not be searched'));
+  assert.ok(body.includes('rate limit exhausted'));
+  assert.ok(
+    !body.includes('Nothing to propose'),
+    'a failed search must not read as a clean sweep'
+  );
+});
+
+test('a total search failure produces a short report, not a wall of noise', () => {
+  const selection = selectCandidates(
+    SEARCH_TERMS.map((query) => ({ query, status: 'error', detail: 'HTTP 503' })),
+    list,
+    noDeclines,
+    NOW
+  );
+  const { body, actionable } = render(selection);
+
+  assert.strictEqual(actionable, 0);
+  assert.strictEqual(selection.candidates.length, 0);
+  assert.ok(!body.includes('## Candidates'));
+  assert.ok(!body.includes('Nothing to propose'));
+  assert.ok(body.includes(`Searched 0 of ${SEARCH_TERMS.length} queries`));
+});
+
+test('one query failing does not discard the others', () => {
+  const selection = selectCandidates(
+    [
+      { query: 'topic:jtag', status: 'error', detail: 'HTTP 502' },
+      ok('topic:fault-injection', [repo()]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+  const { body } = render(selection);
+
+  assert.strictEqual(selection.candidates.length, 1);
+  assert.ok(body.includes('## Candidates'));
+  assert.ok(body.includes('Could not be searched'));
+});
+
+test('HTTP failures from the search API become errors, not empty results', async (t) => {
+  const cases = [
+    { status: 401, expect: /credentials/ },
+    { status: 403, expect: /rate limit|HTTP 403/ },
+    { status: 422, expect: /malformed/ },
+    { status: 429, expect: /rate limit|HTTP 429/ },
+    { status: 503, expect: /HTTP 503/ },
+  ];
+
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  for (const { status, expect } of cases) {
+    global.fetch = async () => ({ status, ok: false, headers: { get: () => '0' } });
+
+    const result = await searchRepositories('topic:jtag');
+    assert.strictEqual(result.status, 'error', `HTTP ${status} must be an error`);
+    assert.match(result.detail, expect);
+  }
+});
+
+test('a network exception is an error, not an empty result set', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => {
+    throw new Error('ECONNRESET');
+  };
+
+  const result = await searchRepositories('topic:jtag');
+  assert.strictEqual(result.status, 'error');
+  assert.match(result.detail, /ECONNRESET/);
+});
+
+test('an empty but successful search is an all-clear, not an error', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    headers: { get: () => '29' },
+    json: async () => ({ items: [] }),
+  });
+
+  const result = await searchRepositories('topic:jtag');
+  assert.strictEqual(result.status, 'ok');
+  assert.deepStrictEqual(result.items, []);
+});
+
+// --- Query construction and preflight ---------------------------------
+
+test('the thresholds are pushed into the query so GitHub does the filtering', () => {
+  const q = buildQuery('topic:jtag', NOW);
+
+  assert.ok(q.startsWith('topic:jtag '));
+  assert.ok(q.includes(`stars:>=${MIN_STARS}`));
+  assert.ok(q.includes('archived:false'));
+  assert.ok(q.includes('fork:false'));
+  assert.match(q, /pushed:>=\d{4}-\d{2}-\d{2}/);
+});
+
+test('preflight refuses when the search quota is short, and says which quota', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    json: async () => ({
+      resources: {
+        core: { remaining: 5000, reset: 0 },
+        search: { remaining: 2, reset: Math.floor(Date.now() / 1000) + 60 },
+      },
+    }),
+  });
+
+  const result = await preflight(15);
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /only 2 GitHub \*search\* requests remain/);
+});
+
+test('preflight refuses a rejected token before any search runs', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({ status: 401, ok: false });
+
+  const result = await preflight(15);
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /credentials/);
+});
+
+test('preflight refuses when core has no room left to file the report', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    json: async () => ({
+      resources: {
+        core: { remaining: 0, reset: Math.floor(Date.now() / 1000) + 60 },
+        search: { remaining: 30, reset: 0 },
+      },
+    }),
+  });
+
+  assert.strictEqual((await preflight(15)).ok, false);
+});
+
+test('preflight passes when both quotas cover the run', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    json: async () => ({
+      resources: { core: { remaining: 5000, reset: 0 }, search: { remaining: 30, reset: 0 } },
+    }),
+  });
+
+  assert.strictEqual((await preflight(15)).ok, true);
+});
+
+// --- Filing the issue -------------------------------------------------
+// The only part that writes to the repository, and it must never write to
+// README.md. Each branch is pinned: an empty run must not open an issue, a
+// monthly run must not pile one up beside the report already open, and the
+// marker must differ from check-staleness.js's so the two never fight over
+// the same issue.
+
+function issueHarness(t, { existingIssue }) {
+  const realFetch = global.fetch;
+  const realEnv = { ...process.env };
+  const calls = [];
+
+  global.fetch = async (url, opts = {}) => {
+    const method = opts.method || 'GET';
+    calls.push({ method, url, body: opts.body ? JSON.parse(opts.body) : null });
+
+    if (method === 'GET') {
+      return {
+        status: 200,
+        ok: true,
+        json: async () =>
+          existingIssue
+            ? [{ number: 77, body: '<!-- candidate-discovery-report -->\nprevious' }]
+            : [],
+      };
+    }
+    return { status: method === 'POST' ? 201 : 200, ok: true, json: async () => ({ number: 456 }) };
+  };
+
+  process.env.GITHUB_TOKEN = 'test-token';
+  process.env.GITHUB_REPOSITORY = 'owner/repo';
+
+  t.after(() => {
+    global.fetch = realFetch;
+    process.env = realEnv;
+  });
+
+  return calls;
+}
+
+test('nothing to propose and no open report files nothing at all', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Nothing to propose', 0);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method !== 'GET').length,
+    0,
+    'an empty run must not open an issue'
+  );
+});
+
+test('nothing to propose closes the report that was already open', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Nothing to propose', 0);
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.ok(write);
+  assert.strictEqual(write.body.state, 'closed');
+  assert.ok(write.url.endsWith('/issues/77'));
+});
+
+test('candidates with no open report open one under its own title', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Candidates', 3);
+
+  const write = calls.find((c) => c.method === 'POST');
+  assert.ok(write);
+  assert.strictEqual(write.body.title, 'Candidate entries for review');
+  assert.ok(write.body.body.startsWith('<!-- candidate-discovery-report -->'));
+  assert.ok(
+    !write.body.body.includes('<!-- entry-health-report -->'),
+    'the two reports must never claim the same issue'
+  );
+});
+
+test('candidates rewrite the open report rather than opening a second', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Candidates', 2);
+
+  assert.strictEqual(calls.filter((c) => c.method === 'POST').length, 0);
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.strictEqual(write.body.state, 'open');
+});
+
+test('no request this script makes ever writes to a file in the repository', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Candidates', 1);
+
+  for (const call of calls) {
+    assert.ok(
+      !/\/contents\/|\/git\/|\/pulls/.test(call.url),
+      `${call.url} would edit the repository; this script only files issues`
+    );
+  }
+});
+
+test('the report tells a reviewer how to decline a candidate', () => {
+  const selection = selectCandidates([ok('q', [repo()])], list, noDeclines, NOW);
+  const { body } = render(selection);
+
+  assert.ok(body.includes('scripts/declined-candidates.json'));
+  assert.ok(body.includes('Nothing here has been added to the list.'));
+});

@@ -12,6 +12,8 @@
     "check:web-health": "node scripts/check-web-health.js",
     "test:staleness": "node --test scripts/check-staleness.test.js",
     "test:web-health": "node --test scripts/check-web-health.test.js",
+    "find:candidates": "node scripts/find-candidates.js",
+    "test:candidates": "node --test scripts/find-candidates.test.js",
     "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {
