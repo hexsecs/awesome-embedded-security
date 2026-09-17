@@ -304,7 +304,7 @@ test('preflight passes when the quota covers the run', async (t) => {
 // pinned: an all-clear must not open an issue, and a monthly run must not
 // pile up a new one beside the report already open.
 
-function issueHarness(t, { existingIssue, lookup = 'ok' }) {
+function issueHarness(t, { existingIssue, lookup = 'ok', issues = null }) {
   const realFetch = global.fetch;
   const realEnv = { ...process.env };
   const realExitCode = process.exitCode;
@@ -345,9 +345,10 @@ function issueHarness(t, { existingIssue, lookup = 'ok' }) {
         status: 200,
         ok: true,
         json: async () =>
-          existingIssue
+          issues ||
+          (existingIssue
             ? [{ number: 99, body: '<!-- entry-health-report -->\nprevious' }]
-            : [],
+            : []),
       };
     }
     return { status: method === 'POST' ? 201 : 200, ok: true, json: async () => ({ number: 123 }) };
@@ -1308,4 +1309,177 @@ test('an issue that was created but answered unreadably is not reported as a fai
 
   await assert.doesNotReject(() => reportIssue('## Gone (404)', 1));
   assert.strictEqual(process.exitCode, 0, 'the issue was created; that call did not fail');
+});
+
+// --- One thread, reopened, forever -------------------------------------
+// The report lives on a single issue that is closed when the list is clean
+// and reopened when something turns up again. The lookup therefore has to
+// include closed issues: with state=open, the run that closed the report
+// last month would find nothing this month, open a second issue, and
+// abandon the first along with its history and its subscribers.
+//
+// The test on the query string is deliberate. Reverting to state=open looks
+// harmless in a diff — it only "narrows a query" — and breaks the thread
+// silently, a month later, where nobody connects the two.
+
+function marked(overrides) {
+  return {
+    number: 99,
+    state: 'open',
+    body: '<!-- entry-health-report -->\nprevious',
+    updated_at: '2026-09-01T00:00:00Z',
+    ...overrides,
+  };
+}
+
+function captureErrors(t) {
+  const lines = [];
+  const real = console.error;
+  console.error = (...args) => lines.push(args.join(' '));
+  t.after(() => {
+    console.error = real;
+  });
+  return lines;
+}
+
+test('the lookup asks for closed issues too', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Gone (404)', 1);
+
+  const get = calls.find((c) => c.method === 'GET');
+  assert.match(
+    get.url,
+    /state=all/,
+    'state=open would orphan the thread the month after it was closed'
+  );
+});
+
+test('a closed report thread is reopened rather than replaced', async (t) => {
+  const calls = issueHarness(t, { issues: [marked({ state: 'closed' })] });
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method === 'POST').length,
+    0,
+    'a closed thread must be reopened, not replaced with a new issue'
+  );
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.ok(write.url.endsWith('/issues/99'));
+  assert.strictEqual(write.body.state, 'open');
+  assert.ok(write.body.body.includes('Gone (404)'));
+});
+
+test('a hand-closed thread reopens too, which is the accepted trade', async (t) => {
+  // There is deliberately no check for who closed it: a manual close means
+  // "dealt with for now", and a finding that is still true next month comes
+  // back on the same thread rather than being lost.
+  const calls = issueHarness(t, {
+    issues: [marked({ state: 'closed', closed_by: { login: 'a-maintainer' } })],
+  });
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.strictEqual(write.body.state, 'open');
+});
+
+test('a clean run closes the open thread', async (t) => {
+  const calls = issueHarness(t, { issues: [marked({ state: 'open' })] });
+
+  await reportIssue('## Nothing needs doing', 0);
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.strictEqual(write.body.state, 'closed');
+});
+
+test('a clean run leaves an already-closed thread completely alone', async (t) => {
+  const calls = issueHarness(t, { issues: [marked({ state: 'closed' })] });
+
+  await reportIssue('## Nothing needs doing', 0);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method !== 'GET').length,
+    0,
+    'rewriting a closed report every clean month would notify watchers forever'
+  );
+});
+
+test('an open thread wins over a closed one, and the extras are named', async (t) => {
+  const errors = captureErrors(t);
+  const calls = issueHarness(t, {
+    issues: [
+      marked({ number: 50, state: 'closed', updated_at: '2026-09-10T00:00:00Z' }),
+      marked({ number: 99, state: 'open', updated_at: '2026-01-01T00:00:00Z' }),
+    ],
+  });
+
+  await reportIssue('## Gone (404)', 1);
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.ok(
+    write.url.endsWith('/issues/99'),
+    'reopening a closed report beside an open one would leave two open reports'
+  );
+  assert.ok(
+    errors.some((line) => line.includes('#50')),
+    'a second marker issue means an earlier run got this wrong, and a human has to merge them'
+  );
+});
+
+test('between two closed threads the most recently active one is reused', async (t) => {
+  const calls = issueHarness(t, {
+    issues: [
+      marked({ number: 10, state: 'closed', updated_at: '2025-01-01T00:00:00Z' }),
+      marked({ number: 20, state: 'closed', updated_at: '2026-09-01T00:00:00Z' }),
+    ],
+  });
+
+  await reportIssue('## Gone (404)', 1);
+
+  assert.ok(calls.find((c) => c.method === 'PATCH').url.endsWith('/issues/20'));
+});
+
+test('an equally stale pair is broken by issue number, so the choice is stable', async (t) => {
+  const calls = issueHarness(t, {
+    issues: [
+      marked({ number: 7, state: 'closed', updated_at: undefined }),
+      marked({ number: 8, state: 'closed', updated_at: undefined }),
+    ],
+  });
+
+  await reportIssue('## Gone (404)', 1);
+
+  assert.ok(
+    calls.find((c) => c.method === 'PATCH').url.endsWith('/issues/8'),
+    'an unstable choice would alternate threads from run to run'
+  );
+});
+
+test('a single match reports no duplicates', async (t) => {
+  const errors = captureErrors(t);
+  const calls = issueHarness(t, { issues: [marked()] });
+
+  await reportIssue('## Gone (404)', 1);
+
+  assert.strictEqual(errors.length, 0, 'the normal case must stay quiet');
+  assert.ok(calls.find((c) => c.method === 'PATCH'));
+});
+
+test('an issue without the marker is not mistaken for the report', async (t) => {
+  const calls = issueHarness(t, {
+    issues: [
+      { number: 3, state: 'open', body: 'an unrelated issue', updated_at: '2026-09-11T00:00:00Z' },
+      { number: 4, state: 'open', body: '<!-- entry-health-report -->', updated_at: '2020-01-01T00:00:00Z', pull_request: {} },
+    ],
+  });
+
+  await reportIssue('## Gone (404)', 1);
+
+  assert.ok(
+    calls.find((c) => c.method === 'POST'),
+    'neither an unmarked issue nor a marked pull request is the report thread'
+  );
 });

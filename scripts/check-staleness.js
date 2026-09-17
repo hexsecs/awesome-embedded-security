@@ -681,11 +681,15 @@ function verifyReadme(content) {
 }
 
 // --- File the report as an issue --------------------------------------
-// One issue, rewritten in place. A new issue every month would bury the
-// repository in near-identical reports, and the interesting question is
-// always "what is wrong now", not "what was wrong in March". The marker
-// below is how the run finds its own issue again; it is invisible when
-// GitHub renders the body.
+// One issue, rewritten in place, for as long as this repository exists. A
+// new issue every month would bury the repository in near-identical
+// reports, and the interesting question is always "what is wrong now", not
+// "what was wrong in March". The marker below is how the run finds its own
+// issue again; it is invisible when GitHub renders the body.
+//
+// That thread outlives being closed: a clean month closes it, and the next
+// month with a finding reopens the same one. See findExistingIssue for why
+// the lookup deliberately includes closed issues.
 
 const ISSUE_MARKER = '<!-- entry-health-report -->';
 const ISSUE_TITLE = 'Entry health report';
@@ -700,8 +704,29 @@ const ISSUE_TITLE = 'Entry health report';
 async function findExistingIssue(owner, repo) {
   let response;
   try {
+    // state=all, deliberately — do not change this back to state=open.
+    //
+    // This run closes the report when the list comes back clean, so with
+    // state=open the very next month with a finding would find nothing,
+    // open a brand-new issue, and orphan the closed one along with its
+    // history and everyone subscribed to it. One thread that reopens is
+    // the whole point of the marker; a fresh issue each cycle is what the
+    // marker exists to prevent.
+    //
+    // The accepted cost: an issue a maintainer closed by hand reopens if
+    // the finding is still there next month. That was weighed and chosen —
+    // a manual close reads as "dealt with for now", not "never tell me
+    // again", and a finding that is still true deserves to come back on
+    // the same thread. There is deliberately no mechanism to detect who
+    // closed it and no label-based opt-out: both are ways of losing a real
+    // finding quietly, which is the failure this script exists to prevent.
+    //
+    // per_page=100 with no pagination is a known limit. The marker issue
+    // would have to fall past 100 issues in this repository's whole
+    // history before the lookup missed it and opened a duplicate; that is
+    // far off, and paging is not worth the surface today.
     response = await fetch(
-      `${API_ROOT}/repos/${owner}/${repo}/issues?state=open&per_page=100`,
+      `${API_ROOT}/repos/${owner}/${repo}/issues?state=all&per_page=100`,
       { headers: apiHeaders() }
     );
   } catch (err) {
@@ -738,12 +763,35 @@ async function findExistingIssue(owner, repo) {
     };
   }
 
+  const matches = issues.filter(
+    (issue) => issue && !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
+  );
+
+  // With closed issues in the listing there can be more than one match, and
+  // the API's ordering is no longer "the open one first" — so the choice is
+  // made here rather than taken from whatever arrived first. An open thread
+  // wins over a closed one, because reopening a closed report while another
+  // is already open would leave two open reports, which is exactly what all
+  // of this is avoiding. Between two of the same state, the one touched
+  // most recently is the live thread; the issue number breaks a tie so the
+  // choice is stable across runs.
+  //
+  // Extra matches are reported rather than silently ignored: more than one
+  // marker issue means an earlier run got this wrong, and that needs a
+  // human to merge them, not an automation quietly picking a favourite.
+  const touchedAt = (issue) => Date.parse(issue.updated_at || '') || 0;
+  const ranked = [...matches].sort((a, b) => {
+    const openness = Number(b.state === 'open') - Number(a.state === 'open');
+    if (openness !== 0) return openness;
+    const updated = touchedAt(b) - touchedAt(a);
+    if (updated !== 0) return updated;
+    return (b.number || 0) - (a.number || 0);
+  });
+
   return {
     ok: true,
-    issue:
-      issues.find(
-        (issue) => issue && !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
-      ) || null,
+    issue: ranked[0] || null,
+    duplicates: ranked.slice(1).map((issue) => issue.number),
   };
 }
 
@@ -780,19 +828,35 @@ async function reportIssue(body, actionable) {
   // open a pull request.
   if (!lookup.ok) {
     console.error(
-      `Cannot tell whether a report issue is already open: ${lookup.reason}. ` +
+      `Cannot tell whether a report issue already exists: ${lookup.reason}. ` +
         'Nothing filed, rather than risk opening a duplicate.'
     );
     process.exitCode = 1;
     return;
   }
 
+  if (lookup.duplicates && lookup.duplicates.length > 0) {
+    console.error(
+      `More than one issue carries the report marker (also #${lookup.duplicates.join(', #')}). ` +
+        'Rewriting the most recently active one; the rest need a human to ' +
+        'merge or close, because only one of them will ever be updated again.'
+    );
+  }
+
   const existing = lookup.issue;
 
-  // Nothing to do and no open report: stay quiet rather than opening an
-  // issue that says everything is fine.
+  // Nothing to do and no report thread yet: stay quiet rather than opening
+  // an issue that says everything is fine.
   if (!existing && actionable === 0) {
-    console.log('No findings and no open report issue; nothing filed.');
+    console.log('No findings and no report issue; nothing filed.');
+    return;
+  }
+
+  // Nothing to do and the thread is already closed: leave it completely
+  // alone. Rewriting a closed report every clean month would edit it
+  // forever, notifying everyone watching it to say nothing has changed.
+  if (existing && existing.state === 'closed' && actionable === 0) {
+    console.log(`Nothing to report; issue #${existing.number} stays closed.`);
     return;
   }
 
@@ -805,7 +869,9 @@ async function reportIssue(body, actionable) {
         body: JSON.stringify({
           body: fullBody,
           // Close it once the list is clean again, so an open report always
-          // means there is something to decide.
+          // means there is something to decide — and reopen that same
+          // thread when something turns up again, rather than starting a
+          // new one. This is the other half of the state=all lookup.
           state: actionable === 0 ? 'closed' : 'open',
         }),
       }
@@ -818,7 +884,8 @@ async function reportIssue(body, actionable) {
     console.log(
       actionable === 0
         ? `Closed issue #${existing.number}; nothing left to act on.`
-        : `Updated issue #${existing.number} with ${actionable} finding(s).`
+        : `${existing.state === 'closed' ? 'Reopened' : 'Updated'} issue ` +
+          `#${existing.number} with ${actionable} finding(s).`
     );
     return;
   }
