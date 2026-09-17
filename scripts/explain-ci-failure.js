@@ -9,20 +9,39 @@
 // the contributor who read it before failing, and the people who hit this
 // are first-time contributors who have not.
 //
-// Runs from .github/workflows/pr-guidance.yml on workflow_run, so it has a
-// writable token even for pull requests from forks. Its inputs — the failing
-// run's log and the pull request's README.md — come from a build artifact
-// and are untrusted: they are pattern-matched and quoted, never executed,
-// and every quoted fragment is stripped and truncated before it goes into a
-// comment body.
+// --- Threat model -----------------------------------------------------
 //
-// Three rules:
-//   - it never changes whether the pull request passes (it exits 0 always,
-//     from a workflow that is not a required check);
-//   - it says nothing at all when the failure is not one it recognises, so
-//     that a comment from it always means something;
-//   - it rewrites its own comment in place rather than stacking a new one on
-//     every push, the same way scripts/check-staleness.js handles its issue.
+// Stated plainly, because an earlier version of this comment asserted a
+// safety property that was not true.
+//
+// This script runs privileged. .github/workflows/pr-guidance.yml triggers it
+// on workflow_run, which hands it the base repository's token with
+// pull-requests: write. That is the whole reason for the workflow_run
+// detour: a pull_request-triggered workflow gets a read-only token on a fork
+// pull request and cannot comment at all, and fork pull requests are exactly
+// the first-time contributors this exists for.
+//
+// Everything in the downloaded artifact is attacker-controlled. Not "could
+// conceivably be tampered with" — the producer job runs `npm ci` and
+// `npm run validate` against the pull request's merge ref, so the fork's
+// package.json defines what `validate` even is. A fork can write whatever it
+// likes into validate.log, README.md and pr-number.txt before the upload.
+//
+// Three consequences, each load-bearing:
+//
+//   - The pull request to comment on is derived from the triggering run's
+//     head SHA through the API, never from the artifact. Trusting
+//     pr-number.txt for targeting let any fork make this repository's own
+//     token post or overwrite a comment on any pull request in the repo.
+//     pr-number.txt survives only as a cross-check that must agree with the
+//     derived number; a mismatch aborts rather than falling back.
+//   - Nothing from the artifact is executed, and every fragment of it that
+//     reaches the comment body goes through codeSpan() — so it renders
+//     literally and cannot author markdown, links or HTML under the bot's
+//     identity. Before that was enforced, a fork could have made the bot
+//     post "**Approved by a maintainer**" above a link of its choosing.
+//   - The checkout is pinned to the base repository's default branch, so no
+//     fork-authored file is ever on disk next to this script.
 //
 // Deliberately NOT handled here: "Awesome list must reside in a valid git
 // repository". It is the most misleading message the tooling produces, but
@@ -37,6 +56,14 @@
 //
 // Revisit only if markdown-lint.yml ever gives actions/checkout a `ref:`
 // that leaves a named local branch checked out. Nothing here does today.
+//
+// Three behavioural rules:
+//   - it never changes whether the pull request passes (it exits 0 always,
+//     from a workflow that is not a required check);
+//   - it says nothing at all when the failure is not one it recognises, so
+//     that a comment from it always means something;
+//   - it rewrites its own comment in place rather than stacking a new one on
+//     every push, the same way scripts/check-staleness.js handles its issue.
 
 'use strict';
 
@@ -74,6 +101,9 @@ const MARKERS_ONLY_RE = new RegExp(`^[\\s${MONEY_MARKER}${ARCHIVED_MARKER}\\uFE0
 const VALID_OPENER_RE = /^\p{Lu}/u;
 
 const ANSI_RE = /\u001b\[[0-9;]*m/g;
+const CONTROL_RE = /[\u0000-\u001f\u007f]/g;
+
+const SHA_RE = /^[0-9a-f]{40}$/;
 
 function readIfPresent(file) {
   try {
@@ -83,12 +113,23 @@ function readIfPresent(file) {
   }
 }
 
-// Anything lifted out of the artifact goes through here before it reaches a
-// comment body: backticks would break out of the code span, and a 500-column
-// entry would bury the advice under it.
-function quotable(text, limit = 160) {
-  const flat = String(text).replace(ANSI_RE, '').replace(/[`\r\n]/g, ' ').trim();
-  return flat.length > limit ? `${flat.slice(0, limit - 1)}…` : flat;
+// The only way fork-controlled text is allowed into the comment body.
+//
+// Wrapping in a code span is what makes it inert: inside one, GitHub renders
+// markdown and HTML literally, so "**Approved by a maintainer**" stays four
+// asterisks and a link stays text. Backticks are stripped first, because a
+// backtick is the one character that could close the span early and let the
+// rest render; control characters and newlines go too, so a single finding
+// cannot spill into lines it does not own. The truncation is not a security
+// property, just a courtesy — a 500-column entry would bury the advice.
+function codeSpan(text, limit = 160) {
+  const flat = String(text)
+    .replace(ANSI_RE, '')
+    .replace(CONTROL_RE, ' ')
+    .replace(/`/g, '')
+    .trim();
+  const clipped = flat.length > limit ? `${flat.slice(0, limit - 1)}…` : flat;
+  return clipped ? `\`${clipped}\`` : '`(empty)`';
 }
 
 // --- Read what the failing run left behind ----------------------------
@@ -123,21 +164,23 @@ function classify(dir) {
           MARKERS_ONLY_RE.test(markers) &&
           (markers.includes(MONEY_MARKER) || markers.includes(ARCHIVED_MARKER));
         if (entry && marked && description && !VALID_OPENER_RE.test(description)) {
-          findings.markerCasing.push({ lineNo, source: quotable(source) });
+          findings.markerCasing.push({ lineNo: Number(lineNo), source });
         }
         continue;
       }
 
-      const repeat = message.match(/^List item description should not start with the item name "(.+)"$/);
+      const repeat = message.match(
+        /^List item description should not start with the item name "(.+)"$/
+      );
       if (repeat) {
-        findings.repeatedName.push({ lineNo, name: quotable(repeat[1], 60) });
+        findings.repeatedName.push({ lineNo: Number(lineNo), name: repeat[1] });
       }
       continue;
     }
 
     const issue = raw.match(README_ISSUE_RE);
     if (!issue) continue;
-    const text = quotable(issue[1], 300);
+    const text = issue[1];
 
     if (/duplicate URL/.test(text)) findings.duplicates.push(text);
     else if (/out of alphabetical order/.test(text)) findings.ordering.push(text);
@@ -153,6 +196,10 @@ function classify(dir) {
 // findings, and a comment past GitHub's 65536-character body limit is not
 // posted at all. Ten of a kind is enough to show the pattern.
 const MAX_PER_SECTION = 10;
+
+// Belt and braces on the same limit, since every fragment below starts out
+// fork-sized until codeSpan clips it.
+const MAX_BODY = 60000;
 
 function listed(items, render) {
   const lines = items.slice(0, MAX_PER_SECTION).map(render);
@@ -177,7 +224,10 @@ function buildBody(findings, runUrl) {
     );
     out.push('');
     out.push(
-      ...listed(findings.markerCasing, (f) => `- \`README.md:${f.lineNo}\` — \`${f.source}\``)
+      ...listed(
+        findings.markerCasing,
+        (f) => `- \`README.md:${Number(f.lineNo)}\` — ${codeSpan(f.source)}`
+      )
     );
     out.push('');
   }
@@ -193,7 +243,7 @@ function buildBody(findings, runUrl) {
     out.push(
       ...listed(
         findings.repeatedName,
-        (f) => `- \`README.md:${f.lineNo}\` — starts with "${f.name}".`
+        (f) => `- \`README.md:${Number(f.lineNo)}\` — starts with ${codeSpan(f.name, 60)}.`
       )
     );
     out.push('');
@@ -202,7 +252,7 @@ function buildBody(findings, runUrl) {
   if (findings.ordering.length > 0) {
     out.push('#### Alphabetical order');
     out.push('');
-    out.push(...listed(findings.ordering, (text) => `> ${text}`));
+    out.push(...listed(findings.ordering, (text) => `- ${codeSpan(text, 300)}`));
     out.push('');
     out.push(
       'Entries are ordered within their own group of siblings, and ordering ' +
@@ -215,7 +265,7 @@ function buildBody(findings, runUrl) {
   if (findings.duplicates.length > 0) {
     out.push('#### Duplicate URL');
     out.push('');
-    out.push(...listed(findings.duplicates, (text) => `> ${text}`));
+    out.push(...listed(findings.duplicates, (text) => `- ${codeSpan(text, 300)}`));
     out.push('');
     out.push(
       'Comparison ignores `www.`, a trailing slash, and case, so two entries ' +
@@ -228,7 +278,7 @@ function buildBody(findings, runUrl) {
   if (findings.toc.length > 0) {
     out.push('#### Table of Contents');
     out.push('');
-    out.push(...listed(findings.toc, (text) => `> ${text}`));
+    out.push(...listed(findings.toc, (text) => `- ${codeSpan(text, 300)}`));
     out.push('');
     out.push(
       'The `## Contents` list has to match the real `##`/`###` headings, ' +
@@ -240,7 +290,7 @@ function buildBody(findings, runUrl) {
 
   if (out.length === 0) return null;
 
-  return [
+  const body = [
     COMMENT_MARKER,
     '### Validate Markdown failed, and at least one of these errors points at the wrong thing',
     '',
@@ -251,8 +301,82 @@ function buildBody(findings, runUrl) {
       'Run `npm ci && npm run validate` locally to reproduce. ' +
       'See `contributing.md` → "Two rules awesome-lint enforces quietly".',
     '',
-    '_Rewritten in place on each push by `.github/workflows/pr-guidance.yml`._',
+    '_Quoted fragments come from the failing run and are shown verbatim. ' +
+      'Rewritten in place on each push by `.github/workflows/pr-guidance.yml`._',
   ].join('\n');
+
+  return body.length > MAX_BODY ? `${body.slice(0, MAX_BODY)}\n\n_Truncated._` : body;
+}
+
+// --- Choose the pull request to comment on ----------------------------
+//
+// The security-critical part. The target comes from the triggering run's
+// head SHA — trusted workflow_run metadata a fork cannot influence — and
+// from the API's answer about which pull request owns that commit. The
+// artifact only gets to agree with it.
+
+function selectPullRequest(pulls, { headSha, headRepo }) {
+  if (!Array.isArray(pulls)) {
+    return { error: 'the pull request lookup did not return a list' };
+  }
+
+  const matches = pulls.filter(
+    (pr) =>
+      pr &&
+      pr.state === 'open' &&
+      pr.head &&
+      pr.head.sha === headSha &&
+      pr.head.repo &&
+      pr.head.repo.full_name === headRepo
+  );
+
+  if (matches.length === 0) {
+    return { error: `no open pull request in ${headRepo} has head ${headSha}` };
+  }
+  // Two pull requests can share a head commit. Guessing between them is
+  // exactly the class of mistake this function exists to prevent.
+  if (matches.length > 1) {
+    return {
+      error: `${matches.length} open pull requests share head ${headSha}; refusing to guess`,
+    };
+  }
+
+  return { number: matches[0].number };
+}
+
+function crossCheck(derived, claimed) {
+  if (!/^\d+$/.test(String(claimed == null ? '' : claimed).trim())) {
+    return { error: 'the artifact carried no usable pull request number to check against' };
+  }
+  if (Number(claimed) !== derived) {
+    return {
+      error:
+        `the artifact claims pull request #${Number(claimed)}, but that head ` +
+        `SHA belongs to #${derived}`,
+    };
+  }
+  return { number: derived };
+}
+
+async function resolveTarget({ owner, repo, headSha, headRepo, claimed }) {
+  if (!SHA_RE.test(String(headSha || ''))) {
+    return { error: `head SHA "${headSha}" is not a commit id` };
+  }
+  if (!headRepo) {
+    return { error: 'the triggering run named no head repository' };
+  }
+
+  const response = await fetch(`${API_ROOT}/repos/${owner}/${repo}/commits/${headSha}/pulls`, {
+    headers: apiHeaders(),
+  });
+  if (!response.ok) {
+    return { error: `pull request lookup failed: ${response.status}` };
+  }
+
+  const selected = selectPullRequest(await response.json(), { headSha, headRepo });
+  if (selected.error) return selected;
+
+  return crossCheck(selected.number, claimed);
 }
 
 // --- Post it ----------------------------------------------------------
@@ -302,7 +426,6 @@ async function upsert(owner, repo, prNumber, body, { createIfMissing }) {
 async function main() {
   const dir = process.env.PR_GUIDANCE_DIR || 'pr-guidance';
   const [owner, repo] = (process.env.GITHUB_REPOSITORY || '').split('/');
-  const prNumber = readIfPresent(path.join(dir, 'pr-number.txt')).trim();
   const runUrl = process.env.RUN_URL || '';
 
   // --dry-run prints what it would say and posts nothing. The only way to
@@ -314,8 +437,23 @@ async function main() {
     return;
   }
 
-  if (!owner || !repo || !/^\d+$/.test(prNumber) || !process.env.GITHUB_TOKEN) {
-    console.log('No pull request context to comment on; nothing to do.');
+  if (!owner || !repo || !process.env.GITHUB_TOKEN) {
+    console.log('No repository context to comment in; nothing to do.');
+    return;
+  }
+
+  const target = await resolveTarget({
+    owner,
+    repo,
+    headSha: process.env.HEAD_SHA,
+    headRepo: process.env.HEAD_REPO,
+    claimed: readIfPresent(path.join(dir, 'pr-number.txt')).trim(),
+  });
+
+  if (target.error) {
+    // Loud, and then nothing. Never a fallback: a path that could not
+    // establish which pull request this is, is a path that must not write.
+    console.error(`Refusing to comment — ${target.error}.`);
     return;
   }
 
@@ -326,26 +464,40 @@ async function main() {
     await upsert(
       owner,
       repo,
-      prNumber,
+      target.number,
       `${COMMENT_MARKER}\nValidate Markdown passes now. Earlier guidance on this pull request no longer applies.`,
       { createIfMissing: false }
     );
     return;
   }
 
-  const findings = classify(dir);
-  const body = buildBody(findings, runUrl);
+  const body = buildBody(classify(dir), runUrl);
 
   if (!body) {
     console.log('Nothing recognised in the failure; staying quiet.');
     return;
   }
 
-  await upsert(owner, repo, prNumber, body, { createIfMissing: true });
+  await upsert(owner, repo, target.number, body, { createIfMissing: true });
 }
 
-main().catch((error) => {
-  // Advisory, and it runs on a pull request that is already red. A crash
-  // here must not add a second red mark that looks like a second problem.
-  console.error(`pr-guidance failed: ${error.message}`);
-});
+// Exported for scripts/explain-ci-failure.test.js. The live API path cannot
+// be exercised offline, so what is tested is the targeting decision and the
+// escaping — the two places where getting it wrong writes to the wrong pull
+// request, or writes something a fork chose.
+module.exports = {
+  classify,
+  buildBody,
+  codeSpan,
+  selectPullRequest,
+  crossCheck,
+  MAX_PER_SECTION,
+};
+
+if (require.main === module) {
+  main().catch((error) => {
+    // Advisory, and it runs on a pull request that is already red. A crash
+    // here must not add a second red mark that looks like a second problem.
+    console.error(`pr-guidance failed: ${error.message}`);
+  });
+}

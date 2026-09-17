@@ -11,11 +11,22 @@ name: PR Guidance
 # for, open from forks. workflow_run runs in the base repository with a
 # writable token.
 #
-# The cost of that token is that nothing from the head commit may be
-# executed. This checks out the base repository's default branch explicitly
-# and never installs or runs anything from the pull request; the artifact it
-# downloads (the failing run's log, and that run's README.md) is read as data
-# by scripts/explain-ci-failure.js and nothing else.
+# The cost of that token is that everything reaching this job is untrusted.
+# The producer job does not merely get tampered with in theory: it runs
+# `npm ci` and `npm run validate` against the pull request's merge ref, so a
+# fork's package.json defines what `validate` is and can write anything it
+# likes into the artifact before it is uploaded.
+#
+# So the artifact is treated as evidence, never as instruction:
+#   - it says which errors occurred; it does not get to say which pull
+#     request to write to. The target is derived from the triggering run's
+#     head SHA — trusted workflow_run metadata — via the API, and
+#     pr-number.txt is only a cross-check that must agree.
+#   - nothing in it is executed, and every fragment quoted from it is
+#     wrapped in a code span so it cannot author markdown under the bot's
+#     identity.
+#   - the checkout is pinned to the base repository's default branch, so no
+#     fork-authored file is ever on disk beside the script.
 #
 # Advisory, and not a required check. The download is allowed to fail
 # quietly, the script exits 0 on every path, and no result here can change
@@ -79,4 +90,8 @@ jobs:
           PR_GUIDANCE_DIR: pr-guidance
           RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           RUN_URL: ${{ github.event.workflow_run.html_url }}
+          # The trusted half. These two decide which pull request gets
+          # written to; the artifact only gets to agree with them.
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
         run: node scripts/explain-ci-failure.js
