@@ -4,8 +4,9 @@
   "version": "1.0.0",
   "description": "Pinned CI tooling for markdown checks",
   "scripts": {
-    "lint:awesome": "awesome-lint README.md",
+    "lint:awesome": "bash scripts/lint-awesome.sh",
     "lint:links": "bash scripts/check-links.sh",
+    "flake:aggregate": "node scripts/link-flake.js aggregate",
     "lint:markdown": "markdownlint-cli2",
     "check:readme": "node scripts/check-readme.js",
     "check:staleness": "node scripts/check-staleness.js",

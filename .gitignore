@@ -2,3 +2,4 @@ node_modules/
 .agents/
 .DS_Store
 docs/
+.link-check/
