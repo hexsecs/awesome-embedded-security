@@ -16,6 +16,7 @@
     "test:candidates": "node --test scripts/find-candidates.test.js",
     "flake:aggregate": "node scripts/link-flake.js aggregate",
     "test:pr-guidance": "node --test scripts/explain-ci-failure.test.js",
+    "test:flake": "node --test scripts/link-flake.test.js",
     "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {

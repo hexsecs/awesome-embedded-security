@@ -35,6 +35,10 @@ TARGET="${1:-README.md}"
 # the error rather than scrolling off above it. The condition is exact: a
 # non-empty branch name with no configured remote is precisely the input that
 # sends the rule down its throwing path.
+#
+# It is also only half the condition. The note is printed only when the lint
+# actually failed — a script written to stop CI telling you the wrong thing
+# has no business printing a twelve-line warning under a green run.
 branch="$(git branch --show-current 2>/dev/null)"
 missing_upstream=false
 if [ -n "$branch" ] && ! git config --get "branch.${branch}.remote" >/dev/null 2>&1; then
@@ -44,7 +48,7 @@ fi
 npx --no-install awesome-lint "$TARGET"
 status=$?
 
-if [ "$missing_upstream" = true ]; then
+if [ "$missing_upstream" = true ] && [ "$status" -ne 0 ]; then
   cat >&2 <<EOF
 
 ==> If you saw "Awesome list must reside in a valid git repository":

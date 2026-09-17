@@ -23,6 +23,8 @@ const path = require('path');
 const {
   classify,
   buildBody,
+  retirementBody,
+  findExistingComment,
   codeSpan,
   selectPullRequest,
   crossCheck,
@@ -215,4 +217,135 @@ test('caps how many findings of one kind it will list', () => {
     buildBody(classify(dir), '')
   );
   assert.match(body, /and 5 more of the same/);
+});
+
+// --- Retirement: a comment must never outlive what it describes ----------
+//
+// The path that mattered, and it is the common one here: a contributor fixes
+// the casing error and pushes, markdown-quality goes green, and the link
+// check fails on one of the flaky hosts this repository retries three times
+// for. The run's conclusion is `failure`, so the "it passes now" branch is
+// skipped, and buildBody returns null because nothing in the log is
+// recognised — which used to mean the old comment stayed up, pointing at a
+// line that no longer has anything wrong with it.
+
+test('retirement says the run is green when it is green', () => {
+  process.env.RUN_CONCLUSION = 'success';
+  const body = retirementBody(false, 'https://example/run');
+  assert.match(body, /passes now/);
+  assert.ok(body.startsWith('<!-- pr-guidance-comment -->'), 'must keep the marker');
+  delete process.env.RUN_CONCLUSION;
+});
+
+test('retirement does not claim green when the run is still red', () => {
+  process.env.RUN_CONCLUSION = 'failure';
+  const body = retirementBody(false, 'https://example/run');
+  assert.ok(!/passes now/.test(body), 'must not tell a red pull request it is green');
+  assert.match(body, /still failing/);
+  assert.match(body, /example\/run/, 'points at the run log instead');
+  delete process.env.RUN_CONCLUSION;
+});
+
+test('retirement distinguishes an unreadable run from an unrecognised one', () => {
+  process.env.RUN_CONCLUSION = 'failure';
+  assert.match(retirementBody(true, ''), /could not be read/);
+  assert.match(retirementBody(false, ''), /not for a reason this bot can explain/);
+  delete process.env.RUN_CONCLUSION;
+});
+
+test('every retirement body carries the marker so it can be found again', () => {
+  for (const conclusion of ['success', 'failure']) {
+    process.env.RUN_CONCLUSION = conclusion;
+    for (const retireOnly of [true, false]) {
+      assert.ok(retirementBody(retireOnly, '').includes('<!-- pr-guidance-comment -->'));
+    }
+  }
+  delete process.env.RUN_CONCLUSION;
+});
+
+// --- Pagination ---------------------------------------------------------
+//
+// The header promises one comment rewritten in place rather than one per
+// push. On a thread longer than a single page, an unpaginated search would
+// never find the marker and would post again every time — the promise broken
+// exactly where a long thread makes it most irritating.
+
+// Must await fn before restoring: returning the promise from inside
+// try/finally puts the real fetch back before the first page resolves, so
+// only page one ever goes through the stub.
+async function withFetch(pages, fn) {
+  const real = globalThis.fetch;
+  const seen = [];
+  globalThis.fetch = async (url) => {
+    seen.push(url);
+    const page = Number(new URL(url).searchParams.get('page'));
+    return { ok: true, json: async () => pages[page - 1] || [] };
+  };
+  try {
+    return await fn(seen);
+  } finally {
+    globalThis.fetch = real;
+  }
+}
+
+const filler = () => Array.from({ length: 100 }, (_, i) => ({ id: i, body: 'unrelated' }));
+
+test('finds its own comment on a later page', async () => {
+  const pages = [filler(), filler(), [{ id: 999, body: `x <!-- pr-guidance-comment --> y` }]];
+  const found = await withFetch(pages, async (seen) => {
+    const c = await findExistingComment('o', 'r', 1);
+    assert.strictEqual(seen.length, 3, 'should have paged through to find it');
+    return c;
+  });
+  assert.strictEqual(found.id, 999);
+});
+
+test('stops at a short page rather than paging forever', async () => {
+  const pages = [filler(), [{ id: 1, body: 'nothing here' }]];
+  const found = await withFetch(pages, async (seen) => {
+    const c = await findExistingComment('o', 'r', 1);
+    assert.strictEqual(seen.length, 2, 'a short page is the last page');
+    return c;
+  });
+  assert.strictEqual(found, null);
+});
+
+test('gives up after a bounded number of pages', async () => {
+  const pages = Array.from({ length: 50 }, filler);
+  await withFetch(pages, async (seen) => {
+    await findExistingComment('o', 'r', 1);
+    assert.ok(seen.length <= 10, `paged ${seen.length} times; must be bounded`);
+  });
+});
+
+// --- The opener rule must match awesome-lint's, not merely resemble it ---
+
+test('an accented capital is still reported, because awesome-lint rejects it', () => {
+  // awesome-lint's escape hatch is / - [A-Z]/ — ASCII only. \p{Lu} matched É
+  // and Å, so the linter failed while this stayed silent on exactly the case
+  // it exists for. Verified against awesome-lint 2.3.0, rules/list-item.js.
+  for (const opener of ['Émulateur de firmware.', 'Ångstrom-level report.']) {
+    const body = withDir(
+      {
+        'validate.log':
+          '  ✖   1:1  List item link and description must be separated with a dash  remark-lint:awesome-list-item',
+        'README.md': `* [Foo](https://example.com) \u{1F4B0} - ${opener}`,
+      },
+      (dir) => buildBody(classify(dir), '')
+    );
+    assert.ok(body, `expected guidance for "${opener}"`);
+    assert.match(body, /must be separated with a dash/);
+  }
+});
+
+test('an ASCII capital opener is left alone, since awesome-lint accepts it', () => {
+  const body = withDir(
+    {
+      'validate.log':
+        '  ✖   1:1  List item link and description must be separated with a dash  remark-lint:awesome-list-item',
+      'README.md': '* [Foo](https://example.com) \u{1F4B0} - Emulator for firmware.',
+    },
+    (dir) => buildBody(classify(dir), '')
+  );
+  assert.strictEqual(body, null, 'a genuine dash error needs no translation');
 });

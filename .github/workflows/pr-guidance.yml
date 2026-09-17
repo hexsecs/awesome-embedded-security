@@ -95,3 +95,18 @@ jobs:
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
         run: node scripts/explain-ci-failure.js
+
+      # If the artifact never arrived there is nothing to classify, but a
+      # comment from an earlier push may still be sitting on the pull request
+      # describing errors nobody can now confirm. Retiring it is the only
+      # safe move; this never creates a comment, only rewrites one that is
+      # already there.
+      - name: Retire stale guidance when the context is unavailable
+        if: steps.context.outcome != 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+        run: node scripts/explain-ci-failure.js --retire-only

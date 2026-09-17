@@ -95,10 +95,14 @@ const ENTRY_RE = /^\s*\*\s+\[([^\]]+)\]\(([^)]+)\)([^-]*)-\s*(.*)$/;
 // into advice about casing.
 const MARKERS_ONLY_RE = new RegExp(`^[\\s${MONEY_MARKER}${ARCHIVED_MARKER}\\uFE0F]*$`, 'u');
 
-// awesome-lint wants a capital letter, not merely "not lowercase": a
-// description opening with a digit, with ".NET", or with a curly quote is
-// rejected the same way. Verified against awesome-lint 2.3.0.
-const VALID_OPENER_RE = /^\p{Lu}/u;
+// Mirrors awesome-lint's own escape hatch, which is `/ - [A-Z]/` — ASCII
+// capitals only (awesome-lint 2.3.0, rules/list-item.js). That matters: this
+// was \p{Lu}, which accepts É and Å, so an entry reading
+// "* [Foo](url) 💰 - Émulateur ..." got the misleading dash error from
+// awesome-lint while this stayed silent about it — silent on exactly the
+// case it exists for. Matching the rule character-for-character is the only
+// way to stay in step with it.
+const VALID_OPENER_RE = /^[A-Z]/;
 
 const ANSI_RE = /\u001b\[[0-9;]*m/g;
 const CONTROL_RE = /[\u0000-\u001f\u007f]/g;
@@ -358,7 +362,13 @@ function crossCheck(derived, claimed) {
   return { number: derived };
 }
 
-async function resolveTarget({ owner, repo, headSha, headRepo, claimed }) {
+// `crossCheck` is skipped only for a retire-only run, where there is no
+// artifact to cross-check against. That is safe for the reason the artifact
+// needed checking in the first place: the target still comes entirely from
+// trusted workflow_run metadata, and a retire-only run can do nothing but
+// rewrite a comment this bot already authored, to a fixed string, with
+// createIfMissing false. There is no input a fork could use to redirect it.
+async function resolveTarget({ owner, repo, headSha, headRepo, claimed, requireCrossCheck = true }) {
   if (!SHA_RE.test(String(headSha || ''))) {
     return { error: `head SHA "${headSha}" is not a commit id` };
   }
@@ -375,6 +385,7 @@ async function resolveTarget({ owner, repo, headSha, headRepo, claimed }) {
 
   const selected = selectPullRequest(await response.json(), { headSha, headRepo });
   if (selected.error) return selected;
+  if (!requireCrossCheck) return { number: selected.number };
 
   return crossCheck(selected.number, claimed);
 }
@@ -390,15 +401,40 @@ function apiHeaders() {
   };
 }
 
+// Paged, because a single page is a promise this cannot keep. The header
+// says it rewrites one comment rather than stacking a new one per push; on a
+// thread longer than one page an unpaginated search would never find the
+// marker, and every push would post again — the exact behaviour it promises
+// not to have, appearing only on the long threads where it is most annoying.
+const COMMENT_PAGE_SIZE = 100;
+const MAX_COMMENT_PAGES = 10;
+
 async function findExistingComment(owner, repo, prNumber) {
-  const response = await fetch(
-    `${API_ROOT}/repos/${owner}/${repo}/issues/${prNumber}/comments?per_page=100`,
-    { headers: apiHeaders() }
+  for (let page = 1; page <= MAX_COMMENT_PAGES; page++) {
+    const response = await fetch(
+      `${API_ROOT}/repos/${owner}/${repo}/issues/${prNumber}/comments` +
+        `?per_page=${COMMENT_PAGE_SIZE}&page=${page}`,
+      { headers: apiHeaders() }
+    );
+    if (!response.ok) return null;
+
+    const comments = await response.json();
+    if (!Array.isArray(comments)) return null;
+
+    const found = comments.find((c) => (c.body || '').includes(COMMENT_MARKER));
+    if (found) return found;
+
+    // A short page is the last page.
+    if (comments.length < COMMENT_PAGE_SIZE) return null;
+  }
+
+  // Past the cap, assume it is not there rather than paging forever. Worst
+  // case is a second comment on a thread of a thousand, which is a better
+  // failure than an unbounded loop holding a write token.
+  console.error(
+    `Stopped searching for an existing comment after ${MAX_COMMENT_PAGES} pages.`
   );
-  if (!response.ok) return null;
-  const comments = await response.json();
-  if (!Array.isArray(comments)) return null;
-  return comments.find((c) => (c.body || '').includes(COMMENT_MARKER)) || null;
+  return null;
 }
 
 async function upsert(owner, repo, prNumber, body, { createIfMissing }) {
@@ -423,6 +459,31 @@ async function upsert(owner, repo, prNumber, body, { createIfMissing }) {
   console.log(existing ? `Updated comment ${existing.id}.` : 'Posted a guidance comment.');
 }
 
+// What replaces the guidance once it no longer applies. Deliberately says
+// which of the three cases happened, so nobody reads "it passes now" on a
+// pull request that is still red.
+function retirementBody(retireOnly, runUrl) {
+  const link = runUrl ? ` See the [run log](${runUrl}).` : '';
+  if (process.env.RUN_CONCLUSION === 'success') {
+    return (
+      `${COMMENT_MARKER}\nValidate Markdown passes now. The guidance that ` +
+      'was here no longer applies.'
+    );
+  }
+  if (retireOnly) {
+    return (
+      `${COMMENT_MARKER}\nValidate Markdown is still failing, but the details ` +
+      `of the last run could not be read, so any earlier guidance here may be ` +
+      `out of date.${link}`
+    );
+  }
+  return (
+    `${COMMENT_MARKER}\nThe errors described here are gone. Validate Markdown ` +
+    `is still failing, but not for a reason this bot can explain — the link ` +
+    `check and markdownlint say what they mean.${link}`
+  );
+}
+
 async function main() {
   const dir = process.env.PR_GUIDANCE_DIR || 'pr-guidance';
   const [owner, repo] = (process.env.GITHUB_REPOSITORY || '').split('/');
@@ -442,12 +503,19 @@ async function main() {
     return;
   }
 
+  // --retire-only is for the case where the artifact could not be
+  // downloaded. There is then nothing to classify, but a comment from an
+  // earlier push may still be sitting there describing errors nobody can
+  // confirm are still real, so the one safe action is to retire it.
+  const retireOnly = process.argv.includes('--retire-only');
+
   const target = await resolveTarget({
     owner,
     repo,
     headSha: process.env.HEAD_SHA,
     headRepo: process.env.HEAD_REPO,
     claimed: readIfPresent(path.join(dir, 'pr-number.txt')).trim(),
+    requireCrossCheck: !retireOnly,
   });
 
   if (target.error) {
@@ -457,24 +525,27 @@ async function main() {
     return;
   }
 
-  // Green again: retire the comment rather than leaving stale advice under a
-  // passing run. Never created in this direction — a pull request that never
-  // failed should never hear from this at all.
-  if (process.env.RUN_CONCLUSION === 'success') {
-    await upsert(
-      owner,
-      repo,
-      target.number,
-      `${COMMENT_MARKER}\nValidate Markdown passes now. Earlier guidance on this pull request no longer applies.`,
-      { createIfMissing: false }
-    );
-    return;
-  }
+  const body = retireOnly || process.env.RUN_CONCLUSION === 'success'
+    ? null
+    : buildBody(classify(dir), runUrl);
 
-  const body = buildBody(classify(dir), runUrl);
-
+  // Nothing to say, in any of three ways: the run is green, the artifact
+  // never arrived, or it failed for a reason this does not recognise. All
+  // three have the same consequence for a comment left by an earlier push —
+  // it is now describing errors that may well be fixed. The commonest path
+  // in this repository is the third one: a contributor fixes the casing
+  // error, pushes, markdown-quality goes green, and the link check fails on
+  // one of the flaky hosts it retries three times for. Leaving the old
+  // comment up would have it pointing at a line that no longer has anything
+  // wrong with it, which is exactly the "a comment always means something"
+  // promise this is built on.
+  //
+  // Retirement never creates: a pull request that never heard from this bot
+  // should not start hearing from it now.
   if (!body) {
-    console.log('Nothing recognised in the failure; staying quiet.');
+    await upsert(owner, repo, target.number, retirementBody(retireOnly, runUrl), {
+      createIfMissing: false,
+    });
     return;
   }
 
@@ -488,6 +559,8 @@ async function main() {
 module.exports = {
   classify,
   buildBody,
+  retirementBody,
+  findExistingComment,
   codeSpan,
   selectPullRequest,
   crossCheck,
