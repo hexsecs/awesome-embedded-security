@@ -169,24 +169,49 @@ async function lookup(entry) {
   }
 
   // Same reasoning as the status codes above, one step later: a 200 whose
-  // body will not parse, or parses to something that is not a repository
-  // object, tells us nothing about the repository. Degrade to unchecked.
-  // Reading `data.archived` off a non-object would throw out of the worker
-  // pool and take the whole sweep with it.
+  // body is not a repository tells us nothing about the repository.
+  //
+  // The check is on the fields this function reads, not on the type of the
+  // body, and that distinction is the whole point. GitHub answers some
+  // secondary rate limits with HTTP 200 and `{"message": "You have
+  // exceeded a secondary rate limit"}` — which parses, and which *is* an
+  // object. A guard asking "is this an object?" waves it straight through,
+  // and then `Boolean(data.archived)` is `false` for every entry in the
+  // list: every 🗄️-marked entry reads as unarchived, and the fix mode
+  // strips the markers and commits them. An API error editing the list is
+  // the one outcome this script must never produce, so the guard has to
+  // exclude that body specifically.
+  //
+  // `full_name` and `archived` are exactly what classify() decides on, so
+  // they are what must be present and of the right type. A repository
+  // object from this endpoint always carries both.
   let data;
   try {
     data = await response.json();
   } catch (err) {
     return { ...entry, status: 'error', detail: `unreadable response body: ${err.message}` };
   }
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    return { ...entry, status: 'error', detail: 'the GitHub API returned no repository object' };
+  if (
+    !data ||
+    typeof data !== 'object' ||
+    Array.isArray(data) ||
+    typeof data.full_name !== 'string' ||
+    typeof data.archived !== 'boolean'
+  ) {
+    const hint = data && typeof data === 'object' && typeof data.message === 'string'
+      ? `: ${data.message}`
+      : '';
+    return {
+      ...entry,
+      status: 'error',
+      detail: `HTTP 200 without a repository object${hint}`,
+    };
   }
 
   return {
     ...entry,
     status: 'ok',
-    archived: Boolean(data.archived),
+    archived: data.archived,
     fullName: data.full_name,
     pushedAt: data.pushed_at,
     htmlUrl: data.html_url,
@@ -223,12 +248,22 @@ async function preflight(needed) {
   } catch (err) {
     return { ok: false, reason: `the rate limit response could not be read: ${err.message}` };
   }
-  if (!data || typeof data !== 'object') {
-    return { ok: false, reason: 'the rate limit response was not an object.' };
+  // Re-audited alongside the repository guard above, and it had the same
+  // hole: `{"message": …}` is an object, so it passed, `core` came out
+  // undefined, and the preflight returned ok — waving through the very run
+  // it exists to stop. A rate_limit response that does not carry a numeric
+  // core quota is not a rate_limit response.
+  const core = data && typeof data === 'object' && data.resources
+    ? data.resources.core
+    : null;
+  if (!core || typeof core.remaining !== 'number') {
+    const hint = data && typeof data === 'object' && typeof data.message === 'string'
+      ? `: ${data.message}`
+      : '';
+    return { ok: false, reason: `the rate limit response carried no quota${hint}.` };
   }
 
-  const core = data.resources && data.resources.core;
-  if (core && core.remaining < needed) {
+  if (core.remaining < needed) {
     const resetAt = new Date(core.reset * 1000).toISOString();
     return {
       ok: false,
@@ -522,6 +557,11 @@ function markerSegment(tokens) {
 // The canonical URL for a renamed repository, keeping anything the link
 // pointed at inside it: "…/old-owner/old-repo/tree/main/docs" has to come
 // out as "…/new-owner/new-repo/tree/main/docs", not as the repository root.
+//
+// Deep links are refused before they reach here, so the suffix is empty in
+// practice. It is kept correct anyway: it is what makes relaxing that
+// refusal a one-line change if the entries ever get a link check that runs
+// on generated pull requests.
 function renamedUrl(entry) {
   if (!entry.htmlUrl) return null;
 
@@ -614,6 +654,31 @@ function applyFixes(content, findings) {
       after = parts[1] + parts[2] + parts[3] + markerSegment(tokens) + parts[5];
       note = 'no longer archived upstream — removed the 🗄️ marker';
     } else {
+      // A deep link names a path *inside* the repository, and a rename
+      // says nothing about whether that path survived it. Splicing the old
+      // suffix onto the new canonical URL is a guess, and nothing
+      // downstream would catch a wrong one: verifyReadme only runs
+      // check-readme.js, which does not fetch anything, and the link check
+      // does not run on a GITHUB_TOKEN-authored pull request. So the guess
+      // would land a dead link with no gate in front of it.
+      //
+      // The justification for this whole fix mode is that it only applies
+      // edits with exactly one correct answer. This is not one of those, so
+      // it goes back to the report — where parseEntries already says these
+      // suggestions are suppressed.
+      if (finding.deepPath) {
+        skipped.push({
+          kind,
+          name: finding.name,
+          lineNo: finding.lineNo,
+          reason:
+            'the link points inside the repository, and whether that path ' +
+            `still exists under \`${finding.fullName}\` is not something ` +
+            'this can check',
+        });
+        continue;
+      }
+
       const target = renamedUrl(finding);
       if (!target) {
         skipped.push({
@@ -701,9 +766,18 @@ const ISSUE_TITLE = 'Entry health report';
 // creation path — which opens a *second* report issue beside the one this
 // whole design assumes is unique. Same rule as everywhere else in this
 // script: an API error is never evidence about the thing being checked.
-async function findExistingIssue(owner, repo) {
-  let response;
-  try {
+const ISSUE_PAGE_SIZE = 100;
+// A cap, not a budget: it stops a broken or hostile API from looping
+// forever. Ten pages is a thousand issues, far past anything this
+// repository will hold, and hitting it is reported as a failed lookup
+// rather than as "no report issue exists".
+const ISSUE_PAGE_LIMIT = 10;
+
+// One page of the issue listing, with every guard the single-shot version
+// had: a throw, a non-2xx, an unreadable body and a body that is not a list
+// are all "I could not find out", never "there is none".
+async function fetchIssuePage(owner, repo, page) {
+  const query = [
     // state=all, deliberately — do not change this back to state=open.
     //
     // This run closes the report when the list comes back clean, so with
@@ -720,15 +794,22 @@ async function findExistingIssue(owner, repo) {
     // the same thread. There is deliberately no mechanism to detect who
     // closed it and no label-based opt-out: both are ways of losing a real
     // finding quietly, which is the failure this script exists to prevent.
-    //
-    // per_page=100 with no pagination is a known limit. The marker issue
-    // would have to fall past 100 issues in this repository's whole
-    // history before the lookup missed it and opened a duplicate; that is
-    // far off, and paging is not worth the surface today.
-    response = await fetch(
-      `${API_ROOT}/repos/${owner}/${repo}/issues?state=all&per_page=100`,
-      { headers: apiHeaders() }
-    );
+    'state=all',
+    // sort=updated is not what makes this correct — the paging below is —
+    // but it puts the report first in the common case, so the loop finds
+    // it and stops on page one, and it is the ordering that degrades most
+    // gracefully if the page cap is ever reached.
+    'sort=updated',
+    'direction=desc',
+    `per_page=${ISSUE_PAGE_SIZE}`,
+    `page=${page}`,
+  ].join('&');
+
+  let response;
+  try {
+    response = await fetch(`${API_ROOT}/repos/${owner}/${repo}/issues?${query}`, {
+      headers: apiHeaders(),
+    });
   } catch (err) {
     return { ok: false, reason: `cannot reach the GitHub API: ${err.message}` };
   }
@@ -750,7 +831,7 @@ async function findExistingIssue(owner, repo) {
   // A 200 carrying an object rather than a list is how GitHub answers some
   // secondary rate limits and abuse-detection trips: `{"message": …}`, with
   // a 2xx status. It parses, so the catch above never fires, and calling
-  // .find on it throws a TypeError out of here and kills the run — after
+  // .filter on it throws a TypeError out of here and kills the run — after
   // the fix step may already have force-pushed a branch and opened a pull
   // request. It is the same "I could not find out" as any other failure
   // and has to be answered the same way.
@@ -763,22 +844,66 @@ async function findExistingIssue(owner, repo) {
     };
   }
 
-  const matches = issues.filter(
-    (issue) => issue && !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
-  );
+  return { ok: true, issues };
+}
 
-  // With closed issues in the listing there can be more than one match, and
-  // the API's ordering is no longer "the open one first" — so the choice is
-  // made here rather than taken from whatever arrived first. An open thread
-  // wins over a closed one, because reopening a closed report while another
-  // is already open would leave two open reports, which is exactly what all
-  // of this is avoiding. Between two of the same state, the one touched
-  // most recently is the live thread; the issue number breaks a tie so the
-  // choice is stable across runs.
-  //
-  // Extra matches are reported rather than silently ignored: more than one
-  // marker issue means an earlier run got this wrong, and that needs a
-  // human to merge them, not an automation quietly picking a favourite.
+// Three outcomes, and they have to stay distinguishable: the report issue
+// was found, the lookup succeeded and there is no report issue, or the
+// lookup could not be done at all. A 5xx, a revoked token or a rate limit
+// is the third, and collapsing it into the second sends the caller down the
+// creation path — which opens a *second* report issue beside the one this
+// whole design assumes is unique. Same rule as everywhere else in this
+// script: an API error is never evidence about the thing being checked.
+//
+// The listing is paged rather than capped at one page of 100. This endpoint
+// returns pull requests alongside issues, so the count that matters is both
+// combined — this repository passed 50 in its first year — and a report
+// that drifts off the end of a single page is read as "no report issue
+// exists", which opens the duplicate the marker exists to prevent. Paging
+// costs one request while the repository is small, because a short page is
+// the last page.
+async function findExistingIssue(owner, repo) {
+  const matches = [];
+
+  for (let page = 1; page <= ISSUE_PAGE_LIMIT; page++) {
+    const result = await fetchIssuePage(owner, repo, page);
+    if (!result.ok) return { ok: false, reason: result.reason };
+
+    matches.push(
+      ...result.issues.filter(
+        (issue) => issue && !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
+      )
+    );
+
+    // A short page is the last page. Every page full to the limit means
+    // there may be more, and running out of pages is a lookup that did not
+    // finish, not a listing with nothing in it.
+    if (result.issues.length < ISSUE_PAGE_SIZE) {
+      return { ok: true, ...rankIssues(matches) };
+    }
+  }
+
+  return {
+    ok: false,
+    reason:
+      `more than ${ISSUE_PAGE_LIMIT * ISSUE_PAGE_SIZE} issues to sift; ` +
+      'the report issue cannot be identified with confidence',
+  };
+}
+
+// With closed issues in the listing there can be more than one match, and
+// the API's ordering is not something to depend on — so the choice is made
+// here rather than taken from whatever arrived first. An open thread wins
+// over a closed one, because reopening a closed report while another is
+// already open would leave two open reports, which is exactly what all of
+// this is avoiding. Between two of the same state, the one touched most
+// recently is the live thread; the issue number breaks a tie so the choice
+// is stable across runs.
+//
+// Extra matches are returned rather than silently dropped: more than one
+// marker issue means an earlier run got this wrong, and that needs a human
+// to merge them, not an automation quietly picking a favourite.
+function rankIssues(matches) {
   const touchedAt = (issue) => Date.parse(issue.updated_at || '') || 0;
   const ranked = [...matches].sort((a, b) => {
     const openness = Number(b.state === 'open') - Number(a.state === 'open');
@@ -789,7 +914,6 @@ async function findExistingIssue(owner, repo) {
   });
 
   return {
-    ok: true,
     issue: ranked[0] || null,
     duplicates: ranked.slice(1).map((issue) => issue.number),
   };
@@ -909,7 +1033,10 @@ async function reportIssue(body, actionable) {
   } catch {
     created = null;
   }
-  const number = created && typeof created === 'object' ? created.number : null;
+  const number =
+    created && typeof created === 'object' && typeof created.number === 'number'
+      ? created.number
+      : null;
   console.log(
     number
       ? `Opened issue #${number} with ${actionable} finding(s).`
@@ -1082,12 +1209,23 @@ function openPullRequest(content, edits, skipped, issueUrl, deps = {}) {
     }
   }
 
-  const bodyFile = path.join(
-    fs.mkdtempSync(path.join(os.tmpdir(), 'entry-health-pr-')),
-    'body.md'
-  );
+  // Cleaned up like verifyReadme's, rather than left behind once per run
+  // and once per test. `gh` has read the file by the time either branch
+  // returns, so the directory goes in a finally.
+  const bodyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'entry-health-pr-'));
+  const bodyFile = path.join(bodyDir, 'body.md');
   fs.writeFileSync(bodyFile, prBody(edits, skipped, issueUrl));
 
+  try {
+    return submitPullRequest({ exec, env, base, existing, bodyFile });
+  } finally {
+    fs.rmSync(bodyDir, { recursive: true, force: true });
+  }
+}
+
+// The gh half of openPullRequest, split out so the body file it reads can be
+// removed in one place whichever way this returns.
+function submitPullRequest({ exec, env, base, existing, bodyFile }) {
   if (existing.pr) {
     // --base on every update, not only when it differs. The head branch is
     // rebuilt from whatever base this run checked out, so the pull request's
@@ -1214,7 +1352,29 @@ async function runFixMode(findings, openPr, deps = {}) {
     // Nothing to propose is exactly when a pull request left over from a
     // month when there was something becomes misleading, so this is where
     // it gets closed rather than where the run quietly ends.
-    if (openPr) {
+    //
+    // But only when the sweep actually answered. Zero edits is also what a
+    // failed sweep produces — lookup() documents that a rate limit can be
+    // reached partway through a run — and retiring on that would close the
+    // pull request and delete its branch, throwing away last month's
+    // correct and still-pending edits, while the report filed by this same
+    // run lists those very entries under "Could not be checked". The run
+    // would be contradicting itself in two places at once.
+    //
+    // Any error blocks it, not just an all-error sweep: the entries that
+    // failed this month may be precisely the ones the open pull request is
+    // fixing, and nothing here can tell. Retirement is cleanup, so
+    // deferring it a month costs nothing; getting it wrong discards work
+    // that a human would have merged.
+    const sweepFailed = findings.errors.length > 0;
+    if (openPr && sweepFailed) {
+      console.log(
+        `Leaving any open pull request alone: ${findings.errors.length} ` +
+          'entr(ies) could not be checked this run, so "nothing to fix" is ' +
+          'not a conclusion this sweep earned.'
+      );
+    }
+    if (openPr && !sweepFailed) {
       const retired = retireStalePullRequest(deps);
       if (!retired.ok) {
         console.error(`Could not retire the open pull request: ${retired.reason}`);

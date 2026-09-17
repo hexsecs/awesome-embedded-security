@@ -13,6 +13,8 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
+const fs = require('node:fs');
+const os = require('node:os');
 
 const {
   readEntries,
@@ -561,20 +563,59 @@ test('a rename rewrites the URL and leaves the display label alone', () => {
   );
 });
 
-test('a rename of a link pointing inside a repository keeps the deep path', () => {
+test('a rename of a link pointing inside a repository is left to a human', () => {
+  // Splicing the old path onto the new repository is a guess about the new
+  // repository's layout, and nothing downstream would catch a wrong one:
+  // check-readme.js does not fetch, and the link check does not run on a
+  // pull request this script authors. A dead link with no gate in front of
+  // it is not an edit with exactly one correct answer.
   const findings = classify([
     fixtureEntry('Charlie', {
       fullName: 'acme/charlie-ng',
       htmlUrl: 'https://github.com/acme/charlie-ng',
     }),
   ]);
-  const { content, edits } = applyFixes(FIXTURE, findings);
+  const { content, edits, skipped } = applyFixes(FIXTURE, findings);
+
+  assert.strictEqual(edits.length, 0, 'a deep-path rename is not auto-applied');
+  assert.strictEqual(content, FIXTURE, 'the entry is left exactly as it was');
+  assert.strictEqual(skipped.length, 1);
+  assert.strictEqual(skipped[0].kind, 'renamed');
+  assert.match(skipped[0].reason, /points inside the repository/);
+
+  // And it still reaches the human, with the reason, in the report.
+  const { body, actionable } = render(findings, 1, {
+    edits,
+    skipped,
+    prUrl: 'https://github.com/owner/repo/pull/7',
+  });
+  assert.ok(body.includes('## Moved'));
+  assert.match(body, /not fixed automatically: the link points inside/);
+  assert.strictEqual(actionable, 1, 'it still needs a decision');
+});
+
+test('a shallow rename beside a deep one is still applied', () => {
+  // The refusal is scoped to the deep-path entry, not to renames generally.
+  const findings = classify([
+    fixtureEntry('Alpha', {
+      fullName: 'acme/alpha-ng',
+      htmlUrl: 'https://github.com/acme/alpha-ng',
+    }),
+    fixtureEntry('Charlie', {
+      fullName: 'acme/charlie-ng',
+      htmlUrl: 'https://github.com/acme/charlie-ng',
+    }),
+  ]);
+  const { content, edits, skipped } = applyFixes(FIXTURE, findings);
 
   assert.strictEqual(edits.length, 1);
+  assert.strictEqual(edits[0].name, 'Alpha');
+  assert.strictEqual(skipped.length, 1);
+  assert.strictEqual(skipped[0].name, 'Charlie');
   assert.strictEqual(
     linesOf(content)[CHARLIE_LINE - 1],
-    '* [Charlie](https://github.com/acme/charlie-ng/tree/main/security) ' +
-      '- Points inside a repository.'
+    linesOf(FIXTURE)[CHARLIE_LINE - 1],
+    'the refused line must be byte-identical'
   );
 });
 
@@ -1222,7 +1263,7 @@ test('a repository lookup answered with a non-object degrades to unchecked', asy
 
     const result = await lookup(entry());
     assert.strictEqual(result.status, 'error', 'an unreadable body is never a finding');
-    assert.match(result.detail, /no repository object/);
+    assert.match(result.detail, /without a repository object/);
   }
 
   global.fetch = async () => ({
@@ -1254,7 +1295,7 @@ test('a rate-limit preflight answered with a non-object refuses the run', async 
   global.fetch = async () => ({ status: 200, ok: true, json: async () => null });
   const nonObject = await preflight(150);
   assert.strictEqual(nonObject.ok, false);
-  assert.match(nonObject.reason, /not an object/);
+  assert.match(nonObject.reason, /carried no quota/);
 
   global.fetch = async () => ({
     status: 200,
@@ -1482,4 +1523,300 @@ test('an issue without the marker is not mistaken for the report', async (t) => 
     calls.find((c) => c.method === 'POST'),
     'neither an unmarked issue nor a marked pull request is the report thread'
   );
+});
+
+// --- The body the guard was written for --------------------------------
+// GitHub answers some secondary rate limits with HTTP 200 and a JSON
+// *object*: {"message": "You have exceeded a secondary rate limit"}. The
+// first version of this guard asked "is the body an object?" — which that
+// body is. It sailed through, `archived` came out false for every entry in
+// the list, every 🗄️-marked entry read as unarchived, and the fix mode
+// stripped the markers and committed them.
+//
+// So the assertion here is not that the body classifies as an error. It is
+// that it produces no edit, end to end, because that is the damage: an API
+// error editing the list is the one thing this script must never do.
+
+const SECONDARY_RATE_LIMIT = {
+  message: 'You have exceeded a secondary rate limit',
+  documentation_url: 'https://docs.github.com/rest/overview/rate-limits',
+};
+
+function respondWith(t, body) {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    headers: { get: () => null },
+    json: async () => body,
+  });
+}
+
+test('a secondary rate limit answered with HTTP 200 produces no edit at all', async (t) => {
+  respondWith(t, SECONDARY_RATE_LIMIT);
+
+  // Every entry in the fixture, asked about and answered with that body.
+  const results = await Promise.all(
+    parseEntries(FIXTURE).map((e) => lookup(e))
+  );
+  const findings = classify(results);
+
+  assert.strictEqual(findings.errors.length, results.length, 'all unchecked');
+  assert.strictEqual(findings.staleMarker.length, 0, 'a 🗄️ entry must not read as unarchived');
+  assert.strictEqual(findings.needsMarker.length, 0);
+  assert.strictEqual(findings.renamed.length, 0);
+  assert.strictEqual(findings.missing.length, 0);
+
+  const { content, edits, skipped } = applyFixes(FIXTURE, findings);
+  assert.strictEqual(edits.length, 0, 'a rate-limited month must not edit the list');
+  assert.strictEqual(skipped.length, 0);
+  assert.strictEqual(content, FIXTURE, 'byte-identical, including every marker');
+
+  // And the report says so, rather than claiming the list is clean.
+  const { body } = render(findings, results.length);
+  assert.ok(body.includes('## Could not be checked'));
+  assert.ok(body.includes('secondary rate limit'), 'the reason should reach the reader');
+});
+
+test('a 200 missing the fields the decision rests on is unchecked', async (t) => {
+  // archived drives the marker edits and full_name drives the rename, so
+  // both have to be present and of the right type before anything is acted
+  // on. A partial object is as unusable as a wrong one.
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  const answer = (body) => {
+    global.fetch = async () => ({
+      status: 200,
+      ok: true,
+      headers: { get: () => null },
+      json: async () => body,
+    });
+  };
+
+  for (const body of [
+    { full_name: 'acme/example' },
+    { archived: true },
+    { full_name: 42, archived: true },
+    { full_name: 'acme/example', archived: 'yes' },
+  ]) {
+    answer(body);
+    const result = await lookup(entry());
+    assert.strictEqual(result.status, 'error', `${JSON.stringify(body)} must not be trusted`);
+  }
+
+  answer({ full_name: 'acme/example', archived: false, pushed_at: recent });
+  assert.strictEqual((await lookup(entry())).status, 'ok', 'a real repository still works');
+});
+
+test('the preflight refuses the rate-limit body instead of waving the run through', async (t) => {
+  respondWith(t, SECONDARY_RATE_LIMIT);
+
+  const result = await preflight(150);
+
+  assert.strictEqual(result.ok, false, 'no quota in the body means no preflight');
+  assert.match(result.reason, /carried no quota/);
+  assert.match(result.reason, /secondary rate limit/);
+});
+
+// --- A failed sweep is not "nothing left to fix" -----------------------
+
+test('a sweep that could not check anything leaves the open pull request alone', async (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: JSON.stringify([OUR_PR]), stderr: '' } },
+  });
+  const findings = classify([
+    entry({ name: 'Broken', status: 'error', detail: 'GitHub API rate limit exhausted' }),
+    entry({ name: 'AlsoBroken', status: 'error', detail: 'HTTP 502' }),
+  ]);
+
+  await runFixMode(findings, true, h.deps);
+
+  assert.strictEqual(
+    h.called('gh pr close').length,
+    0,
+    'closing it would discard last month\'s pending edits over a rate limit'
+  );
+});
+
+test('a single unchecked entry is enough to defer retirement', async (t) => {
+  // The entries that failed may be exactly the ones the open pull request
+  // is fixing, and nothing here can tell which.
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: JSON.stringify([OUR_PR]), stderr: '' } },
+  });
+  const findings = classify([
+    entry({ name: 'Fine' }),
+    entry({ name: 'Broken', status: 'error', detail: 'HTTP 502' }),
+  ]);
+
+  await runFixMode(findings, true, h.deps);
+
+  assert.strictEqual(h.called('gh pr close').length, 0);
+});
+
+test('a sweep that answered for everything still retires it', async (t) => {
+  const h = prHarness(t, {
+    overrides: { 'gh pr list': { ok: true, stdout: JSON.stringify([OUR_PR]), stderr: '' } },
+  });
+
+  await runFixMode(classify([entry({ name: 'Fine' })]), true, h.deps);
+
+  assert.strictEqual(h.called('gh pr close').length, 1, 'a clean, complete sweep still cleans up');
+});
+
+// --- Paging the issue listing -----------------------------------------
+// This endpoint returns pull requests as well as issues, so a single page of
+// 100 covers far less of a repository's history than it looks like, and the
+// report drifts down it monotonically. Falling off the end reads as "no
+// report issue exists", which opens the duplicate the marker exists to
+// prevent.
+
+function pagedIssueHarness(t, pages) {
+  const realFetch = global.fetch;
+  const realEnv = { ...process.env };
+  const realExitCode = process.exitCode;
+  const calls = [];
+
+  global.fetch = async (url, opts = {}) => {
+    const method = opts.method || 'GET';
+    calls.push({ method, url, body: opts.body ? JSON.parse(opts.body) : null });
+    if (method !== 'GET') return { status: 200, ok: true, json: async () => ({ number: 123 }) };
+
+    const page = Number(new URL(url).searchParams.get('page')) || 1;
+    return { status: 200, ok: true, json: async () => pages[page - 1] || [] };
+  };
+
+  process.env.GITHUB_TOKEN = 'test-token';
+  process.env.GITHUB_REPOSITORY = 'owner/repo';
+  t.after(() => {
+    global.fetch = realFetch;
+    process.env = realEnv;
+    process.exitCode = realExitCode;
+  });
+
+  return calls;
+}
+
+function filler(count, from) {
+  return Array.from({ length: count }, (_, i) => ({
+    number: from + i,
+    state: 'closed',
+    body: 'an unrelated issue',
+    updated_at: '2026-09-01T00:00:00Z',
+  }));
+}
+
+test('a report issue that has drifted onto a later page is still found', async (t) => {
+  const calls = pagedIssueHarness(t, [
+    filler(100, 200),
+    [...filler(20, 300), marked({ number: 12, state: 'closed' })],
+  ]);
+
+  await reportIssue('## Gone (404)\n\n- **Dead**', 1);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method === 'POST').length,
+    0,
+    'a second report issue is exactly what the marker exists to prevent'
+  );
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.ok(write.url.endsWith('/issues/12'));
+  assert.strictEqual(write.body.state, 'open');
+});
+
+test('a short first page is the last page, so the small case costs one request', async (t) => {
+  const calls = pagedIssueHarness(t, [[marked()]]);
+
+  await reportIssue('## Gone (404)', 1);
+
+  assert.strictEqual(
+    calls.filter((c) => c.method === 'GET').length,
+    1,
+    'paging must not cost a request per month while the repository is small'
+  );
+});
+
+test('the listing is asked for in the order that keeps the report near the front', async (t) => {
+  const calls = pagedIssueHarness(t, [[marked()]]);
+
+  await reportIssue('## Gone (404)', 1);
+
+  const query = new URL(calls[0].url).searchParams;
+  assert.strictEqual(query.get('state'), 'all', 'state=open orphans the thread once it is closed');
+  assert.strictEqual(query.get('sort'), 'updated');
+  assert.strictEqual(query.get('direction'), 'desc');
+});
+
+test('running out of pages is a failed lookup, not an empty one', async (t) => {
+  // Every page full to the limit means there may always be more. Deciding
+  // "there is no report issue" from that is how the duplicate gets opened.
+  const calls = pagedIssueHarness(t, Array.from({ length: 12 }, (_, p) => filler(100, p * 100)));
+  process.exitCode = 0;
+
+  await reportIssue('## Gone (404)', 1);
+
+  assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0, 'nothing filed');
+  assert.strictEqual(process.exitCode, 1, 'and the failure stays visible');
+});
+
+test('a failure on a later page is not read as the end of the listing', async (t) => {
+  const realFetch = global.fetch;
+  const realEnv = { ...process.env };
+  const realExitCode = process.exitCode;
+  const calls = [];
+  process.env.GITHUB_TOKEN = 'test-token';
+  process.env.GITHUB_REPOSITORY = 'owner/repo';
+  t.after(() => {
+    global.fetch = realFetch;
+    process.env = realEnv;
+    process.exitCode = realExitCode;
+  });
+  process.exitCode = 0;
+
+  global.fetch = async (url, opts = {}) => {
+    const method = opts.method || 'GET';
+    calls.push({ method, url });
+    if (method !== 'GET') return { status: 200, ok: true, json: async () => ({ number: 1 }) };
+    const page = Number(new URL(url).searchParams.get('page')) || 1;
+    if (page === 1) return { status: 200, ok: true, json: async () => filler(100, 0) };
+    return { status: 502, ok: false, json: async () => ({}) };
+  };
+
+  await reportIssue('## Gone (404)', 1);
+
+  assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0);
+  assert.strictEqual(process.exitCode, 1);
+});
+
+// --- The pull request body file ----------------------------------------
+
+test('the pull request body file does not outlive the run', (t) => {
+  const before = fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith('entry-health-pr-'));
+  const h = prHarness(t, {
+    overrides: { 'gh pr create': { ok: true, stdout: 'https://github.com/owner/repo/pull/1', stderr: '' } },
+  });
+
+  openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  const after = fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith('entry-health-pr-'));
+  assert.deepStrictEqual(after, before, 'the temp directory should be cleaned up like verifyReadme does');
+});
+
+test('the body file is cleaned up even when gh fails', (t) => {
+  const before = fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith('entry-health-pr-'));
+  const h = prHarness(t, {
+    overrides: { 'gh pr create': { ok: false, stdout: '', stderr: 'gh: not authenticated' } },
+  });
+
+  const result = openPullRequest('new content\n', [EDIT], [], null, h.deps);
+
+  assert.strictEqual(result.ok, false);
+  const after = fs.readdirSync(os.tmpdir()).filter((n) => n.startsWith('entry-health-pr-'));
+  assert.deepStrictEqual(after, before);
 });
