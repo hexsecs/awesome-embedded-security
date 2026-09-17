@@ -58,6 +58,20 @@ access and one API request per entry:
 GITHUB_TOKEN=... npm run check:staleness
 ```
 
+It reports four things that need a decision — a repository that has gone
+(404), one that has been renamed or transferred, one that is archived but
+missing its 🗄️ marker, and one still carrying 🗄️ after being unarchived —
+and one thing that does not. Repositories with no pushes for two years or
+more are listed separately, under a heading that says no action is implied.
+Quiet is not the same as unmaintained: paper artifacts and
+vulnerable-by-design teaching targets are expected to be frozen, and several
+entries here were added knowing they were dormant, because they remain the
+best option in their niche.
+
+An API error is never reported as a missing repository. A rate-limited or
+rejected request is listed as unchecked instead, because the cost of getting
+that wrong is someone deleting a live entry.
+
 ### Web entry health
 
 Entry Health only knows about the 152 entries hosted on GitHub. The other 93 —
@@ -81,6 +95,20 @@ npm run check:web-health          # add --no-write to leave the snapshot alone
 It reports two things that need a decision: an entry that now redirects to a
 *different* page, and a page whose content changed after holding still for a
 year or more, flagged as "recheck the description" rather than as an error.
+
+A difference has to show up on two consecutive runs before it counts. Vendor
+sites pick a locale or an A/B variant per request, and reporting the first
+sighting would file a fresh finding every month forever, so a new one is
+listed under "Seen once, watching" for a month first.
+
+Once reported, a finding stays reported. It does not clear itself next month:
+the snapshot holds what the repository has *accepted* separately from what the
+web currently looks like, so a retired product cannot be announced once and
+then quietly forgotten. A finding goes away when the entry is edited, when the
+page goes back to what it was, or when someone signs it off by adding it to
+`scripts/web-health-acknowledged.json` — a hand-maintained file the script
+reads and never writes, with the exact block to paste printed in the report.
+
 Pages unchanged for two years or more are listed separately under a heading
 that says no action is implied — a frozen specification or a finished paper
 artifact is supposed to sit still.
@@ -90,20 +118,6 @@ the link checker uses, and any non-2xx response, timeout, or bot wall is
 recorded as unchecked rather than as a finding. Whether a URL is actually dead
 is the link check's question, because the cost of getting that wrong is
 someone deleting a live entry.
-
-It reports four things that need a decision — a repository that has gone
-(404), one that has been renamed or transferred, one that is archived but
-missing its 🗄️ marker, and one still carrying 🗄️ after being unarchived —
-and one thing that does not. Repositories with no pushes for two years or
-more are listed separately, under a heading that says no action is implied.
-Quiet is not the same as unmaintained: paper artifacts and
-vulnerable-by-design teaching targets are expected to be frozen, and several
-entries here were added knowing they were dormant, because they remain the
-best option in their niche.
-
-An API error is never reported as a missing repository. A rate-limited or
-rejected request is listed as unchecked instead, because the cost of getting
-that wrong is someone deleting a live entry.
 
 ## Entry Guidelines
 

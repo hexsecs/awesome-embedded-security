@@ -61,6 +61,14 @@ jobs:
       # run starts from nothing and can never report a change. [skip ci] is
       # there because markdown-lint.yml watches scripts/**, and a snapshot
       # refresh is not a reason to re-lint the list.
+      #
+      # The retry loop is not belt and braces. `concurrency` serializes this
+      # workflow against itself but not against people, and this job spends
+      # minutes talking to ~90 hosts — a pull request merging in that window
+      # rejects a bare push as non-fast-forward, reddens the run, and throws
+      # away the advanced baseline, so the next run re-reports everything it
+      # had already recorded. Rebasing is safe here because the only file
+      # this commit touches is one nobody edits by hand.
       - name: Commit the refreshed snapshot
         run: |
           if git diff --quiet -- scripts/web-health-snapshot.json; then
@@ -71,4 +79,12 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add scripts/web-health-snapshot.json
           git commit -m 'Refresh the web health snapshot [skip ci]'
-          git push
+          for attempt in 1 2 3; do
+            if git push; then
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}); rebasing onto the new tip."
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          echo 'Could not push the refreshed snapshot after three attempts.'
+          exit 1

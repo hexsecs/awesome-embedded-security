@@ -1,0 +1,10 @@
+{
+  "note": "Hand-maintained. Each key is a README URL whose web health finding a maintainer has reviewed and accepted; \"reviewed\" is the date they looked. scripts/check-web-health.js reads this file and never writes it, and prints the exact block to paste when it reports a finding.",
+  "example": {
+    "https://vendor.example/products/widget": {
+      "reviewed": "2026-09-17",
+      "note": "Delete this example. Real entries go in \"acknowledged\" below."
+    }
+  },
+  "acknowledged": {}
+}
