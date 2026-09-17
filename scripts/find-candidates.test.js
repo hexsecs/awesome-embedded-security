@@ -538,7 +538,7 @@ test('a failed search is unchecked, never an all-clear', () => {
 
   assert.strictEqual(actionable, 0);
   assert.strictEqual(selection.unchecked.length, 1);
-  assert.ok(body.includes('Could not be searched'));
+  assert.ok(body.includes('Not fully searched'));
   assert.ok(body.includes('rate limit exhausted'));
   assert.ok(
     !body.includes('Nothing to propose'),
@@ -559,7 +559,7 @@ test('a total search failure produces a short report, not a wall of noise', () =
   assert.strictEqual(selection.candidates.length, 0);
   assert.ok(!body.includes('## Candidates'));
   assert.ok(!body.includes('Nothing to propose'));
-  assert.ok(body.includes(`Searched 0 of ${SEARCH_TERMS.length} queries`));
+  assert.ok(body.includes(`Fully searched 0 of ${SEARCH_TERMS.length} queries`));
 });
 
 test('one query failing does not discard the others', () => {
@@ -576,7 +576,7 @@ test('one query failing does not discard the others', () => {
 
   assert.strictEqual(selection.candidates.length, 1);
   assert.ok(body.includes('## Candidates'));
-  assert.ok(body.includes('Could not be searched'));
+  assert.ok(body.includes('Not fully searched'));
 });
 
 test('HTTP failures from the search API become errors, not empty results', async (t) => {
@@ -987,4 +987,402 @@ test('an issues listing that is not an array is a failure, not an empty list', a
   await reportIssue('## Candidates', 2);
 
   assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0);
+});
+
+// --- The description corpus -------------------------------------------
+// draftDescription's leading-name stripper is the one piece of this script
+// that rewrites text a human will paste into the list verbatim, so it gets a
+// table rather than a handful of examples. Every earlier bug here shared a
+// shape: the stripper matched something that was not actually the leading
+// name — an article's letter at the head of the *next* word, or the name as a
+// prefix of a longer word — and the corrupted remainder was then capitalized,
+// given a full stop, and emitted inside a ```md fence as paste-ready.
+//
+// That is worse than the blank this function is supposed to fall back to,
+// because it is confident. The fixtures below are chosen to pin the
+// boundaries specifically: a- and an-initial following words, a name that is
+// a strict prefix of the next word, a name repeated later in the sentence, a
+// name containing punctuation, and articles that are genuinely articles.
+//
+// Verified against awesome-lint: a strict-prefix name left unstripped
+// ("Flash" / "Flashing utility…") does NOT trip no-repeat-item-in-description,
+// so passing those through untouched is correct rather than merely safe.
+const DESCRIPTION_CORPUS = [
+  // --- the alternation must not eat the next word's first letter ---
+  ['GlitchKit', 'GlitchKit — Automated glitching framework for embedded targets',
+    'Automated glitching framework for embedded targets.'],
+  ['emba', 'emba - Analyzer for Linux-based firmware of embedded devices',
+    'Analyzer for Linux-based firmware of embedded devices.'],
+  ['Zap', 'Zap - Anvil-based test harness for secure boot verification',
+    'Anvil-based test harness for secure boot verification.'],
+  ['Zap', 'Zap: Applied power analysis toolkit for smartcard research',
+    'Applied power analysis toolkit for smartcard research.'],
+  ['Zap', 'Zap — Theoretical fault model explorer for secure elements',
+    'Theoretical fault model explorer for secure elements.'],
+
+  // --- but genuine copulas and articles must still go ---
+  ['Faultier', 'Faultier is an affordable fault injection tool for hardware hacking',
+    'Affordable fault injection tool for hardware hacking.'],
+  ['Faultier', 'Faultier is a portable voltage glitching platform for MCU research',
+    'Portable voltage glitching platform for MCU research.'],
+  ['Zap', 'Zap, the definitive JTAG scanner for embedded targets everywhere',
+    'Definitive JTAG scanner for embedded targets everywhere.'],
+
+  // --- a name that is a strict prefix of the next word is not the name ---
+  ['Flash', 'Flashing utility for embedded devices over SWD and JTAG',
+    'Flashing utility for embedded devices over SWD and JTAG.'],
+  ['Radio', 'Radioactive signal analysis toolkit for software defined radio',
+    'Radioactive signal analysis toolkit for software defined radio.'],
+
+  // --- names carrying punctuation ---
+  ['OP-TEE', 'OP TEE: open portable trusted execution environment for ARM TrustZone.',
+    'Open portable trusted execution environment for ARM TrustZone.'],
+  ['OP-TEE', 'OP-TEE — An open portable TEE implementation for ARM TrustZone',
+    'Open portable TEE implementation for ARM TrustZone.'],
+
+  // --- only the leading occurrence is stripped ---
+  ['GlitchKit', 'GlitchKit — Automated framework; GlitchKit targets STM32 and nRF parts',
+    'Automated framework; GlitchKit targets STM32 and nRF parts.'],
+
+  // --- matching the leading name is case-insensitive ---
+  ['GlitchKit', 'GLITCHKIT - Automated glitching framework for embedded targets',
+    'Automated glitching framework for embedded targets.'],
+
+  // --- no leading name: capital and full stop only ---
+  ['Some Tool', 'A library for parsing UEFI capsule updates and signatures',
+    'A library for parsing UEFI capsule updates and signatures.'],
+  ['Some Tool', 'An open source toolkit for analysing secure boot chains',
+    'An open source toolkit for analysing secure boot chains.'],
+];
+
+test('the description corpus drafts every fixture correctly', () => {
+  const wrong = [];
+
+  for (const [name, input, expected] of DESCRIPTION_CORPUS) {
+    const got = draftDescription(name, { description: input });
+    if (got.text !== expected) {
+      wrong.push(
+        `  [${name}] ${JSON.stringify(input)}\n` +
+          `     expected ${JSON.stringify(expected)}\n` +
+          `     got      ${JSON.stringify(got.text)}${got.text === null ? ' (' + got.problem + ')' : ''}`
+      );
+    }
+  }
+
+  assert.strictEqual(
+    wrong.length,
+    0,
+    `${wrong.length} of ${DESCRIPTION_CORPUS.length} fixtures drafted wrongly:\n${wrong.join('\n')}`
+  );
+});
+
+// The property that every fixture above is really pinning: the stripper may
+// only remove whole words. If the drafted text is a suffix of the input, the
+// character before the cut must be a boundary — never mid-word.
+test('stripping never cuts into the middle of a word', () => {
+  for (const [name, input] of DESCRIPTION_CORPUS) {
+    const got = draftDescription(name, { description: input });
+    if (!got.text) continue;
+
+    const tail = got.text.replace(/\.$/, '');
+    const idx = input.toLowerCase().lastIndexOf(tail.toLowerCase());
+    if (idx <= 0) continue; // nothing was stripped, or the text was recased
+
+    const preceding = input[idx - 1];
+    assert.ok(
+      /[^A-Za-z0-9]/.test(preceding),
+      `[${name}] cut mid-word: "${input}" -> "${got.text}" ` +
+        `(character before the cut was ${JSON.stringify(preceding)})`
+    );
+  }
+});
+
+// --- A timed-out search is HTTP 200 -----------------------------------
+// GitHub answers a query that blew its time budget with 200, a truncated or
+// empty `items`, and `incomplete_results: true`. Reading only `items` records
+// that as a fully-searched query, which walks around the completeness gate:
+// `unchecked` stays empty, main() passes `complete: true`, and an open report
+// is rewritten — or, with nothing left, closed. A search that never finished
+// would read as an all-clear.
+
+test('incomplete_results is not a clean result', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    headers: { get: () => '25' },
+    json: async () => ({ incomplete_results: true, items: [] }),
+  });
+
+  const result = await searchRepositories('topic:jtag');
+  assert.notStrictEqual(result.status, 'ok', 'a timed-out query is not "ok"');
+  assert.strictEqual(result.status, 'partial');
+  assert.match(result.detail, /partial result set|time budget/);
+});
+
+test('a partial result still contributes the repositories it did return', () => {
+  const selection = selectCandidates(
+    [{ query: 'topic:fault-injection', status: 'partial', detail: 'timed out', items: [repo()] }],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.candidates.length, 1, 'real results are not thrown away');
+  assert.strictEqual(selection.unchecked.length, 1, 'but the query is still not fully searched');
+});
+
+test('a partial result makes the run incomplete, so it cannot close a report', async (t) => {
+  const selection = selectCandidates(
+    [{ query: 'topic:fault-injection', status: 'partial', detail: 'timed out', items: [] }],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  // This is the exact shape that used to slip through: 200, no items, so
+  // actionable is 0 for a reason that is not true.
+  assert.strictEqual(selection.unchecked.length, 1);
+  const complete = selection.unchecked.length === 0;
+  assert.strictEqual(complete, false);
+
+  const calls = issueHarness(t, { existingIssue: true });
+  await reportIssue(render(selection).body, 0, { complete });
+
+  assert.strictEqual(
+    calls.filter((c) => c.method !== 'GET').length,
+    0,
+    'a timed-out search must not close the review queue'
+  );
+});
+
+test('incomplete_results:false is an ordinary clean result', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    headers: { get: () => '25' },
+    json: async () => ({ incomplete_results: false, items: [] }),
+  });
+
+  const result = await searchRepositories('topic:jtag');
+  assert.strictEqual(result.status, 'ok');
+});
+
+// --- Placement across several candidates ------------------------------
+// Placing each candidate against the pristine README is wrong as soon as two
+// land in the same section: both get the same line and the same neighbours,
+// so applying the first invalidates the second. An exact position is the main
+// thing this report offers, and with a twelve-candidate cap funnelling into a
+// handful of sections, two in one section is ordinary.
+
+function faultInjectionRepo(name) {
+  return repo({
+    full_name: `acme/${name.toLowerCase()}`,
+    name,
+    html_url: `https://github.com/acme/${name.toLowerCase()}`,
+    description: 'Voltage glitching harness for embedded targets.',
+    topics: ['fault-injection', 'glitching'],
+  });
+}
+
+function emulationRepo(name) {
+  return repo({
+    full_name: `acme/${name.toLowerCase()}`,
+    name,
+    html_url: `https://github.com/acme/${name.toLowerCase()}`,
+    description: 'QEMU-based firmware rehosting harness for embedded images.',
+    topics: [],
+  });
+}
+
+test('two candidates in one section do not both claim the same position', () => {
+  const selection = selectCandidates(
+    [ok('q', [faultInjectionRepo('Glitchy'), faultInjectionRepo('Warlock')])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  const [first, second] = selection.candidates;
+  assert.strictEqual(first.section, 'Fault Injection');
+  assert.strictEqual(second.section, 'Fault Injection');
+
+  // Glitchy sorts between Fault Tool and Zapper; Warlock after Glitchy. The
+  // second must see the first, not the pristine file.
+  assert.notStrictEqual(
+    `${first.placement.lineNo}/${first.placement.before && first.placement.before.label}`,
+    `${second.placement.lineNo}/${second.placement.before && second.placement.before.label}`,
+    'both candidates claimed an identical position'
+  );
+  assert.strictEqual(second.placement.after.label, 'Glitchy');
+});
+
+// The strongest available assertion: actually apply the insertions in report
+// order and re-run the alphabetical check over the result.
+test('applying every proposed position leaves the list sorted', () => {
+  const selection = selectCandidates(
+    [
+      ok('q', [
+        faultInjectionRepo('Glitchy'),
+        faultInjectionRepo('Warlock'),
+        faultInjectionRepo('Abacus'),
+        emulationRepo('Rehoster'),
+      ]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.candidates.length, 4);
+
+  // Positions describe the finished file, so they are applied in ascending
+  // line order — that reproduces exactly the state they were computed against.
+  const lines = FAKE_README.split('\n');
+  const inOrder = [...selection.candidates].sort(
+    (a, b) => a.placement.lineNo - b.placement.lineNo
+  );
+  for (const c of inOrder) {
+    assert.ok(c.placement, `${c.name} should have a position`);
+    lines.splice(c.placement.lineNo - 1, 0, entryLine(c));
+  }
+
+  const after = readList(lines);
+  for (const [name, section] of after.sections) {
+    const labels = section.entries.map((e) => e.label);
+    const sorted = [...labels].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+    assert.deepStrictEqual(
+      labels,
+      sorted,
+      `"${name}" is out of alphabetical order after applying the proposals`
+    );
+  }
+
+  // And every candidate really did land where the report said it would.
+  for (const c of selection.candidates) {
+    assert.match(
+      lines[c.placement.lineNo - 1],
+      new RegExp(`\\[${c.name}\\]`),
+      `${c.name} did not land on the line the report promised`
+    );
+  }
+});
+
+test('an insertion shifts the line numbers of sections below it', () => {
+  const selection = selectCandidates(
+    [ok('q', [faultInjectionRepo('Abacus'), emulationRepo('Rehoster')])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  const fault = selection.candidates.find((c) => c.section === 'Fault Injection');
+  const emul = selection.candidates.find((c) => c.section === 'Emulation Tools');
+  assert.ok(fault && emul);
+
+  // Qiling sits at line 17 in the pristine fixture. Abacus goes in above it
+  // (line 11, ahead of ChipSHOUTER), pushing Qiling to 18; Rehoster sorts
+  // after Qiling, so it lands at 19. Without the cross-section shift this
+  // would read 18.
+  assert.strictEqual(fault.placement.lineNo, 11);
+  assert.strictEqual(emul.placement.lineNo, 19);
+});
+
+test('placement does not mutate the caller\'s section index', () => {
+  const before = list.sections.get('Fault Injection').entries.map((e) => `${e.label}:${e.lineNo}`);
+
+  selectCandidates(
+    [ok('q', [faultInjectionRepo('Glitchy'), faultInjectionRepo('Warlock')])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  const after = list.sections.get('Fault Injection').entries.map((e) => `${e.label}:${e.lineNo}`);
+  assert.deepStrictEqual(after, before, 'the shared README index must stay pristine');
+});
+
+// --- Metadata we cannot read is not metadata that passed ---------------
+
+test('an unparseable pushed_at is filtered out, not silently kept', () => {
+  for (const bad of ['not-a-date', '', null, undefined, 0]) {
+    const selection = selectCandidates(
+      [ok('q', [repo({ pushed_at: bad })])],
+      list,
+      noDeclines,
+      NOW
+    );
+    assert.strictEqual(
+      selection.candidates.length,
+      0,
+      `pushed_at ${JSON.stringify(bad)} must not reach the report`
+    );
+  }
+});
+
+test('an unreadable timestamp is reported apart from genuine dormancy', () => {
+  const selection = selectCandidates(
+    [ok('q', [repo({ pushed_at: 'not-a-date' })])],
+    list,
+    noDeclines,
+    NOW
+  );
+
+  assert.strictEqual(selection.rejected.unusable, 1);
+  assert.strictEqual(selection.rejected.dormant, 0, 'that is a different fact');
+});
+
+test('a valid timestamp still passes', () => {
+  const selection = selectCandidates([ok('q', [repo()])], list, noDeclines, NOW);
+  assert.strictEqual(selection.candidates.length, 1);
+  assert.strictEqual(selection.rejected.unusable, 0);
+});
+
+// --- preflight must fail closed ---------------------------------------
+
+test('unreadable JSON from /rate_limit is a refusal, not a stack trace', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  global.fetch = async () => ({
+    status: 200,
+    ok: true,
+    json: async () => {
+      throw new Error('Unexpected token < in JSON');
+    },
+  });
+
+  const result = await preflight(15);
+  assert.strictEqual(result.ok, false);
+  assert.match(result.reason, /unreadable JSON/);
+});
+
+test('a rate_limit body with no quota block refuses the run', async (t) => {
+  const realFetch = global.fetch;
+  t.after(() => {
+    global.fetch = realFetch;
+  });
+
+  for (const body of [{}, { resources: {} }, { resources: { core: { remaining: 5000, reset: 0 } } }]) {
+    global.fetch = async () => ({ status: 200, ok: true, json: async () => body });
+
+    const result = await preflight(15);
+    assert.strictEqual(
+      result.ok,
+      false,
+      `${JSON.stringify(body)} must not authorise 15 blind searches`
+    );
+    assert.match(result.reason, /quota|unknown/i);
+  }
 });

@@ -416,11 +416,26 @@ function escapeRegExp(s) {
 // Builds a pattern that matches the project name however it is punctuated,
 // so "OP-TEE" in the name also matches "OP TEE" or "OPTEE" at the head of
 // the description.
+// The trailing lookahead is load-bearing: without it the pattern matches the
+// name's characters as a *prefix of a longer word*, so "Flash" matches inside
+// "Flashing utility for…" and the stripper removes five characters from the
+// middle of a word, leaving "Ing utility for…". The name only counts as the
+// leading name when what follows it is not more of the same word.
 function namePattern(name) {
   const runs = name.split(/[^A-Za-z0-9]+/).filter(Boolean).map(escapeRegExp);
   if (runs.length === 0) return null;
-  return runs.join('[^A-Za-z0-9]*');
+  return `${runs.join('[^A-Za-z0-9]*')}(?![A-Za-z0-9])`;
 }
+
+// A copula or article is only one if it stands as a whole word. Written as
+// bare alternations — `(?:a|an|the)?` — each branch happily matches the first
+// letters of whatever follows, so "GlitchKit — Automated…" lost its "A" to
+// the `a` branch, "…— An open…" lost "An", and "…— Theoretical…" lost "The".
+// Each was then recapitalized and given a full stop, producing a confident,
+// paste-ready, wrong entry line — the precise outcome draftDescription exists
+// to avoid. Both the leading whitespace and the trailing lookahead are
+// required to hold the word boundary on each side.
+const WORD_BOUNDARY = '(?![A-Za-z0-9])';
 
 function draftDescription(name, repo) {
   const raw = (repo.description || '').replace(/\s+/g, ' ').trim();
@@ -441,7 +456,10 @@ function draftDescription(name, repo) {
   const pattern = namePattern(name);
   if (pattern) {
     const lead = new RegExp(
-      `^(?:the\\s+)?${pattern}\\s*(?:[-–—:,|]+\\s*)?(?:is|are)?\\s*(?:a|an|the)?\\s*`,
+      `^(?:the\\s+)?${pattern}` +
+        `\\s*(?:[-–—:,|]+\\s*)?` +
+        `(?:(?:is|are)${WORD_BOUNDARY}\\s*)?` +
+        `(?:(?:an|a|the)${WORD_BOUNDARY}\\s*)?`,
       'i'
     );
     const stripped = text.replace(lead, '').trim();
@@ -523,10 +541,14 @@ function selectCandidates(results, list, declined, now = new Date()) {
   const byFullName = new Map();
 
   for (const result of results) {
-    if (result.status !== 'ok') {
+    // 'partial' counts as not fully searched *and* contributes its items: the
+    // results that did come back are real, and the ones that did not are the
+    // reason the run may not overwrite an open report.
+    if (result.status === 'error' || result.status === 'partial') {
       unchecked.push(result);
-      continue;
     }
+    if (result.status === 'error') continue;
+
     for (const repo of result.items || []) {
       if (!repo || !repo.full_name) continue;
       const key = repo.full_name.toLowerCase();
@@ -545,6 +567,8 @@ function selectCandidates(results, list, declined, now = new Date()) {
     fork: 0,
     lowStars: 0,
     dormant: 0,
+    // Metadata we cannot read, rather than metadata that failed a threshold.
+    unusable: 0,
     listed: 0,
     declined: 0,
   };
@@ -575,7 +599,16 @@ function selectCandidates(results, list, declined, now = new Date()) {
       rejected.lowStars++;
       continue;
     }
-    if (!repo.pushed_at || new Date(repo.pushed_at) < cutoff) {
+    // `new Date('not-a-date') < cutoff` is false, so without the NaN guard an
+    // unparseable timestamp *passes* the dormancy filter and is then rendered
+    // as "last push not-a-date" in the Signal line. These re-checks exist so
+    // that a threshold cannot be silently disabled; this one had a hole in it.
+    const pushed = repo.pushed_at ? new Date(repo.pushed_at) : null;
+    if (!pushed || Number.isNaN(pushed.getTime())) {
+      rejected.unusable++;
+      continue;
+    }
+    if (pushed < cutoff) {
       rejected.dormant++;
       continue;
     }
@@ -602,7 +635,7 @@ function selectCandidates(results, list, declined, now = new Date()) {
       continue;
     }
 
-    kept.push(buildCandidate(repo, queries, list));
+    kept.push(buildCandidate(repo, queries));
   }
 
   // Ranking, kept deliberately simple so a maintainer can read a score off
@@ -615,7 +648,7 @@ function selectCandidates(results, list, declined, now = new Date()) {
   kept.sort((a, b) => b.score - a.score || b.stars - a.stars);
 
   return {
-    candidates: kept.slice(0, MAX_CANDIDATES),
+    candidates: placeAll(kept.slice(0, MAX_CANDIDATES), list),
     considered: byFullName.size,
     keptCount: kept.length,
     rejected,
@@ -624,7 +657,93 @@ function selectCandidates(results, list, declined, now = new Date()) {
   };
 }
 
-function buildCandidate(repo, queries, list) {
+// Places every candidate in the order the report lists them, against a
+// README that accumulates the ones above it.
+//
+// Placing each candidate independently against the pristine file is wrong the
+// moment two land in the same section: both compute the same line number and
+// the same pair of neighbours, so applying the first invalidates the second.
+// With a twelve-candidate cap and a keyword table that funnels into a handful
+// of sections, two in one section is the ordinary case, not the edge case —
+// and an exact position is the main thing this report offers over "here is a
+// repository, go find somewhere for it".
+//
+// Note an insertion shifts every line below it in the *whole* file, not just
+// within its own section, so the offsets are applied across all sections.
+function placeAll(candidates, list) {
+  // A deep-enough copy that the caller's section index is left pristine.
+  const working = new Map();
+  for (const [name, section] of list.sections) {
+    working.set(name, {
+      name: section.name,
+      headingLine: section.headingLine,
+      entries: section.entries.map((entry) => ({ ...entry })),
+    });
+  }
+
+  for (const candidate of candidates) {
+    const section = candidate.section ? working.get(candidate.section) : null;
+    if (!section) {
+      candidate.placement = null;
+      continue;
+    }
+
+    const placement = placeInSection(section, candidate.name);
+    candidate.placement = placement;
+
+    // Everything at or below the insertion point moves down one line...
+    const at = placement.lineNo;
+    for (const other of working.values()) {
+      if (other.headingLine >= at) other.headingLine++;
+      for (const entry of other.entries) {
+        if (entry.lineNo >= at) entry.lineNo++;
+      }
+    }
+
+    // ...and the new entry takes the line it was placed at, so a later
+    // candidate in the same section sorts against it by name too.
+    const idx = section.entries.findIndex((entry) => entry.lineNo > at);
+    section.entries.splice(idx === -1 ? section.entries.length : idx, 0, {
+      label: candidate.name,
+      lineNo: at,
+      ref: candidate,
+    });
+  }
+
+  // Second pass: restate every position against the *finished* file.
+  //
+  // The positions computed above are each correct at the moment that
+  // candidate is inserted, and stale immediately afterwards — a later
+  // candidate that sorts higher (Abacus, after Glitchy has been placed)
+  // shifts the earlier one down and can slot between it and the neighbour it
+  // was promised. Reporting those first-pass numbers would reintroduce the
+  // bug one layer down.
+  //
+  // So every candidate is restated against the state with all of them
+  // applied. That makes the whole report internally consistent: apply them
+  // all and every line number and neighbour pair is exactly right. A
+  // neighbour may itself be another candidate, which is worth seeing.
+  for (const candidate of candidates) {
+    if (!candidate.placement) continue;
+    const section = working.get(candidate.section);
+    const entries = section.entries;
+    const i = entries.findIndex((entry) => entry.ref === candidate);
+    if (i === -1) continue;
+
+    const plain = (entry) =>
+      entry ? { label: entry.label, lineNo: entry.lineNo } : null;
+
+    candidate.placement = {
+      lineNo: entries[i].lineNo,
+      after: i > 0 ? plain(entries[i - 1]) : null,
+      before: i < entries.length - 1 ? plain(entries[i + 1]) : null,
+    };
+  }
+
+  return candidates;
+}
+
+function buildCandidate(repo, queries) {
   const topics = repo.topics || [];
   const topicHits = topics.filter((t) => TOPIC_SIGNALS.has(t));
   const stars = repo.stargazers_count || 0;
@@ -634,7 +753,6 @@ function buildCandidate(repo, queries, list) {
   const name = repo.name;
   const description = draftDescription(name, repo);
   const section = proposeSection(repo);
-  const known = section ? list.sections.get(section.name) : null;
 
   return {
     name,
@@ -650,7 +768,7 @@ function buildCandidate(repo, queries, list) {
     description,
     section: section ? section.name : null,
     sectionMatches: section ? section.matched : [],
-    placement: known ? placeInSection(known, name) : null,
+    placement: null, // filled in by placeAll once the cap is known
     markerHint: markerHint(repo),
   };
 }
@@ -668,11 +786,20 @@ function render(selection) {
   const searched = queriesRun - unchecked.length;
 
   out.push(
-    `Searched ${searched} of ${queriesRun} queries and found ${considered} ` +
-      `distinct repositories; ${keptCount} survived the filters and the ` +
-      `top ${candidates.length} are below.`
+    `Fully searched ${searched} of ${queriesRun} queries and found ` +
+      `${considered} distinct repositories; ${keptCount} survived the ` +
+      `filters and the top ${candidates.length} are below.`
   );
   out.push('');
+  if (candidates.length > 1) {
+    out.push(
+      '_Positions describe the list with every proposal below applied, so ' +
+        'a neighbour may itself be another candidate. Take them all and ' +
+        'each line number is exact; take only some and the neighbours still ' +
+        'hold while the line numbers shift by however many you skipped._'
+    );
+    out.push('');
+  }
   out.push(
     '**Nothing here has been added to the list.** These are proposals. ' +
       'Whether a project belongs on this list is a judgement about topical ' +
@@ -763,7 +890,8 @@ function render(selection) {
         `${rejected.listed} already listed, ${rejected.declined} declined, ` +
         `${rejected.lowStars} under ${MIN_STARS} stars, ${rejected.dormant} ` +
         `with no push in ${PUSHED_WITHIN_MONTHS} months, ${rejected.archived} ` +
-        `archived, ${rejected.fork} forks.`
+        `archived, ${rejected.fork} forks, ${rejected.unusable} with ` +
+        'unreadable metadata.'
     );
     out.push('');
   } else if (candidates.length > 0) {
@@ -773,7 +901,8 @@ function render(selection) {
       `${rejected.listed} already listed, ${rejected.declined} previously ` +
         `declined, ${rejected.lowStars} under ${MIN_STARS} stars, ` +
         `${rejected.dormant} with no push in ${PUSHED_WITHIN_MONTHS} months, ` +
-        `${rejected.archived} archived, ${rejected.fork} forks.` +
+        `${rejected.archived} archived, ${rejected.fork} forks, ` +
+        `${rejected.unusable} with unreadable metadata.` +
         (keptCount > candidates.length
           ? ` ${keptCount - candidates.length} more passed the filters but ` +
             `fell outside the top ${MAX_CANDIDATES}.`
@@ -787,12 +916,14 @@ function render(selection) {
   // rendered as a finding, and the inverse matters just as much: an error
   // must not be rendered as an all-clear either.
   if (unchecked.length > 0) {
-    out.push('## Could not be searched');
+    out.push('## Not fully searched');
     out.push('');
     out.push(
-      'Rate limiting or a network failure, not evidence that these queries ' +
-        'return nothing. Anything they would have found is missing from the ' +
-        'report above.'
+      'Rate limiting, a network failure, or a query that exceeded its time ' +
+        'budget on GitHub\'s side — not evidence that these queries return ' +
+        'nothing. Anything they would have found is missing from the report ' +
+        'above, so this run is treated as incomplete and will not overwrite ' +
+        'or close an existing report.'
     );
     out.push('');
     for (const u of unchecked) {
@@ -856,7 +987,33 @@ async function searchRepositories(term, now = new Date()) {
     return { query: term, status: 'error', detail: `unreadable response: ${err.message}` };
   }
 
-  return { query: term, status: 'ok', items: Array.isArray(data.items) ? data.items : [] };
+  const items = Array.isArray(data.items) ? data.items : [];
+
+  // GitHub answers a query that exceeded its time budget with HTTP 200, a
+  // truncated (often empty) `items`, and `incomplete_results: true`. Reading
+  // only `items` records that as a clean, fully-searched query — which walks
+  // straight around the completeness gate in reportIssue: `unchecked` stays
+  // empty, main() passes `complete: true`, and an open report is rewritten
+  // or, if nothing survived, closed. A timed-out search would then read as an
+  // all-clear, which is the one conclusion this script must never reach by
+  // accident.
+  //
+  // 'partial' rather than 'error' because the items that did come back are
+  // real candidates worth showing. They are ingested; the query still counts
+  // as not fully searched.
+  if (data.incomplete_results === true) {
+    return {
+      query: term,
+      status: 'partial',
+      items,
+      detail:
+        'GitHub returned a partial result set (the query exceeded its time ' +
+        `budget); ${items.length} result(s) came back and an unknown number ` +
+        'did not',
+    };
+  }
+
+  return { query: term, status: 'ok', items };
 }
 
 async function searchAll(terms, now = new Date()) {
@@ -904,12 +1061,33 @@ async function preflight(searches, now = new Date()) {
     return { ok: false, reason: `the GitHub API returned HTTP ${response.status}.` };
   }
 
-  const data = await response.json();
-  const resources = data.resources || {};
+  // Every other parse in this file is guarded; this one threw to the
+  // catch-all in main() and printed a raw stack instead of the considered
+  // "Cannot run the search: ..." message.
+  let data;
+  try {
+    data = await response.json();
+  } catch (err) {
+    return { ok: false, reason: `the GitHub API returned unreadable JSON: ${err.message}` };
+  }
+
+  const resources = (data && data.resources) || {};
   const search = resources.search;
   const core = resources.core;
 
-  if (search && search.remaining < searches) {
+  // A /rate_limit body with no quota block at all is not permission to fire
+  // fifteen searches blind — that is the exact opposite of what a preflight is
+  // for. Refuse, rather than discovering the budget by exhausting it.
+  if (!search || !core) {
+    return {
+      ok: false,
+      reason:
+        'the GitHub API did not report the search and core quotas, so the ' +
+        'budget for this run is unknown. Refusing rather than guessing.',
+    };
+  }
+
+  if (search.remaining < searches) {
     const resetAt = new Date(search.reset * 1000).toISOString();
     return {
       ok: false,
@@ -921,7 +1099,7 @@ async function preflight(searches, now = new Date()) {
     };
   }
 
-  if (core && core.remaining < CORE_REQUESTS) {
+  if (core.remaining < CORE_REQUESTS) {
     const resetAt = new Date(core.reset * 1000).toISOString();
     return {
       ok: false,
