@@ -726,7 +726,9 @@ test('preflight passes when both quotas cover the run', async (t) => {
 // marker must differ from check-staleness.js's so the two never fight over
 // the same issue.
 
-function issueHarness(t, { existingIssue }) {
+// `lookupStatus` fails the GET that looks for an already-open report, so the
+// tests can tell "there is no open report" apart from "I could not find out".
+function issueHarness(t, { existingIssue, lookupStatus = 200, lookupThrows = false }) {
   const realFetch = global.fetch;
   const realEnv = { ...process.env };
   const calls = [];
@@ -736,9 +738,19 @@ function issueHarness(t, { existingIssue }) {
     calls.push({ method, url, body: opts.body ? JSON.parse(opts.body) : null });
 
     if (method === 'GET') {
+      if (lookupThrows) throw new Error('ECONNRESET');
+      if (lookupStatus !== 200) {
+        return {
+          status: lookupStatus,
+          ok: false,
+          headers: { get: () => '0' },
+          json: async () => ({ message: 'nope' }),
+        };
+      }
       return {
         status: 200,
         ok: true,
+        headers: { get: () => '4999' },
         json: async () =>
           existingIssue
             ? [{ number: 77, body: '<!-- candidate-discovery-report -->\nprevious' }]
@@ -751,9 +763,13 @@ function issueHarness(t, { existingIssue }) {
   process.env.GITHUB_TOKEN = 'test-token';
   process.env.GITHUB_REPOSITORY = 'owner/repo';
 
+  // reportIssue signals a refusal to post by setting process.exitCode, which
+  // would otherwise leak out and fail the whole test run.
+  const realExitCode = process.exitCode;
   t.after(() => {
     global.fetch = realFetch;
     process.env = realEnv;
+    process.exitCode = realExitCode;
   });
 
   return calls;
@@ -826,4 +842,149 @@ test('the report tells a reviewer how to decline a candidate', () => {
 
   assert.ok(body.includes('scripts/declined-candidates.json'));
   assert.ok(body.includes('Nothing here has been added to the list.'));
+});
+
+// --- Incomplete results must not destroy pending review work ----------
+// The candidate list from a run where a query failed is a floor, not a set.
+// Overwriting an open report with one drops candidates that only the failed
+// query would have surfaced, and a maintainer may be part way through
+// reviewing them; closing one because the partial list came back empty
+// discards the whole queue on the strength of a search that never ran. One
+// query out of fifteen timing out is the common case, not the exotic one.
+
+test('a partial search failure leaves an open report untouched', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Candidates', 3, { complete: false });
+
+  assert.strictEqual(
+    calls.filter((c) => c.method !== 'GET').length,
+    0,
+    'an incomplete run must not rewrite a report it cannot reproduce'
+  );
+  assert.strictEqual(process.exitCode, 1, 'and the run should flag itself');
+});
+
+test('a partial search failure does not close an open report', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  // The dangerous shape: one query fails, the rest legitimately find
+  // nothing, and `actionable` is 0 for a reason that is not true.
+  await reportIssue('## Could not be searched', 0, { complete: false });
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.strictEqual(
+    write,
+    undefined,
+    'closing on an incomplete search discards the review queue'
+  );
+});
+
+test('an incomplete run may still open a report where none exists', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Candidates', 12, { complete: false });
+
+  const write = calls.find((c) => c.method === 'POST');
+  assert.ok(
+    write,
+    'there is no pending work to lose, and 12 candidates should not be ' +
+      'thrown away because a 13th query timed out'
+  );
+});
+
+test('an incomplete run with nothing found and no open report stays quiet', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Could not be searched', 0, { complete: false });
+
+  assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0);
+});
+
+test('a complete run still rewrites and closes as before', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true });
+
+  await reportIssue('## Nothing to propose', 0, { complete: true });
+
+  const write = calls.find((c) => c.method === 'PATCH');
+  assert.ok(write, 'completeness is the only thing that gates this');
+  assert.strictEqual(write.body.state, 'closed');
+});
+
+// --- A failed lookup is not proof that no report exists ---------------
+// Treating a 5xx, a permission error or a rate-limited response as "no issue
+// found" sends reportIssue down the creation path and opens a second report
+// beside the one already open. From then on the single-issue design is
+// broken and the two reports diverge silently.
+
+test('a failed existing-issue lookup never creates a second report', async (t) => {
+  for (const status of [403, 429, 500, 502, 503]) {
+    const calls = issueHarness(t, { existingIssue: true, lookupStatus: status });
+
+    await reportIssue('## Candidates', 5);
+
+    assert.strictEqual(
+      calls.filter((c) => c.method === 'POST').length,
+      0,
+      `HTTP ${status} on the lookup must not be read as "no issue exists"`
+    );
+    assert.strictEqual(calls.filter((c) => c.method === 'PATCH').length, 0);
+    assert.strictEqual(process.exitCode, 1, `HTTP ${status} should flag the run`);
+    process.exitCode = 0;
+  }
+});
+
+test('a network exception during the lookup does not create a report', async (t) => {
+  const calls = issueHarness(t, { existingIssue: true, lookupThrows: true });
+
+  await reportIssue('## Candidates', 5);
+
+  assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0);
+  assert.strictEqual(process.exitCode, 1);
+});
+
+test('a 200 with no matching issue really does mean no report is open', async (t) => {
+  const calls = issueHarness(t, { existingIssue: false });
+
+  await reportIssue('## Candidates', 5);
+
+  assert.ok(
+    calls.find((c) => c.method === 'POST'),
+    'the only response that authorises creating a report is a successful ' +
+      'listing that contains none'
+  );
+});
+
+test('an issues listing that is not an array is a failure, not an empty list', async (t) => {
+  const realFetch = global.fetch;
+  const realEnv = { ...process.env };
+  const realExitCode = process.exitCode;
+  const calls = [];
+
+  global.fetch = async (url, opts = {}) => {
+    const method = opts.method || 'GET';
+    calls.push({ method });
+    if (method === 'GET') {
+      return {
+        status: 200,
+        ok: true,
+        headers: { get: () => '4999' },
+        // What the API returns when it declines with a 200, e.g. an
+        // abuse-detection body. `.find` would throw; `[]` would be a lie.
+        json: async () => ({ message: 'You have exceeded a secondary rate limit' }),
+      };
+    }
+    return { status: 201, ok: true, json: async () => ({ number: 1 }) };
+  };
+  process.env.GITHUB_TOKEN = 'test-token';
+  process.env.GITHUB_REPOSITORY = 'owner/repo';
+  t.after(() => {
+    global.fetch = realFetch;
+    process.env = realEnv;
+    process.exitCode = realExitCode;
+  });
+
+  await reportIssue('## Candidates', 2);
+
+  assert.strictEqual(calls.filter((c) => c.method !== 'GET').length, 0);
 });

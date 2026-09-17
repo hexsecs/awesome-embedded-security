@@ -943,22 +943,78 @@ async function preflight(searches, now = new Date()) {
 const ISSUE_MARKER = '<!-- candidate-discovery-report -->';
 const ISSUE_TITLE = 'Candidate entries for review';
 
+// Returns {ok: true, issue} — where `issue` is null when the lookup
+// definitely found no open report — or {ok: false, detail} when the lookup
+// could not answer the question at all.
+//
+// The distinction is the whole point. Collapsing a 5xx, a permission error
+// or a rate-limited response into "no issue exists" sends the caller down
+// the creation path and opens a *second* report beside the one already open,
+// which is precisely what rewriting a single issue in place exists to avoid.
+// Once there are two, every later run picks whichever the listing returns
+// first and the reports diverge silently.
+//
+// This assumes the open report is on the first page of 100 open issues. On a
+// list repository that holds; if this ever ran somewhere busier it would need
+// to page, for the same reason.
 async function findExistingIssue(owner, repo) {
-  const response = await fetch(
-    `${API_ROOT}/repos/${owner}/${repo}/issues?state=open&per_page=100`,
-    { headers: apiHeaders() }
-  );
-  if (!response.ok) return null;
+  let response;
+  try {
+    response = await fetch(
+      `${API_ROOT}/repos/${owner}/${repo}/issues?state=open&per_page=100`,
+      { headers: apiHeaders() }
+    );
+  } catch (err) {
+    return { ok: false, detail: `cannot reach the GitHub API: ${err.message}` };
+  }
 
-  const issues = await response.json();
-  return (
-    issues.find(
-      (issue) => !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
-    ) || null
-  );
+  if (!response.ok) {
+    const remaining = response.headers && response.headers.get('x-ratelimit-remaining');
+    return {
+      ok: false,
+      detail:
+        response.status === 401 || response.status === 404
+          ? `HTTP ${response.status} — the token cannot read this repository's issues`
+          : (response.status === 403 || response.status === 429) && remaining === '0'
+            ? 'GitHub API rate limit exhausted'
+            : `HTTP ${response.status} from the GitHub API`,
+    };
+  }
+
+  let issues;
+  try {
+    issues = await response.json();
+  } catch (err) {
+    return { ok: false, detail: `unreadable response: ${err.message}` };
+  }
+  if (!Array.isArray(issues)) {
+    return { ok: false, detail: 'the issues listing was not an array' };
+  }
+
+  return {
+    ok: true,
+    issue:
+      issues.find(
+        (issue) => !issue.pull_request && (issue.body || '').includes(ISSUE_MARKER)
+      ) || null,
+  };
 }
 
-async function reportIssue(body, actionable) {
+// `complete` says whether every search query actually ran. When it is false
+// the candidate list is a floor, not a set: anything reachable only through
+// the query that failed is missing from `body`, and the report says so.
+//
+// That makes an incomplete run safe to *add* with and unsafe to *overwrite*
+// with. Rewriting an open report from an incomplete run drops candidates a
+// previous, complete run found and a maintainer has not finished reviewing;
+// closing one because `actionable` is 0 discards the whole queue on the
+// strength of a search that never happened. Opening a report where none
+// exists destroys nothing, so that stays allowed — fifteen queries finding
+// twelve candidates should not be thrown away because a sixteenth timed out.
+//
+// One query failing is far more likely than all fifteen failing, so this is
+// the common path, not the exotic one.
+async function reportIssue(body, actionable, { complete = true } = {}) {
   const slug = process.env.GITHUB_REPOSITORY || '';
   const [owner, repo] = slug.split('/');
   if (!owner || !repo) {
@@ -983,12 +1039,34 @@ async function reportIssue(body, actionable) {
     body,
   ].join('\n');
 
-  const existing = await findExistingIssue(owner, repo);
+  const lookup = await findExistingIssue(owner, repo);
+  if (!lookup.ok) {
+    console.error(
+      `Cannot tell whether a report issue is already open (${lookup.detail}); ` +
+        'not posting. Opening one blind risks a duplicate report beside the ' +
+        'one already being rewritten.'
+    );
+    process.exitCode = 1;
+    return;
+  }
+  const existing = lookup.issue;
 
   // Nothing to propose and no open report: stay quiet rather than opening an
   // issue that says there is nothing to add.
   if (!existing && actionable === 0) {
     console.log('No candidates and no open report issue; nothing filed.');
+    return;
+  }
+
+  // An incomplete run may neither rewrite nor close an open report. See the
+  // note on `complete` above.
+  if (existing && !complete) {
+    console.error(
+      `Search results were incomplete; leaving issue #${existing.number} ` +
+        'untouched rather than overwriting it with a partial report' +
+        (actionable === 0 ? ' or closing it on a search that never ran.' : '.')
+    );
+    process.exitCode = 1;
     return;
   }
 
@@ -1075,18 +1153,13 @@ async function main() {
 
   if (process.argv.includes('--report-issue')) {
     console.log('');
-    // If every query failed there is no information in this run at all.
-    // Rewriting the report with an empty candidate list would close an issue
-    // full of real candidates because the search API had a bad morning.
-    if (selection.unchecked.length === selection.queriesRun) {
-      console.error(
-        'Every search query failed; leaving the existing report untouched ' +
-          'rather than overwriting it with an empty one.'
-      );
-      process.exitCode = 1;
-      return;
-    }
-    await reportIssue(body, actionable);
+    // The question that governs whether an open report may be touched is
+    // "were the results complete?", not "did everything fail?" — a single
+    // query timing out already means the candidate list is missing whatever
+    // only that query would have found. reportIssue decides what that allows.
+    await reportIssue(body, actionable, {
+      complete: selection.unchecked.length === 0,
+    });
   }
 }
 
