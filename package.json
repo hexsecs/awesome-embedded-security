@@ -9,7 +9,9 @@
     "lint:markdown": "markdownlint-cli2",
     "check:readme": "node scripts/check-readme.js",
     "check:staleness": "node scripts/check-staleness.js",
+    "check:web-health": "node scripts/check-web-health.js",
     "test:staleness": "node --test scripts/check-staleness.test.js",
+    "test:web-health": "node --test scripts/check-web-health.test.js",
     "validate": "npm run lint:markdown && npm run lint:awesome && npm run check:readme"
   },
   "devDependencies": {

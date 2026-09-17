@@ -58,6 +58,39 @@ access and one API request per entry:
 GITHUB_TOKEN=... npm run check:staleness
 ```
 
+### Web entry health
+
+Entry Health only knows about the 152 entries hosted on GitHub. The other 93 —
+vendor product pages, standards bodies, a GitLab project, documentation portals
+— had no health signal beyond "the URL returned 200". A retired product whose
+page collapses to the vendor homepage, or a "discontinued" notice, answers 200
+just as cheerfully as a live project.
+
+The Web Health workflow covers those. It runs on the 15th of each month, asks
+the GitLab API the same questions Entry Health asks GitHub, and for everything
+else records where the URL finally lands after redirects plus a hash of the
+page with the volatile parts — scripts, nonces, CSRF tokens, rendered
+timestamps, cache-busted asset URLs — normalized out. That snapshot lives in
+`scripts/web-health-snapshot.json` and the workflow commits it back, so each
+run can diff against the last.
+
+```bash
+npm run check:web-health          # add --no-write to leave the snapshot alone
+```
+
+It reports two things that need a decision: an entry that now redirects to a
+*different* page, and a page whose content changed after holding still for a
+year or more, flagged as "recheck the description" rather than as an error.
+Pages unchanged for two years or more are listed separately under a heading
+that says no action is implied — a frozen specification or a finished paper
+artifact is supposed to sit still.
+
+Hosts that block automated clients are skipped using the same `ignorePatterns`
+the link checker uses, and any non-2xx response, timeout, or bot wall is
+recorded as unchecked rather than as a finding. Whether a URL is actually dead
+is the link check's question, because the cost of getting that wrong is
+someone deleting a live entry.
+
 It reports four things that need a decision — a repository that has gone
 (404), one that has been renamed or transferred, one that is archived but
 missing its 🗄️ marker, and one still carrying 🗄️ after being unarchived —
