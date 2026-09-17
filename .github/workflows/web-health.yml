@@ -1,0 +1,90 @@
+name: Web Health
+
+# Covers the entries Entry Health cannot see. That workflow asks GitHub
+# about the entries hosted there; this one handles the rest of the list —
+# GitLab projects via the GitLab API, and every vendor page, standards body
+# and documentation portal via a content snapshot that successive runs diff
+# against. A discontinued product whose page now redirects to a generic
+# homepage still answers 200, so neither the link check nor Entry Health
+# can see it go.
+#
+# Deliberately separate from markdown-lint.yml. That workflow gates merges
+# and must stay fast and deterministic; this one talks to ~90 third-party
+# hosts, is advisory, and should never be able to turn a pull request red.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:00 UTC on the 15th of each month. The link check runs on the 1st
+    # and Entry Health on the 8th; a week further on keeps the third report
+    # off the same morning as either of them, so a maintainer reads one
+    # list at a time instead of three at once.
+    - cron: '0 6 15 * *'
+
+permissions:
+  # contents: write is for the snapshot only. The check never edits
+  # README.md — what to do about a page that has changed is a judgement
+  # call, not something a script should make.
+  contents: write
+  issues: write
+
+concurrency:
+  group: web-health
+  cancel-in-progress: false
+
+jobs:
+  web-health:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+
+      # Runs offline against synthetic responses. Cheap, and it is the only
+      # thing standing between a misread timeout and a report telling
+      # someone an entry has moved when the host was simply down.
+      - name: Test the checker
+        run: npm run test:web-health
+
+      - name: Check web entry health
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional. Public GitLab projects need no token; one only raises
+          # the shared per-IP quota on a busy runner.
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: npm run check:web-health -- --report-issue
+
+      # The snapshot is the whole signal: without a committed baseline every
+      # run starts from nothing and can never report a change. [skip ci] is
+      # there because markdown-lint.yml watches scripts/**, and a snapshot
+      # refresh is not a reason to re-lint the list.
+      #
+      # The retry loop is not belt and braces. `concurrency` serializes this
+      # workflow against itself but not against people, and this job spends
+      # minutes talking to ~90 hosts — a pull request merging in that window
+      # rejects a bare push as non-fast-forward, reddens the run, and throws
+      # away the advanced baseline, so the next run re-reports everything it
+      # had already recorded. Rebasing is safe here because the only file
+      # this commit touches is one nobody edits by hand.
+      - name: Commit the refreshed snapshot
+        run: |
+          if git diff --quiet -- scripts/web-health-snapshot.json; then
+            echo 'Snapshot unchanged.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/web-health-snapshot.json
+          git commit -m 'Refresh the web health snapshot [skip ci]'
+          for attempt in 1 2 3; do
+            if git push; then
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}); rebasing onto the new tip."
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || exit 1
+          done
+          echo 'Could not push the refreshed snapshot after three attempts.'
+          exit 1

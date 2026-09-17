@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "note": "Written by scripts/check-web-health.js. Hand edits are overwritten. To sign off an outstanding finding, add the entry to scripts/web-health-acknowledged.json instead — this file is not the place to do it.",
+  "entries": {}
+}
