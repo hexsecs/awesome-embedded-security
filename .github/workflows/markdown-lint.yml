@@ -49,10 +49,16 @@ jobs:
         run: |
           npm ci
       # The log is kept so pr-guidance.yml can translate the errors whose
-      # messages point at the wrong thing. tee does not change the result:
-      # the default shell already runs with `set -o pipefail`, so the
-      # pipeline reports npm's status and not tee's.
+      # messages point at the wrong thing.
+      #
+      # `shell: bash` is load-bearing, not decoration. A step with no shell
+      # specified runs under `bash -e {0}`, which does NOT set pipefail, so
+      # `npm run validate | tee` reports tee's exit status and the quality
+      # gate can never fail. Naming bash explicitly gets
+      # `bash --noprofile --norc -eo pipefail {0}`, which is what makes the
+      # pipeline report npm's status.
       - name: Run markdown quality checks
+        shell: bash
         run: |
           mkdir -p .pr-guidance
           npm run validate 2>&1 | tee .pr-guidance/validate.log
