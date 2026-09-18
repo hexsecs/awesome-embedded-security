@@ -59,6 +59,41 @@
       "url": "https://github.com/kakahuote1/TinyPKI",
       "reason": "IoT PKI library whose scope is hard to judge: the repository is recent and its description reads as a feature list rather than a statement of what it does. Worth reconsidering if it establishes a track record.",
       "date": "2026-09-17"
+    },
+    {
+      "url": "https://github.com/istio/istio",
+      "reason": "Service mesh for Kubernetes. Carries the fault-injection topic, but there it means chaos testing of network calls, not glitching a chip.",
+      "date": "2026-09-18"
+    },
+    {
+      "url": "https://github.com/omarKmekkawy/Useful-Youtube-Channels",
+      "reason": "Index of general electronics and mechanical engineering YouTube channels. Not a security resource.",
+      "date": "2026-09-18"
+    },
+    {
+      "url": "https://github.com/GainSec/AutoProber",
+      "reason": "Flying-probe automation for hardware hacking, and the idea is in scope, but there is nothing here to evaluate: two commits, both on the day the repository was created, one contributor, no license, and one watcher against 331 stars and 20 forks. Worth reconsidering if real development follows.",
+      "date": "2026-09-18"
+    },
+    {
+      "url": "https://github.com/ASCIT31/Dark-Moon",
+      "reason": "General-purpose AI pentesting platform spanning web, cloud, identity, CI/CD, Active Directory and Kubernetes; IoT firmware is one target among many rather than its subject. The description is also promotional in a way the entry guidelines exclude.",
+      "date": "2026-09-18"
+    },
+    {
+      "url": "https://github.com/cjee21/Check-UEFISecureBootVariables",
+      "reason": "PowerShell scripts for auditing Secure Boot variables on Windows PCs. Desktop OS hardening, not embedded, same as sbctl and lanzaboote.",
+      "date": "2026-09-18"
+    },
+    {
+      "url": "https://github.com/pbatard/Mosby",
+      "reason": "Generates and installs custom UEFI Secure Boot keys on desktop and laptop machines. Desktop OS hardening, not embedded.",
+      "date": "2026-09-18"
+    },
+    {
+      "url": "https://github.com/Foxboron/go-uefi",
+      "reason": "Go library for Linux UEFI variables and Secure Boot signing, and the library underneath sbctl, which was declined for the same reason: the target is general-purpose machines, not embedded devices.",
+      "date": "2026-09-18"
     }
   ]
 }

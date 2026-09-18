@@ -303,9 +303,11 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Jlsca](https://github.com/Keysight/Jlsca) - Side-channel analysis toolkit in Julia, geared toward correlation and linear regression attacks over large trace sets.
 * [lascar](https://github.com/Ledger-Donjon/lascar) - Fast Python SCA library from Ledger's hardware wallet security team supporting CPA, DPA, MIA, template attacks, and ML-based attacks with lazy loading for large trace datasets.
 * [pyecsca](https://github.com/J08nY/pyecsca) - Side-channel analysis and reverse engineering toolkit aimed specifically at elliptic curve implementations, where the other tools here are oriented toward AES.
+* [rainbow](https://github.com/Ledger-Donjon/rainbow) - Unicorn-based simulator from Ledger's Donjon team for tracing embedded binaries to evaluate side-channel leakage and fault injection resistance without physical hardware; pairs with lascar for the analysis step.
 * [SCAAML](https://github.com/google/scaaml) - Deep-learning side-channel framework from Google built on TensorFlow, shipping the GPAM attack models and the AES and ECC trace datasets behind its published key-recovery results.
 * [SCALE](https://github.com/danpage/scale) - Side-Channel Attack Lab Exercises providing educational material for learning power analysis attacks with low-cost hardware.
 * [scared](https://github.com/eshard/scared) - Industrial-grade side-channel analysis framework from eShard with best-in-class trace processing performance; supports CPA, DPA, TVLA/NICV leakage assessment, and very large trace datasets.
+* [screaming_channels](https://github.com/eurecom-s3/screaming_channels) - Attack toolkit and research artifacts for radio side-channels in mixed-signal chips, where leakage from the CPU core is unintentionally mixed onto the device's own radio transmissions and recovered at a distance.
 
 ### Fault Injection
 
@@ -361,12 +363,14 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Wi-Fi Tools
 
 * [ESP32 Marauder](https://github.com/justcallmekoko/ESP32Marauder) - A suite of WiFi/Bluetooth offensive and defensive tools for the ESP32.
+* [GhostESP](https://github.com/GhostESP-Revival/GhostESP) - ESP-IDF-native Wi-Fi and BLE assessment firmware for ESP32 boards, with live capture streaming to Wireshark, on-device PCAP handling, and wardriving support across a wide range of board targets.
 * [Pwnagotchi](https://pwnagotchi.ai/) - A2C-based “AI” powered by bettercap and running on a Raspberry Pi Zero W that learns from its surrounding WiFi environment in order to maximize the crackable WPA key material it captures.
 
 ## Further Learning and Training
 
 * [DVID](https://github.com/Vulcainreo/DVID) - Damn Vulnerable IoT Device: open hardware ATmega328p board (Gerbers published) purpose-built for practicing UART extraction, firmware dumping, and Bluetooth sniffing attacks on physical hardware.
 * [DVRF](https://github.com/praetorian-inc/DVRF) 🗄️ - Damn Vulnerable Router Firmware: modified Linksys firmware containing intentional MIPS/ARM binary exploitation challenges (buffer overflows, format strings, heap bugs) runnable under QEMU without physical hardware.
+* [Embedded-Hacking](https://github.com/mytechnotalent/Embedded-Hacking) - Free step-by-step course and PDF book building from bare-metal C on the Raspberry Pi Pico 2 through to reverse engineering the resulting firmware, published lesson by lesson.
 * [Embeddedsecurity.io](https://embeddedsecurity.io/) - Beginners resource on embedded systems security.
 * Fault Injection and Side Channel Attacks
   * [raelize.com - Blog](https://raelize.com/blog) - Great insight into hardware hacking such as fault injection and side-channel attacks.
@@ -406,6 +410,7 @@ List of security lists.
     * [CAN IDs](https://github.com/iDoka/awesome-automotive-can-id) - Catalogue of decoded CAN bus identifiers and message formats across vehicle makes and models.
     * [CANbus](https://github.com/iDoka/awesome-canbus) - CAN bus tooling, adapters, protocol documentation, and reverse engineering resources.
 * Embedded
+  * [Connected Things](https://github.com/V33RU/awesome-connected-things-sec) - Security resources for connected devices spanning IoT, automotive, medical, and SCADA, covering hardware, firmware, and radio tooling alongside research write-ups.
   * [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security) - Firmware analysis, emulation, and IoT security research, maintained by Fraunhofer FKIE.
   * [General Embedded](https://github.com/nhivp/Awesome-Embedded) - Embedded development resources: RTOSes, toolchains, libraries, and hardware platforms.
 * General Security
