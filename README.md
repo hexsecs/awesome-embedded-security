@@ -83,6 +83,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [dewolf](https://github.com/fkie-cad/dewolf) - Decompiler from Fraunhofer FKIE focused on readable output, built as a Binary Ninja plugin over its medium-level IL.
 * [Ghidra](https://ghidra-sre.org/) - A software reverse engineering (SRE) suite of tools developed by NSA's Research Directorate in support of the Cybersecurity mission.
 * [Ghidriff](https://github.com/clearbluejar/ghidriff) - Headless Ghidra patch diffing that runs from the command line and emits Markdown or JSON, making binary diffs practical to automate in CI.
+* [HAL](https://github.com/emsec/hal) - Netlist reverse engineering and manipulation framework that parses FPGA and ASIC netlists into a graph representation for traversal and analysis, with a C++ core and Python bindings.
 * [IDA Pro](https://hex-rays.com/ida-pro/) 💰 - Disassembler capable of creating maps of their execution to show the binary instructions that are actually executed by the processor in a symbolic representation (assembly language). Advanced techniques have been implemented into IDA Pro so that it can generate assembly language source code from machine-executable code and make this complex code more human-readable.
 * [Keystone](https://github.com/keystone-engine/keystone) - A lightweight multi-architecture assembler framework that complements Capstone.
 * [Miasm](https://github.com/cea-sec/miasm) - Reverse engineering framework with its own intermediate language, a JIT emulator, and symbolic execution, covering MSP430 and MIPS alongside the usual architectures.
@@ -269,6 +270,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Hardware Reverse Engineering Multitools
 
 * [Bus Pirate](https://buspirate.com/) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
+* [ESP32 Bit Pirate](https://github.com/geo-tp/ESP32-Bit-Pirate) - Open-source ESP32 firmware inspired by the Bus Pirate that sniffs and drives I2C, SPI, UART, 1-Wire, JTAG, CAN, and USB from a serial or web-based CLI, with Bluetooth, Wi-Fi, Sub-GHz, and RFID modes alongside.
 * [Glasgow Interface Explorer](https://glasgow-embedded.org/) - Versatile open-source FPGA-based hardware debugging and reverse engineering tool supporting SPI, I2C, UART, JTAG, and custom protocols with a high-level Python API.
 * [GreatFET](https://greatscottgadgets.com/greatfet/) - Open-source USB host-side hardware security research platform from Great Scott Gadgets with an expandable neighbor board ecosystem for interfacing with embedded targets.
 * [Hydrabus](https://hydrabus.com/) - Open-source multi-protocol hardware hacking tool with support for SPI, I2C, UART, CAN, 1-Wire, and JTAG interfaces, purpose-built for embedded device analysis.
