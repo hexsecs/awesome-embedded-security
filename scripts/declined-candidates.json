@@ -29,6 +29,36 @@
       "url": "https://github.com/hexsecs/awesome-embedded-security",
       "reason": "This list itself. It matches most of the search terms and would otherwise be proposed for inclusion in itself.",
       "date": "2026-09-17"
+    },
+    {
+      "url": "https://github.com/ventoy/Ventoy",
+      "reason": "Bootable USB creator for installing operating systems. Carries the secure-boot topic, but it is not an embedded security tool.",
+      "date": "2026-09-17"
+    },
+    {
+      "url": "https://github.com/pbatard/rufus",
+      "reason": "USB drive formatting and bootable media utility. Same reason as Ventoy: the secure-boot topic is incidental to what it does.",
+      "date": "2026-09-17"
+    },
+    {
+      "url": "https://github.com/parawanderer/OpenTagViewer",
+      "reason": "Android app for viewing Apple FindMy trackers. A consumer utility rather than embedded security tooling.",
+      "date": "2026-09-17"
+    },
+    {
+      "url": "https://github.com/Foxboron/sbctl",
+      "reason": "Secure Boot key manager for desktop Linux UEFI. Good at its job, but the target is general-purpose machines, not embedded devices.",
+      "date": "2026-09-17"
+    },
+    {
+      "url": "https://github.com/nix-community/lanzaboote",
+      "reason": "Secure Boot and measured boot for NixOS on desktop and server Linux. Out of scope for the same reason as sbctl.",
+      "date": "2026-09-17"
+    },
+    {
+      "url": "https://github.com/kakahuote1/TinyPKI",
+      "reason": "IoT PKI library whose scope is hard to judge: the repository is recent and its description reads as a feature list rather than a statement of what it does. Worth reconsidering if it establishes a track record.",
+      "date": "2026-09-17"
     }
   ]
 }
