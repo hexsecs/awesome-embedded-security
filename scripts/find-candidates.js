@@ -208,8 +208,9 @@ function readList(lines) {
     // Only top-level items participate in a section's alphabetical run.
     // Nested lists (the language groups under Language Specific Decompilers,
     // the categories under Other Awesome Lists) are ordered against
-    // themselves, and this script never proposes into them — see
-    // SECTION_KEYWORDS.
+    // themselves, and this script never computes a position inside one — see
+    // SECTION_KEYWORDS, and `placeable` in proposeSection for the awesome-list
+    // case, where the section is known but the position is not.
     if (indent.length === 0 && current) {
       current.entries.push({ label: name, lineNo });
     }
@@ -275,43 +276,202 @@ function readDeclined() {
 // repository's name, description and topics, with hyphens treated as spaces
 // so the `fault-injection` topic matches the "fault injection" keyword.
 //
-// Two sections are deliberately absent. "Language Specific Decompilers" and
-// the categories under "Other Awesome Lists" are nested lists, and a nested
-// list needs a sub-category decision this table cannot make. Anything that
-// would land there gets no suggestion, which is the honest answer.
+// Keywords are split into `specific` and `generic`, and that split is the
+// heart of this table. The first live run scored sections by how many
+// keywords matched, which made every match worth exactly the same, and two
+// things went wrong because of it. A twenty-protocol bus tool matched the
+// single word `bluetooth` and was filed under BLE, because one match beat no
+// match. And a section with a long, broad vocabulary could out-count a
+// section with one precise hit purely by owning more ways to match — breadth
+// of vocabulary standing in for strength of evidence.
+//
+// So: a `specific` keyword names this section's subject and very little else.
+// `chipwhisperer`, `secure boot`, `facedancer`, `netlist` — a repository
+// carrying one of those is telling you what it is. A `generic` keyword is
+// true of the section but also true of a large slice of this domain, and
+// turns up in the metadata of projects that merely *touch* the subject:
+// `bluetooth`, `fuzz`, `rtos`, `nand`, `taint`, `emulation`. Words like
+// `matter` and `dice` are section names by unlucky coincidence and are
+// generic for that reason alone.
+//
+// "Language Specific Decompilers" is deliberately absent: it is a nested list
+// whose sub-category this table cannot choose, so anything landing there gets
+// no suggestion. "Other Awesome Lists" is absent from this table too, but for
+// the opposite reason — see awesomeListSignals below, which routes to it
+// without consulting keywords at all.
 const SECTION_KEYWORDS = [
-  ['Binary Parsing and Analysis Tools', ['binwalk', 'firmware extraction', 'unpacking', 'file carving', 'binary analysis', 'elf', 'executable format', 'filesystem extraction']],
-  ['Disassemblers/Decompilers', ['disassembler', 'decompiler', 'decompilation', 'ghidra', 'ida pro', 'lifter']],
-  ['Debugging Tools', ['debugger', 'gdb', 'gdbserver', 'debug probe', 'swd', 'on chip debugging']],
-  ['USB Emulation and Fuzzing', ['usb emulation', 'usb device emulation', 'facedancer', 'usb fuzzing', 'usb gadget']],
-  ['Secure Boot and Firmware Trust', ['secure boot', 'secureboot', 'verified boot', 'measured boot', 'bootloader', 'coreboot', 'chain of trust']],
-  ['Firmware Supply Chain and SBOM', ['sbom', 'supply chain', 'cyclonedx', 'spdx', 'provenance', 'attestation', 'vex']],
-  ['Fuzzing Tools', ['fuzzing', 'fuzzer', 'fuzz', 'afl', 'libfuzzer', 'coverage guided']],
-  ['Security Auditing Frameworks', ['audit', 'auditing', 'assessment framework', 'penetration testing', 'security scanner']],
-  ['Firmware Taint Analysis', ['taint analysis', 'taint', 'dataflow analysis', 'symbolic execution', 'concolic']],
-  ['RTOS Security', ['rtos', 'freertos', 'zephyr', 'threadx', 'rt thread', 'nuttx', 'mbed os']],
-  ['TEE/Trusted Execution Environments', ['tee', 'trustzone', 'optee', 'op tee', 'sgx', 'enclave', 'trusted execution', 'keystone']],
-  ['Root of Trust and TPM', ['tpm', 'root of trust', 'hsm', 'secure element', 'caliptra', 'remote attestation', 'dice']],
-  ['OTA Update Security', ['ota', 'over the air', 'firmware update', 'swupdate', 'mender', 'suit manifest', 'rauc']],
-  ['IoT Protocol Security', ['mqtt', 'coap', 'modbus', 'lorawan', 'iot protocol', 'matter', 'thread protocol']],
-  ['Bluetooth and BLE Security', ['bluetooth', 'ble', 'bluetooth low energy', 'hci', 'gatt']],
-  ['Zigbee / Z-Wave Security', ['zigbee', 'z wave', 'zwave', '802 15 4', 'ieee802154']],
-  ['Baseband Security', ['baseband', 'cellular', 'lte', 'gsm', '5g', 'srsran', 'modem']],
-  ['Firmware Malware Analysis', ['malware', 'implant', 'rootkit', 'bootkit', 'yara', 'uefi malware']],
-  ['Emulation Tools', ['emulation', 'emulator', 'qemu', 'unicorn', 'rehosting', 'firmware emulation']],
-  ['MCU Firmware Fuzzing', ['mcu fuzzing', 'firmware fuzzing', 'microcontroller fuzzing', 'peripheral modeling']],
-  ['Hardware Reverse Engineering Multitools', ['multitool', 'bus pirate', 'hardware hacking tool', 'flipper zero']],
-  ['Hardware Debug Interfaces', ['jtag', 'boundary scan', 'jtagulator', 'swd probe', 'tap controller']],
-  ['USB Protocol Analysis', ['usb analyzer', 'usb sniffer', 'usb protocol analysis', 'usb capture']],
-  ['Chip-Off and Memory Forensics', ['chip off', 'nand', 'emmc', 'spi flash', 'flash dump', 'memory forensics', 'bga']],
-  ['Side-Channel Analysis', ['side channel', 'sidechannel', 'power analysis', 'dpa', 'cpa', 'electromagnetic analysis', 'chipwhisperer', 'cache attack']],
-  ['Fault Injection', ['fault injection', 'glitching', 'glitch', 'voltage glitching', 'clock glitching', 'emfi', 'laser fault']],
-  ['Logic Analyzers', ['logic analyzer', 'sigrok', 'saleae', 'protocol decoder']],
-  ['NFC and RFID', ['nfc', 'rfid', 'mifare', 'proxmark', 'iso14443', 'desfire']],
-  ['RF Tools (Non-SDR)', ['sub ghz', 'cc1101', 'rf transceiver', 'garage door', 'keyfob']],
-  ['Software Defined Radio Software', ['sdr', 'gnuradio', 'gnu radio', 'rtl sdr', 'software defined radio', 'signal analysis']],
-  ['Wi-Fi Tools', ['wifi', 'wi fi', '802 11', 'wpa', 'wpa2', 'deauth']],
+  ['Binary Parsing and Analysis Tools', {
+    specific: ['binwalk', 'firmware extraction', 'file carving', 'executable format', 'filesystem extraction'],
+    generic: ['unpacking', 'binary analysis', 'elf'],
+  }],
+  // `netlist` closes the gap that left HAL — a netlist reverse engineering
+  // framework that calls itself the equivalent of IDA or Ghidra — with no
+  // suggestion at all. A bare `reverse engineering` keyword would have caught
+  // it too and is exactly the wrong fix: it appears in the metadata of a large
+  // fraction of this list's subject matter, including most of the hardware
+  // sections, and would pull all of them in here. These say what they mean.
+  ['Disassemblers/Decompilers', {
+    specific: ['disassembler', 'decompiler', 'decompilation', 'ghidra', 'ida pro', 'netlist', 'gate level netlist', 'bitstream reverse engineering'],
+    generic: ['lifter'],
+  }],
+  ['Debugging Tools', {
+    specific: ['gdb', 'gdbserver', 'debug probe', 'on chip debugging'],
+    generic: ['debugger', 'swd'],
+  }],
+  ['USB Emulation and Fuzzing', {
+    specific: ['usb emulation', 'usb device emulation', 'facedancer', 'usb fuzzing', 'usb gadget'],
+    generic: [],
+  }],
+  ['Secure Boot and Firmware Trust', {
+    specific: ['secure boot', 'secureboot', 'verified boot', 'measured boot', 'coreboot', 'chain of trust'],
+    generic: ['bootloader'],
+  }],
+  ['Firmware Supply Chain and SBOM', {
+    specific: ['sbom', 'cyclonedx', 'spdx', 'vex', 'supply chain'],
+    generic: ['provenance', 'attestation'],
+  }],
+  ['Fuzzing Tools', {
+    specific: ['fuzzing', 'fuzzer', 'afl', 'libfuzzer', 'coverage guided'],
+    generic: ['fuzz'],
+  }],
+  ['Security Auditing Frameworks', {
+    specific: ['assessment framework', 'penetration testing', 'security scanner'],
+    generic: ['audit', 'auditing'],
+  }],
+  ['Firmware Taint Analysis', {
+    specific: ['taint analysis', 'dataflow analysis', 'symbolic execution', 'concolic'],
+    generic: ['taint'],
+  }],
+  ['RTOS Security', {
+    specific: ['freertos', 'zephyr', 'threadx', 'rt thread', 'nuttx', 'mbed os'],
+    generic: ['rtos'],
+  }],
+  ['TEE/Trusted Execution Environments', {
+    specific: ['trustzone', 'optee', 'op tee', 'sgx', 'trusted execution', 'keystone'],
+    generic: ['tee', 'enclave'],
+  }],
+  ['Root of Trust and TPM', {
+    specific: ['tpm', 'root of trust', 'hsm', 'secure element', 'caliptra', 'remote attestation'],
+    generic: ['dice'],
+  }],
+  ['OTA Update Security', {
+    specific: ['over the air', 'firmware update', 'swupdate', 'mender', 'suit manifest', 'rauc'],
+    generic: ['ota'],
+  }],
+  ['IoT Protocol Security', {
+    specific: ['mqtt', 'coap', 'modbus', 'lorawan', 'iot protocol', 'thread protocol'],
+    generic: ['matter'],
+  }],
+  ['Bluetooth and BLE Security', {
+    specific: ['bluetooth low energy', 'hci', 'gatt'],
+    generic: ['bluetooth', 'ble'],
+  }],
+  ['Zigbee / Z-Wave Security', {
+    specific: ['zigbee', 'z wave', 'zwave', '802 15 4', 'ieee802154'],
+    generic: [],
+  }],
+  ['Baseband Security', {
+    specific: ['baseband', 'srsran', 'gsm', 'lte', '5g'],
+    generic: ['cellular', 'modem'],
+  }],
+  ['Firmware Malware Analysis', {
+    specific: ['rootkit', 'bootkit', 'yara', 'uefi malware', 'implant'],
+    generic: ['malware'],
+  }],
+  ['Emulation Tools', {
+    specific: ['qemu', 'unicorn', 'rehosting', 'firmware emulation'],
+    generic: ['emulation', 'emulator'],
+  }],
+  ['MCU Firmware Fuzzing', {
+    specific: ['mcu fuzzing', 'firmware fuzzing', 'microcontroller fuzzing', 'peripheral modeling'],
+    generic: [],
+  }],
+  ['Hardware Reverse Engineering Multitools', {
+    specific: ['multitool', 'bus pirate', 'hardware hacking tool', 'flipper zero'],
+    generic: [],
+  }],
+  ['Hardware Debug Interfaces', {
+    specific: ['jtag', 'boundary scan', 'jtagulator', 'swd probe', 'tap controller'],
+    generic: [],
+  }],
+  ['USB Protocol Analysis', {
+    specific: ['usb analyzer', 'usb sniffer', 'usb protocol analysis', 'usb capture'],
+    generic: [],
+  }],
+  ['Chip-Off and Memory Forensics', {
+    specific: ['chip off', 'emmc', 'spi flash', 'flash dump', 'memory forensics', 'bga'],
+    generic: ['nand'],
+  }],
+  ['Side-Channel Analysis', {
+    specific: ['side channel', 'sidechannel', 'power analysis', 'electromagnetic analysis', 'chipwhisperer', 'cache attack'],
+    generic: ['dpa', 'cpa'],
+  }],
+  ['Fault Injection', {
+    specific: ['fault injection', 'glitching', 'voltage glitching', 'clock glitching', 'emfi', 'laser fault'],
+    generic: ['glitch'],
+  }],
+  ['Logic Analyzers', {
+    specific: ['logic analyzer', 'sigrok', 'saleae', 'protocol decoder'],
+    generic: [],
+  }],
+  ['NFC and RFID', {
+    specific: ['mifare', 'proxmark', 'iso14443', 'desfire'],
+    generic: ['nfc', 'rfid'],
+  }],
+  ['RF Tools (Non-SDR)', {
+    specific: ['sub ghz', 'cc1101', 'rf transceiver', 'garage door', 'keyfob'],
+    generic: [],
+  }],
+  ['Software Defined Radio Software', {
+    specific: ['gnuradio', 'gnu radio', 'rtl sdr', 'software defined radio'],
+    generic: ['sdr', 'signal analysis'],
+  }],
+  ['Wi-Fi Tools', {
+    specific: ['802 11', 'wpa', 'wpa2', 'deauth'],
+    generic: ['wifi', 'wi fi'],
+  }],
 ];
+
+// The multitools section is named here because two rules below reason about
+// it by name rather than by position in the table.
+const MULTITOOL_SECTION = 'Hardware Reverse Engineering Multitools';
+
+// The one section this script routes to without consulting SECTION_KEYWORDS
+// at all, and the one it cannot compute a position inside.
+const AWESOME_LIST_SECTION = 'Other Awesome Lists';
+
+// Scoring weights.
+//
+// A specific keyword is worth four generic ones, and the generic contribution
+// is capped at two, so no quantity of broad vocabulary can ever reach the
+// evidence of a single precise hit. That cap is the part that matters: it is
+// what stops a section winning on breadth of vocabulary. `sca-rig` in the test
+// corpus is the shape — two soft BLE words against one `chipwhisperer` — and
+// counting matches got it wrong 2-1.
+const SPECIFIC_WEIGHT = 4;
+const GENERIC_WEIGHT = 1;
+const GENERIC_CAP = 2;
+
+// A section has to reach this to be named at all, which is one specific
+// keyword, or two independent generic ones. A single generic word on its own
+// is how the BLE section collected four of the first twelve candidates; it is
+// still reported, as a near miss with the keyword named, but it no longer
+// gets to be an answer.
+const MIN_SECTION_SCORE = 2;
+
+// ...and it has to be ahead of the runner-up by more than one generic hit.
+// Two sections within a point of each other is a coin toss, and a coin toss
+// presented as a suggestion costs more than it saves: a reviewer who finds
+// two wrong placements stops checking the rest.
+const MIN_LEAD = 2;
+
+// Matching this many *distinct sections* means the repository does many
+// things. Calibrated against the two real cases that bracket it: GhostESP is
+// a BLE research platform that also says nfc, rfid and wifi — three sections,
+// with one of them plainly dominant — and ESP32-Bit-Pirate is a bus tool that
+// touches five. Note this counts sections, not keywords: five keywords for
+// one section is a strong single answer, not a broad one.
+const MULTITOOL_SECTIONS = 4;
 
 // Topics worth extra weight in the ranking: a project that tagged itself with
 // one of these is asserting it belongs to this subject, which is a stronger
@@ -346,21 +506,189 @@ function hasWord(hay, keyword) {
   return normalized ? hay.includes(` ${normalized} `) : false;
 }
 
-// Returns the best-scoring section and the keywords that got it there, so the
-// report can show its working and a reviewer can disagree cheaply.
-function proposeSection(repo) {
-  const hay = haystack(repo);
-  let best = null;
+// Is this repository a list of things rather than a thing?
+//
+// An awesome list belongs under `## Other Awesome Lists` whatever its subject,
+// and routing it on keywords is a category error rather than a near miss: the
+// words in its metadata describe its *contents*, not what it is. The first
+// live run proposed awesome-connected-things-sec for the Bluetooth section
+// because it carries `ble-security` and `bluetooth-security` topics — which it
+// does, because it indexes Bluetooth research. Every list-of-things has this
+// failure mode, and it gets worse the better the list is.
+//
+// Three independent signals, and any one of them is enough. Each is a
+// deliberate declaration by the project's own maintainers — the `awesome-`
+// naming convention, the `awesome`/`awesome-list` topics, and a description
+// that says in words that it is a curated list — so none of them happens by
+// accident, and requiring two would miss lists that only make one. Getting
+// this wrong in the false-positive direction is cheap and visible: the report
+// prints which signals fired, and the worst case is a reviewer moving one
+// entry. Getting it wrong the other way is the bug being fixed here.
+const AWESOME_NAME_RE = /^awesome[-_ ]|[-_ ]awesome([-_ ]?lists?)?$/;
+const AWESOME_TOPICS = new Set(['awesome', 'awesome-list', 'awesome-lists']);
+const AWESOME_DESCRIPTION_RE =
+  /\b(curated (list|collection)|awesome list|list of awesome|(list|collection|index) of (security |free |open source )*(resources|tools|lists|links|papers))\b/;
 
-  for (const [name, keywords] of SECTION_KEYWORDS) {
-    const matched = keywords.filter((k) => hasWord(hay, k));
-    if (matched.length === 0) continue;
-    if (!best || matched.length > best.matched.length) {
-      best = { name, matched };
-    }
+function awesomeListSignals(repo) {
+  const signals = [];
+
+  const name = (repo.name || '').toLowerCase();
+  if (AWESOME_NAME_RE.test(name)) {
+    signals.push(`the name "${repo.name}" follows the awesome-list convention`);
   }
 
-  return best;
+  const topics = (repo.topics || []).map((t) => String(t).toLowerCase());
+  const topicHit = topics.filter((t) => AWESOME_TOPICS.has(t));
+  if (topicHit.length > 0) {
+    signals.push(`it applied the ${topicHit.map((t) => `${t}`).join(' and ')} topic`);
+  }
+
+  const description = (repo.description || '').toLowerCase();
+  if (AWESOME_DESCRIPTION_RE.test(description)) {
+    signals.push('its description says it is a curated list');
+  }
+
+  return signals;
+}
+
+// Scores every section that matched, strongest first. Ties break on the order
+// of SECTION_KEYWORDS so the output is deterministic — but a tie never decides
+// anything on its own, because proposeSection requires a lead before it names
+// a winner.
+function scoreSections(hay) {
+  const scored = [];
+
+  SECTION_KEYWORDS.forEach(([name, keywords], order) => {
+    const specific = keywords.specific.filter((k) => hasWord(hay, k));
+    const generic = keywords.generic.filter((k) => hasWord(hay, k));
+    if (specific.length === 0 && generic.length === 0) return;
+
+    scored.push({
+      name,
+      heading: `### ${name}`,
+      order,
+      score:
+        SPECIFIC_WEIGHT * specific.length +
+        Math.min(GENERIC_WEIGHT * generic.length, GENERIC_CAP),
+      matched: [
+        ...specific.map((keyword) => ({ keyword, specific: true })),
+        ...generic.map((keyword) => ({ keyword, specific: false })),
+      ],
+    });
+  });
+
+  scored.sort((a, b) => b.score - a.score || a.order - b.order);
+  return scored;
+}
+
+// Always returns a proposal object, never null, because "I do not know" is a
+// result with contents: the sections it looked at and what they scored. A
+// reviewer can act on that. `name: null` is the no-suggestion case.
+//
+//   name        the section, or null
+//   heading     the heading as it appears in README.md, or null
+//   placeable   false when the section exists but has no computable position
+//   note        why there is no line number, or why there is no suggestion
+//   matched     what put it there: {keyword, specific} pairs, or, for an
+//               awesome list, the signals that identified it as one
+//   contenders  every other section that matched, strongest first
+function proposeSection(repo) {
+  const awesome = awesomeListSignals(repo);
+  if (awesome.length > 0) {
+    return {
+      name: AWESOME_LIST_SECTION,
+      // A `##`, not a `###`: it is a top-level section holding a nested list
+      // grouped by category, and readList only indexes `###` headings.
+      heading: `## ${AWESOME_LIST_SECTION}`,
+      placeable: false,
+      note:
+        'an awesome list belongs here whatever its contents are about. The ' +
+        'section is a nested list grouped by category, and this script does ' +
+        'not place into nested lists, so the category and the position are a ' +
+        'hand decision',
+      matched: awesome.map((keyword) => ({ keyword, specific: true })),
+      score: null,
+      contenders: [],
+    };
+  }
+
+  const scored = scoreSections(haystack(repo));
+  const [winner, runnerUp] = scored;
+  const others = (chosen) => scored.filter((s) => s !== chosen);
+
+  const undecided = (note) => ({
+    name: null,
+    heading: null,
+    placeable: false,
+    note,
+    matched: [],
+    score: null,
+    contenders: scored,
+  });
+
+  if (!winner) {
+    return undecided(
+      'nothing in the repository name, description or topics matched a section'
+    );
+  }
+
+  // Breadth first, and deliberately ahead of the score: a repository that
+  // matches four or more sections is telling you it does many things, and
+  // "whichever of those matched hardest" is not a conclusion that follows from
+  // that. ESP32-Bit-Pirate matched five — multitools, JTAG, Bluetooth, RFID,
+  // Wi-Fi — and the old scoring answered "Bluetooth", which was true of one
+  // mode out of twenty.
+  //
+  // Where it says in its own metadata that it is a multitool, that is the
+  // answer and the list has a section for exactly it. Where it does not, no
+  // suggestion: the multitools section is a *hardware* section, and a broad
+  // software framework that happens to name six protocols does not belong
+  // there. The contenders are printed either way, so the breadth itself
+  // reaches the reviewer rather than being collapsed into a guess.
+  if (scored.length >= MULTITOOL_SECTIONS) {
+    const multitool = scored.find((s) => s.name === MULTITOOL_SECTION);
+    if (multitool) {
+      return {
+        name: multitool.name,
+        heading: multitool.heading,
+        placeable: true,
+        note: null,
+        matched: multitool.matched,
+        score: multitool.score,
+        contenders: others(multitool),
+      };
+    }
+    return undecided(
+      `it matched ${scored.length} different sections, which is evidence that ` +
+        'it does several things rather than that it belongs to the one that ' +
+        'scored highest'
+    );
+  }
+
+  if (winner.score < MIN_SECTION_SCORE) {
+    const only = winner.matched.map((m) => `\`${m.keyword}\``).join(', ');
+    return undecided(
+      `the only evidence was ${only}, which is generic enough to appear in ` +
+        'projects that merely touch the subject'
+    );
+  }
+
+  if (runnerUp && winner.score - runnerUp.score < MIN_LEAD) {
+    return undecided(
+      `\`${winner.heading}\` (score ${winner.score}) was not clearly ahead of ` +
+        `\`${runnerUp.heading}\` (score ${runnerUp.score})`
+    );
+  }
+
+  return {
+    name: winner.name,
+    heading: winner.heading,
+    placeable: true,
+    note: null,
+    matched: winner.matched,
+    score: winner.score,
+    contenders: others(winner),
+  };
 }
 
 // --- Alphabetical placement ------------------------------------------
@@ -667,7 +995,13 @@ function buildCandidate(repo, queries, list) {
   const name = repo.name;
   const description = draftDescription(name, repo);
   const section = proposeSection(repo);
-  const known = section ? list.sections.get(section.name) : null;
+  // `placeable: false` means the section is real but has no computable
+  // position — Other Awesome Lists, whose entries live in a nested list. The
+  // lookup is skipped rather than allowed to miss, because a miss renders as
+  // "heading not found in README.md", which would be a different and false
+  // claim about a heading that is plainly there.
+  const known =
+    section.name && section.placeable ? list.sections.get(section.name) : null;
 
   return {
     name,
@@ -681,8 +1015,12 @@ function buildCandidate(repo, queries, list) {
     queries: [...queries],
     score,
     description,
-    section: section ? section.name : null,
-    sectionMatches: section ? section.matched : [],
+    section: section.name,
+    sectionHeading: section.heading,
+    sectionNote: section.note,
+    sectionScore: section.score,
+    sectionMatches: section.matched,
+    sectionContenders: section.contenders,
     // Positions are computed against README.md exactly as it stands, each
     // independently of the others. Applying a subset bottom-up (descending
     // line number) is then always exact, because an insertion never shifts
@@ -760,19 +1098,25 @@ function render(selection) {
             ? `after **${c.placement.after.label}**, as the last entry`
             : 'as the only entry';
         out.push(
-          `- **Section:** \`### ${c.section}\` — insert at README.md:` +
+          `- **Section:** \`${c.sectionHeading}\` — insert at README.md:` +
             `${c.placement.lineNo}, ${where}`
         );
+      } else if (c.section && c.sectionNote) {
+        // A section it is sure of and a position it cannot compute. Saying
+        // both is the point: the alternative is either a line number that was
+        // guessed or a suggestion thrown away because the last step of it
+        // could not be finished.
+        out.push(`- **Section:** \`${c.sectionHeading}\` — ${c.sectionNote}`);
       } else if (c.section) {
         out.push(
-          `- **Section:** \`### ${c.section}\` — heading not found in ` +
+          `- **Section:** \`${c.sectionHeading}\` — heading not found in ` +
             'README.md, so no position was computed'
         );
       } else {
         out.push(
-          '- **Section:** no suggestion. Nothing in the repository metadata ' +
-            'matched a section, or it belongs in a nested list this script ' +
-            'does not place into.'
+          `- **Section:** no suggestion — ${c.sectionNote}. A section a ` +
+            'reviewer cannot trust costs more than none, so the sections it ' +
+            'weighed are listed below instead of a pick among them.'
         );
       }
 
@@ -787,10 +1131,32 @@ function render(selection) {
             : '') +
           `; last push ${String(c.pushedAt).slice(0, 10)}`
       );
-      if (c.sectionMatches.length > 0) {
+      // Specific and generic are labelled rather than merged, because which
+      // kind of keyword carried a section is most of what a reviewer needs to
+      // decide whether to believe it.
+      if (c.sectionMatches.length > 0 && c.sectionScore === null) {
+        // An awesome list: what matched is a set of self-declarations, not
+        // keywords, so it is labelled as one rather than dressed up as one.
+        out.push(`- **Identified as a list by:** ${c.sectionMatches.map((m) => m.keyword).join('; ')}`);
+      } else if (c.sectionMatches.length > 0) {
         out.push(
           `- **Section matched on:** ` +
-            c.sectionMatches.map((m) => `\`${m}\``).join(', ')
+            c.sectionMatches
+              .map((m) => `\`${m.keyword}\`${m.specific ? '' : ' (generic)'}`)
+              .join(', ') +
+            `; score ${c.sectionScore}`
+        );
+      }
+      if (c.sectionContenders.length > 0) {
+        out.push(
+          `- **Other sections it touched:** ` +
+            c.sectionContenders
+              .map(
+                (s) =>
+                  `\`${s.heading}\` (score ${s.score}: ` +
+                  `${s.matched.map((m) => `\`${m.keyword}\``).join(', ')})`
+              )
+              .join(', ')
         );
       }
       if (c.markerHint) out.push(`- **Marker:** ${c.markerHint}`);
