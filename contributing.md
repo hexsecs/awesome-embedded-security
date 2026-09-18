@@ -157,6 +157,7 @@ the link checker uses, and any non-2xx response, timeout, or bot wall is
 recorded as unchecked rather than as a finding. Whether a URL is actually dead
 is the link check's question, because the cost of getting that wrong is
 someone deleting a live entry.
+
 ### Finding candidates
 
 Every other check here is defensive: it keeps what is already listed from
