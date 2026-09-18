@@ -443,7 +443,7 @@ test('keyword matching is whole-word, so short keywords do not match inside word
     description: 'Continuous integration pipeline helper for makefiles.',
     topics: [],
   });
-  assert.strictEqual(section, null);
+  assert.strictEqual(section.name, null);
 });
 
 test('an unrecognisable project gets no section rather than a wrong one', () => {
@@ -510,6 +510,421 @@ test('an empty section places the first entry under its heading', () => {
   assert.strictEqual(placed.lineNo, section.headingLine + 2);
   assert.strictEqual(placed.after, null);
   assert.strictEqual(placed.before, null);
+});
+
+// --- The routing corpus -----------------------------------------------
+// Every ROUTING_CORPUS entry marked `live: true` is a real repository, with
+// the name, description and topics GitHub returned for it on 2026-09-17 —
+// these are the twelve candidates the first live discovery run produced, and
+// proposeSection sees exactly these three fields and nothing else. They are
+// reproduced verbatim rather than paraphrased, because the bug this corpus
+// exists to pin was invisible in paraphrase: four of the twelve landed in
+// `Bluetooth and BLE Security` on the strength of one incidental word.
+//
+// The synthetic entries alongside them pin what must not regress while that
+// is fixed. Loosening the BLE section until a bus tool stops landing there is
+// easy and wrong; the corpus holds a genuinely Bluetooth-only tool, genuinely
+// secure-boot tools, and an entry whose whole case is a single precise
+// keyword, so a fix that routes by breaking those fails here.
+//
+// `expect: null` means no suggestion, which is a result, not a gap.
+const ROUTING_CORPUS = [
+  {
+    live: true,
+    why: 'An awesome list. Its topics describe its contents, not its subject.',
+    expect: 'Other Awesome Lists',
+    placeable: false,
+    repo: {
+      name: 'awesome-connected-things-sec',
+      description: 'A Curated list of Security Resources for all connected things',
+      topics: [
+        'automotive-security', 'awesome', 'awesome-list', 'ble-security',
+        'bluetooth-security', 'embedded-security', 'firmware-analysis',
+        'firmware-security', 'hardware-hacking', 'ics-security',
+        'iot-pentesting', 'iot-security', 'reverse-engineering', 'rf-security',
+        'wireless-security',
+      ],
+    },
+  },
+  {
+    live: true,
+    why: 'Routed correctly before this change and must still route there.',
+    expect: 'Security Auditing Frameworks',
+    repo: {
+      name: 'AutoProber',
+      description:
+        'Hardware hacker’s flying probe automation stack for agent-driven   ' +
+        'target discovery, microscope mapping, safety-monitored CNC motion, ' +
+        'probe review, and   controlled pin probing.',
+      topics: [
+        'ai-agents', 'autromation', 'embedded-security', 'flying-probe',
+        'gainsec', 'hardware-hacking', 'hardware-security', 'iot-security',
+        'offensive-security', 'pcb', 'pcb-probing', 'penetration-testing',
+        'reverse-engineering', 'robotics', 'security-research',
+      ],
+    },
+  },
+  {
+    live: true,
+    why:
+      'A multi-protocol bus tool. One incidental `bluetooth` topic sent it to ' +
+      'the BLE section; a maintainer put it next to Bus Pirate.',
+    expect: 'Hardware Reverse Engineering Multitools',
+    repo: {
+      name: 'ESP32-Bit-Pirate',
+      description: 'A Hardware Hacking Tool with Web-Based CLI That Speaks Every Protocol ',
+      topics: [
+        'arduino', 'bluetooth', 'can-bus', 'debugging', 'eeprom', 'esp32',
+        'flipperzero', 'gpio', 'hardware-hacking', 'i2c', 'jtag', 'openocd',
+        'protocols', 'pwm', 'radio', 'rfid', 'spi', 'subghz', 'uart', 'wifi',
+      ],
+    },
+  },
+  {
+    live: true,
+    why:
+      'The regression guard that matters most: BLE is its actual subject, so ' +
+      'a fix that stops bus tools landing in BLE must not stop this one.',
+    expect: 'Bluetooth and BLE Security',
+    repo: {
+      name: 'GhostESP',
+      description: 'The open-source wireless research platform for ESP32.',
+      topics: [
+        'ble', 'bluetooth-low-energy', 'cardputer', 'embedded', 'esp-idf',
+        'esp32', 'flipperzero', 'hardware-hacking', 'iot-security', 'nfc',
+        'pentesting', 'red-team', 'rfid', 'security-research', 'subghz',
+        'wardriving', 'wifi-hacking', 'wifi-security',
+      ],
+    },
+  },
+  {
+    live: true,
+    why: 'Routed correctly before this change and must still route there.',
+    expect: 'Security Auditing Frameworks',
+    repo: {
+      name: 'Dark-Moon',
+      description:
+        'Autonomous AI pentesting engine across web, cloud, identity, CI/CD, ' +
+        'IaC, databases, Active Directory, Kubernetes, IoT firmware and AI/LLM ' +
+        'endpoints (OWASP LLM Top 10). Real exploits with proof for every ' +
+        'finding. Privacy gateway: the LLM never sees your real IPs, hosts or ' +
+        'creds; nothing leaves your perimeter.',
+      topics: [
+        'active-directory', 'ai-agents', 'ai-red-team', 'ai-security-tool',
+        'autonomous-agents', 'cloud-security', 'firmware-security',
+        'iot-security', 'kubernetes', 'llm', 'local-llm', 'mcp',
+        'multi-agent-systems', 'offensive-security', 'penetration-testing',
+        'pentesting', 'red-team', 'security-automation', 'security-tools',
+        'self-hosted',
+      ],
+    },
+  },
+  {
+    live: true,
+    why:
+      'Nothing in the table covers PKI for constrained devices, and inventing ' +
+      'a section for it is not this script’s job.',
+    expect: null,
+    repo: {
+      name: 'TinyPKI',
+      description:
+        'TinyPKI is a lightweight C11/OpenSSL PKI core for constrained IoT and ' +
+        'edge networks, combining ECQV implicit certificates, sparse Merkle ' +
+        'revocation proofs, MMR issuance transparency, CA-signed checkpoints, ' +
+        't-of-n edge witnesses, and SM2/SM3/SM4 sessions.',
+      topics: [
+        'c11', 'certificate-revocation', 'certificate-transparency',
+        'cryptography', 'ecqv', 'edge-computing', 'embedded-security',
+        'iot-security', 'lightweight-pki', 'merkle-mountain-range',
+        'merkle-tree', 'offline-verification', 'openssl', 'pki',
+        'secure-session', 'sm2', 'sm3', 'sm4', 'sparse-merkle-tree',
+        'threshold-policy',
+      ],
+    },
+  },
+  {
+    live: true,
+    why:
+      'Declined as off-topic, but the routing was right: it really does carry ' +
+      'secure-boot. Relevance is a separate question from placement.',
+    expect: 'Secure Boot and Firmware Trust',
+    repo: {
+      name: 'Ventoy',
+      description: 'A new bootable USB solution.',
+      topics: [
+        'arm64', 'auto-install', 'bootable-usb', 'bsd', 'chromeos', 'iso-files',
+        'legacy', 'linux', 'multiboot', 'persistence', 'secure-boot', 'uefi',
+        'unattended', 'unix', 'usb', 'windows', 'x86', 'x86-64',
+      ],
+    },
+  },
+  {
+    live: true,
+    why: 'As Ventoy: declined on relevance, routed correctly.',
+    expect: 'Secure Boot and Firmware Trust',
+    repo: {
+      name: 'rufus',
+      description: 'The Reliable USB Formatting Utility',
+      topics: [
+        'bios', 'boot', 'bootable-drives', 'freedos', 'gpt', 'grub', 'grub4dos',
+        'iso', 'mbr', 'md5', 'persistence', 'rufus', 'secure-boot', 'sha1',
+        'sha256', 'syslinux', 'uefi', 'usb', 'windows', 'windows-to-go',
+      ],
+    },
+  },
+  {
+    live: true,
+    why: 'A genuine secure-boot tool. Routing must survive.',
+    expect: 'Secure Boot and Firmware Trust',
+    repo: {
+      name: 'sbctl',
+      description: ':computer: :lock: :key: Secure Boot key manager',
+      topics: [
+        'efi', 'efi-stub', 'go', 'golang', 'linux', 'secure-boot', 'secureboot',
+        'signatures', 'uefi', 'uefi-secureboot',
+      ],
+    },
+  },
+  {
+    live: true,
+    why: 'A genuine secure-boot tool. Routing must survive.',
+    expect: 'Secure Boot and Firmware Trust',
+    repo: {
+      name: 'lanzaboote',
+      description:
+        'Secure Boot & Measured Boot for NixOS [maintainers=@blitz ' +
+        '@raitobezarius @nikstur]',
+      topics: [
+        'efi', 'measured-boot', 'nix', 'nixos', 'nixpkgs', 'rust', 'secure-boot',
+        'security', 'tpm2', 'uefi',
+      ],
+    },
+  },
+  {
+    live: true,
+    why:
+      'Netlist reverse engineering, hand-placed beside Ghidra and IDA. No ' +
+      'keyword in the table covered netlists, so it got nothing.',
+    expect: 'Disassemblers/Decompilers',
+    repo: {
+      name: 'hal',
+      description: 'HAL – The Hardware Analyzer',
+      topics: [
+        'embedded-security', 'fpga', 'hal', 'hardware', 'integrated-circuits',
+        'netlist', 'reverse-engineering', 'security',
+      ],
+    },
+  },
+  {
+    live: true,
+    why: 'As Ventoy: declined on relevance, routed correctly.',
+    expect: 'Bluetooth and BLE Security',
+    repo: {
+      name: 'OpenTagViewer',
+      description: 'Track your AirTags, iDevices and other FindMy devices on Android',
+      topics: [
+        'airtag', 'android', 'bluetooth', 'bluetooth-le', 'bluetooth-low-energy',
+        'chaquopy', 'findmy', 'hardware-hacking', 'icloud', 'icloud-sync',
+        'looking-for-contributors', 'openhaystack', 'packet-analysis',
+        'reverse-engineering', 'wiki',
+      ],
+    },
+  },
+
+  // --- Synthetic cases, pinning the edges the live twelve do not reach ---
+  {
+    why: 'One strong, specific keyword and nothing else still has to route.',
+    expect: 'Side-Channel Analysis',
+    repo: {
+      name: 'tracehunter',
+      description: 'Correlation power analysis over captured traces.',
+      topics: [],
+    },
+  },
+  {
+    why:
+      'An awesome list that never says "awesome": the description alone is ' +
+      'enough, because contents-based routing is wrong for all of them.',
+    expect: 'Other Awesome Lists',
+    placeable: false,
+    repo: {
+      name: 'iot-security-resources',
+      description: 'A curated list of Zigbee, Z-Wave and LoRaWAN security research.',
+      topics: ['zigbee', 'z-wave'],
+    },
+  },
+  {
+    why: 'A list whose only declaration is the topic its maintainers applied.',
+    expect: 'Other Awesome Lists',
+    placeable: false,
+    repo: {
+      name: 'firmware-index',
+      description: 'Everything worth reading about firmware fuzzing and emulation.',
+      topics: ['awesome-list', 'firmware-security'],
+    },
+  },
+  {
+    why:
+      'Breadth across many sections with no multitool self-description: the ' +
+      'honest answer is the contenders, not a pick among them.',
+    expect: null,
+    repo: {
+      name: 'protocolzoo',
+      description:
+        'Research harness covering MQTT brokers, Zigbee coordinators, ' +
+        'LoRaWAN gateways, GATT servers and Modbus PLCs.',
+      topics: ['mifare', 'sigrok', 'chipwhisperer'],
+    },
+  },
+  {
+    why:
+      'Breadth of generic vocabulary must not beat one precise hit: two soft ' +
+      'words for one section against `chipwhisperer` for another. Counting ' +
+      'matches, BLE won this 2-1.',
+    expect: 'Side-Channel Analysis',
+    repo: {
+      name: 'sca-rig',
+      description: 'ChipWhisperer capture rig.',
+      topics: ['bluetooth', 'ble'],
+    },
+  },
+  {
+    why: 'Nothing matches at all, which stays a non-answer rather than a guess.',
+    expect: null,
+    repo: { name: 'Mystery', description: 'Assorted utilities.', topics: [] },
+  },
+];
+
+for (const entry of ROUTING_CORPUS) {
+  const label = entry.live ? `${entry.repo.name} (live)` : entry.repo.name;
+  test(`routing: ${label} -> ${entry.expect || 'no suggestion'}`, () => {
+    const proposal = proposeSection(entry.repo);
+    assert.strictEqual(proposal.name, entry.expect, entry.why);
+  });
+}
+
+test('an awesome list is routed by what it is, never by what it contains', () => {
+  const proposal = proposeSection(
+    ROUTING_CORPUS.find((e) => e.repo.name === 'awesome-connected-things-sec').repo
+  );
+
+  // Its topics include ble-security and bluetooth-security. Those describe the
+  // resources it indexes, and routing on them is the bug.
+  assert.strictEqual(proposal.name, 'Other Awesome Lists');
+  assert.ok(
+    proposal.matched.some((m) => /awesome/.test(m.keyword)),
+    'the report has to show which signal said "this is a list"'
+  );
+});
+
+test('an awesome list reports the section it cannot compute a position in', () => {
+  const entry = ROUTING_CORPUS.find((e) => e.placeable === false);
+  const proposal = proposeSection(entry.repo);
+
+  assert.strictEqual(proposal.placeable, false);
+  assert.match(proposal.heading, /^## Other Awesome Lists$/);
+  assert.match(proposal.note, /nested/i, 'it must say why there is no line number');
+});
+
+test('a multi-protocol tool is not filed under the first protocol it matched', () => {
+  const proposal = proposeSection(
+    ROUTING_CORPUS.find((e) => e.repo.name === 'ESP32-Bit-Pirate').repo
+  );
+
+  assert.strictEqual(proposal.name, 'Hardware Reverse Engineering Multitools');
+  assert.ok(
+    proposal.contenders.length > 1,
+    'a reviewer checking this needs to see what else it looked like'
+  );
+  assert.ok(
+    proposal.contenders.some((c) => c.name === 'Bluetooth and BLE Security'),
+    'BLE was the old answer, so it has to appear as a contender'
+  );
+});
+
+test('breadth with no multitool claim is reported as breadth, not as a pick', () => {
+  const proposal = proposeSection(
+    ROUTING_CORPUS.find((e) => e.repo.name === 'protocolzoo').repo
+  );
+
+  assert.strictEqual(proposal.name, null);
+  assert.match(proposal.note, /different sections/);
+  assert.ok(proposal.contenders.length >= 4);
+});
+
+test('a lone generic keyword is not enough to name a section', () => {
+  const proposal = proposeSection({
+    name: 'tagtool',
+    description: 'Companion app that talks to trackers over Bluetooth.',
+    topics: [],
+  });
+
+  assert.strictEqual(proposal.name, null);
+  assert.deepStrictEqual(
+    proposal.contenders.map((c) => c.name),
+    ['Bluetooth and BLE Security'],
+    'the near miss is still worth showing'
+  );
+});
+
+test('a near-tie is reported as a near-tie rather than resolved by table order', () => {
+  // `netlist` for one section, `sigrok` for another: one precise keyword each.
+  const proposal = proposeSection({
+    name: 'twoways',
+    description: 'Netlist viewer with a sigrok capture backend.',
+    topics: [],
+  });
+
+  assert.strictEqual(proposal.name, null);
+  assert.match(proposal.note, /not clearly ahead/);
+});
+
+test('the report names the contenders when it declines to choose', () => {
+  const selection = selectCandidates(
+    [
+      ok('q', [
+        repo({
+          full_name: 'acme/protocolzoo',
+          name: 'protocolzoo',
+          html_url: 'https://github.com/acme/protocolzoo',
+          ...ROUTING_CORPUS.find((e) => e.repo.name === 'protocolzoo').repo,
+        }),
+      ]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+  const { body } = render(selection);
+
+  assert.ok(body.includes('no suggestion'));
+  assert.ok(body.includes('IoT Protocol Security'), 'the contenders have to be shown');
+});
+
+test('the report says an awesome list has a section but no computable line', () => {
+  const selection = selectCandidates(
+    [
+      ok('q', [
+        repo({
+          full_name: 'v33ru/awesome-connected-things-sec',
+          html_url: 'https://github.com/V33RU/awesome-connected-things-sec',
+          ...ROUTING_CORPUS.find((e) => e.repo.name === 'awesome-connected-things-sec')
+            .repo,
+        }),
+      ]),
+    ],
+    list,
+    noDeclines,
+    NOW
+  );
+  const { body } = render(selection);
+
+  assert.ok(body.includes('## Other Awesome Lists'));
+  assert.ok(
+    !body.includes('heading not found'),
+    'the heading is in README.md; saying otherwise is a different, false claim'
+  );
+  assert.ok(!/README\.md:\d+/.test(body), 'it must not invent a line number');
 });
 
 test('the rendered report names the section and the exact line', () => {
