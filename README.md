@@ -120,6 +120,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Firmware Supply Chain and SBOM
 
+* [CRACI](https://docs.craci.com/guides/examples/yocto/) 💰 - Managed GitHub Actions runners that run Yocto/BitBake builds and record the packages each build fetches in a CycloneDX or SPDX SBOM for that job.
 * [CVE Binary Tool](https://github.com/ossf/cve-bin-tool) - OpenSSF tool that scans binaries directly for 350+ known-vulnerable open source components (OpenSSL, libpng, BusyBox, and more), without requiring a pre-built SBOM; can also generate one from the scan.
 * [Grype](https://github.com/anchore/grype) - Vulnerability scanner that consumes SBOMs to identify known CVEs in firmware dependencies.
 * [in-toto](https://in-toto.io/) - Framework for supply chain integrity that records signed provenance steps and enforces layout verification.
