@@ -104,6 +104,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Open OCD](https://github.com/openocd-org/openocd/) - Provides on-chip programming and debugging support with a layered architecture of JTAG interface and TAP support.
 * [probe-rs](https://probe.rs/) - Modern Rust-based embedded debug toolkit supporting SWD/JTAG with built-in flashing, RTT logging, and GDB server for ARM and RISC-V targets.
 * [pyOCD](https://pyocd.io) - An open-source Python library for programming and debugging Arm Cortex-M microcontrollers with cross-platform debug probe support.
+* [gv100-fecs-limiter](https://github.com/jajmangold/gv100-fecs-limiter) - Reverse-engineering the FECS speed-select limiter on NVIDIA CMP 100-210 (GV100) GPUs: VBIOS decode, BAR0 register probes, CUDA tensor-path benchmarks, leaked NVIDIA source analysis. `gpu` `nvidia`
 
 ### USB Emulation and Fuzzing
 
