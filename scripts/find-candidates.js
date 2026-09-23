@@ -55,7 +55,9 @@ const SEARCH_TERMS = [
   'topic:iot-security',
   'topic:hardware-hacking',
   'topic:side-channel',
-  'topic:fault-injection',
+  // Chaos engineering for cloud services claims this topic too, and it
+  // outnumbers hardware glitching by stars, so it is excluded by name.
+  'topic:fault-injection -topic:chaos-engineering -topic:chaos-testing -topic:kubernetes',
   'topic:secure-boot',
   'topic:jtag',
   // Broad topics, narrowed with a security term.

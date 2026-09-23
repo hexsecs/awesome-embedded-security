@@ -94,6 +94,56 @@
       "url": "https://github.com/Foxboron/go-uefi",
       "reason": "Go library for Linux UEFI variables and Secure Boot signing, and the library underneath sbctl, which was declined for the same reason: the target is general-purpose machines, not embedded devices.",
       "date": "2026-09-18"
+    },
+    {
+      "url": "https://github.com/chaos-mesh/chaos-mesh",
+      "reason": "Chaos engineering platform for Kubernetes. Carries the fault-injection topic in the cloud-reliability sense, like istio, not glitching a chip.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/chaosblade-io/chaosblade",
+      "reason": "Chaos engineering toolkit for cloud and container infrastructure. Same reason as chaos-mesh: fault injection in the reliability-testing sense.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/litmuschaos/litmus",
+      "reason": "Cloud-native chaos engineering for Kubernetes. Same reason as chaos-mesh.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/alexei-led/pumba",
+      "reason": "Chaos testing and network emulation for Docker containers. Same reason as chaos-mesh.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/pingcap/failpoint",
+      "reason": "Go library for injecting failures into code paths during testing. Software fault injection, not hardware.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/asatarin/testing-distributed-systems",
+      "reason": "Awesome list about testing distributed systems. Found through the fault-injection topic, but not an embedded security resource.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/7PH/powerglitch",
+      "reason": "JavaScript library for visual glitch effects on web pages. Matched the glitching search on the word alone.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/Wren6991/Hazard3",
+      "reason": "RISC-V processor core. Its debug module earns the jtag topic, but it is a CPU design, not a security tool.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/makalin/KeyForge3D",
+      "reason": "Turns a photo of a key into a 3D-printable model. Physical lock bypass rather than embedded security.",
+      "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/hypery11/flipper-tesla-fsd",
+      "reason": "Flipper Zero and ESP32 mods for Tesla vehicles, such as disabling driver-attention nags and unlocking FSD by region. Vehicle modding rather than a security research resource, and the repository has no license.",
+      "date": "2026-09-23"
     }
   ]
 }
