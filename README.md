@@ -148,6 +148,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Security Auditing Frameworks
 
+* [Bjorn](https://github.com/infinition/Bjorn) - Network scanning and offensive security tool for the Raspberry Pi with a 2.13-inch e-Paper HAT that discovers hosts, open ports, and exposed services, then runs brute-force and custom attack scripts against them.
 * [EXPLIoT](https://pypi.org/project/expliot/) - Framework for security testing and exploiting IoT products and IoT infrastructure. It provides a set of plugins (test cases) which are used to perform the assessment and can be extended easily with new ones.
 * [Firmware Analysis and Comparison Tool (FACT)](https://fkie-cad.github.io/FACT_core/) - Automated Firmware Security analysis (Router, IoT, UEFI, Webcams, Drones, …). It is easy to use (web UI), extend (plug-in system) and integrate (REST API).
 * [FwAnalyzer (Firmware Analyzer)](https://github.com/cruise-automation/fwanalyzer) - Tool to analyze (ext2/3/4), FAT/VFat, SquashFS, UBIFS filesystem images, cpio archives, and directory content using a set of configurable rules.
@@ -270,6 +271,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Hardware Reverse Engineering Multitools
 
 * [Bus Pirate](https://buspirate.com/) - Open source hacker multi-tool that talks to electronic stuff. It's got a bunch of features an intrepid hacker might need to prototype their next project.
+* [cyber-controller](https://github.com/LxveAce/cyber-controller) - Dashboard for flashing, controlling, and coordinating ESP32 security firmware (Marauder, Bruce, GhostESP), Flipper Zero, and Raspberry Pi hardware from one place.
 * [ESP32 Bit Pirate](https://github.com/geo-tp/ESP32-Bit-Pirate) - Open-source ESP32 firmware inspired by the Bus Pirate that sniffs and drives I2C, SPI, UART, 1-Wire, JTAG, CAN, and USB from a serial or web-based CLI, with Bluetooth, Wi-Fi, Sub-GHz, and RFID modes alongside.
 * [Glasgow Interface Explorer](https://glasgow-embedded.org/) - Versatile open-source FPGA-based hardware debugging and reverse engineering tool supporting SPI, I2C, UART, JTAG, and custom protocols with a high-level Python API.
 * [GreatFET](https://greatscottgadgets.com/greatfet/) - Open-source USB host-side hardware security research platform from Great Scott Gadgets with an expandable neighbor board ecosystem for interfacing with embedded targets.
