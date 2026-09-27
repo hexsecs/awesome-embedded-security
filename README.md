@@ -109,12 +109,14 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [Facedancer](https://github.com/greatscottgadgets/facedancer) - Python framework for emulating, creating, and tampering with USB devices using compatible hardware such as Cynthion or GreatFET.
 * [Hydradancer](https://github.com/HydraDancer/hydradancer_fw) - Facedancer backend firmware from Quarkslab for the HydraUSB3 board, reaching USB 2.0 High-Speed emulation rates well above the original Facedancer hardware.
+* [Raw Gadget](https://github.com/xairy/raw-gadget) - Linux kernel module exposing a low-level interface to the USB Gadget subsystem for emulating arbitrary USB devices in software; it is what syzkaller uses to fuzz the kernel's USB host stack.
 * [umap2](https://github.com/nccgroup/umap2) - Host-side USB security assessment tool from NCC Group that emulates devices to enumerate which classes a host supports, then fuzzes the matching drivers with the Kitty engine.
 
 ### Secure Boot and Firmware Trust
 
 * [AVB (Android Verified Boot)](https://android.googlesource.com/platform/external/avb/+/master/README.md) - Reference implementation and design guidance for chained trust and verified partitions in embedded Android systems.
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
+* [Trusted Firmware-A](https://trustedfirmware-a.readthedocs.io/en/latest/) - Reference secure-world firmware for Arm A-profile processors, providing the EL3 secure monitor and a Trusted Board Boot chain of trust following Arm's TBBR-CLIENT specification.
 * [U-Boot Verified Boot](https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html) - FIT-signature based verified boot support for embedded Linux boot chains.
 * [wolfBoot](https://github.com/wolfSSL/wolfBoot) - Portable secure bootloader for 32-bit MCUs using wolfCrypt for image signature verification (Ed25519, ECC, RSA, post-quantum LMS/XMSS), with delta updates, encrypted images, and explicit voltage-glitch countermeasures.
 
@@ -160,6 +162,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [EmTaint](https://github.com/kuc001/EmTaint) - Structured symbolic expression-based taint analysis with on-demand alias resolution for embedded Linux firmware; found 151 0-day vulnerabilities across 35 real-world images. ISSTA 2023.
 * [KARONTE](https://github.com/ucsb-seclab/karonte) - Static analysis tool that tracks untrusted input flows across binary boundaries (shared files, sockets, env vars) in embedded Linux firmware using angr-based inter-binary taint propagation. IEEE S&P 2020.
+* [Operation Mango](https://github.com/sefcom/operation-mango-public) - Taint-style static analysis that finds vulnerabilities in binary firmware services by reasoning backward from dangerous sinks, using a technique it calls assumed execution. USENIX Security 2024.
 * [SaTC](https://github.com/NSSL-SJTU/SaTC) - Anchors taint analysis to string literals shared between web front-end and back-end binaries to pinpoint user-controlled input entry points; found 33 unknown bugs in commercial firmware. USENIX Security 2021.
 
 ### RTOS Security
@@ -217,6 +220,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [BlueToolkit](https://github.com/sgxgsx/BlueToolkit) - Modular black-box vulnerability testing framework for Bluetooth Classic and BLE with Recon/Exploit/Report modules covering 40+ public exploits (MITM, RCE, DoS); used to uncover 128 vulnerabilities across 22 vehicles from major automakers. USENIX WOOT 2025.
 * [BrakTooth](https://github.com/Matheus-Garbelini/braktooth_esp32_bluetooth_classic_attacks) - Directed exploit suite for Bluetooth Classic LMP layer vulnerabilities, targeting protocol layers inaccessible from standard host stacks; affected 1,400+ products from Intel, Qualcomm, and Broadcom. USENIX Security 2022.
 * [BtleJuice](https://github.com/DigitalSecurity/btlejuice) 🗄️ - Bluetooth Low Energy MITM proxy framework for real-time interception and manipulation of BLE communications. Archived since 2018; see BtleJack or the WHAD Framework for maintained alternatives.
+* [FirmXRay](https://github.com/OSUSecLab/FirmXRay) - Ghidra-based static analysis that finds Bluetooth link-layer vulnerabilities in bare-metal Cortex-M firmware built on Nordic and TI BLE SDKs. CCS 2020.
 * [GATTacker](https://github.com/securing/gattacker) - BLE MITM tool for intercepting and relaying GATT profiles to test BLE device authentication and data integrity.
 * [InternalBlue](https://github.com/seemoo-lab/internalblue) - Bluetooth experimentation framework enabling binary patching, LMP injection, and live monitoring of Broadcom/Cypress firmware on commodity devices (iPhone, Samsung Galaxy, Raspberry Pi) without custom hardware.
 * [nRF Sniffer for Bluetooth LE](https://www.nordicsemi.com/Products/Development-tools/nRF-Sniffer-for-Bluetooth-LE) 💰 - Nordic Semiconductor's BLE packet sniffer for capturing and analyzing Bluetooth Low Energy traffic with Wireshark integration. Wireshark plugin is open source; dongle firmware is a closed binary requiring Nordic hardware.
@@ -251,6 +255,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Firmadyne](https://github.com/firmadyne/firmadyne) - Automated system for emulating and analyzing Linux-based embedded firmware; extracts and boots firmware images in QEMU to enable dynamic vulnerability discovery.
 * [FirmAE](https://github.com/pr0v3rbs/FirmAE) - An automated framework for emulation and vulnerability analysis of IoT firmware with an 79% success rate using arbitration techniques.
 * [FirmSolo](https://github.com/BUseclab/FirmSolo) - Reverse-engineers vendor Linux kernel module version magic to load proprietary `.ko` drivers into a compatible kernel for dynamic analysis and fuzzing, unlocking code previously inaccessible to emulators. USENIX Security 2023.
+* [Greenhouse](https://github.com/sefcom/greenhouse) - User-space rehosting of single network services from Linux-based firmware, using a patched QEMU and AFL++ for fuzzing; rehosted 2,841 of 7,140 images from nine vendors. USENIX Security 2023.
 * [HALucinator](https://github.com/embedded-sec/halucinator) - MCU firmware emulation framework that replaces Hardware Abstraction Layer (HAL) functions with high-level models, enabling full firmware execution without physical hardware.
 * [PANDA](https://github.com/panda-re/panda) - Platform for Architecture-Neutral Dynamic Analysis with record/replay functionality and LLVM IR translation for whole-system analysis.
 * [Qiling](https://github.com/qilingframework/qiling) - An advanced binary emulation framework supporting cross-platform OS-level emulation for Windows, Linux, Android, BSD, UEFI, and multiple architectures.
@@ -280,6 +285,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Hardware Debug Interfaces
 
+* [blueTag](https://github.com/Aodrulez/blueTag) - JTAGulator alternative for RP2040 boards such as the Raspberry Pi Pico that detects JTAG and SWD pinouts on unknown targets, and doubles as a CMSIS-DAP adapter, flashrom SPI programmer and USB-to-serial bridge.
 * [JTAGenum](https://github.com/cyphunk/JTAGenum) - Enumerates JTAG pinouts on unknown boards by brute-force testing candidate pin mappings.
 * [JTAGulator](https://github.com/grandideastudio/jtagulator) - Automates discovery of JTAG, SWD, and UART debug interfaces on unknown PCBs by brute-forcing pin combinations, with sigrok-compatible logic analyzer mode and direct OpenOCD integration for post-discovery exploitation.
 * [UrJTAG](https://urjtag.sourceforge.io/) - Open-source JTAG toolkit for boundary scan, flash programming, and low-level target interaction.
@@ -289,6 +295,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Cynthion](https://greatscottgadgets.com/cynthion/) - FPGA-based USB research tool and high-speed USB 2.0 protocol analyzer for capturing traffic and experimenting with USB devices.
 * [LUNA](https://github.com/greatscottgadgets/luna) - FPGA-based USB analysis and development platform from Great Scott Gadgets, enabling USB sniffing, protocol fuzzing, and custom USB peripheral development via Amaranth HDL.
 * [OpenVizsla](https://github.com/openvizsla/ov_ftdi) - Open hardware USB protocol tracer with an FPGA capture path and host software for sniffing full and high-speed traffic; boards are sold by sysmocom and 3mdeb.
+* [Packetry](https://github.com/greatscottgadgets/packetry) - Great Scott Gadgets' USB 2.0 protocol analysis application, decoding traffic captured live by Cynthion or loaded from pcap files.
 
 ### Chip-Off and Memory Forensics
 
@@ -321,6 +328,8 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Logic Analyzers
 
+* [DSView](https://github.com/DreamSourceLab/DSView) - GUI for DreamSourceLab's logic analyzers and oscilloscopes, built on the sigrok project.
+* [LogicAnalyzer](https://github.com/gusmanb/logicanalyzer) - Open hardware and software logic analyzer for the RP2040 and RP2350, capturing up to 24 channels at 100 Msps from a Raspberry Pi Pico and daisy-chaining up to five boards.
 * [Saleae](https://www.saleae.com/) 💰 - Commercial logic analyzer hardware ($149–$499+) with proprietary software; widely used for decoding SPI, I2C, UART, and other embedded protocols.
 * [Sigrok](https://sigrok.org/) - Portable, cross-platform, Free/Libre/Open-Source signal analysis software suite that supports various device types (e.g. logic analyzers, oscilloscopes, and many more).
 
@@ -329,6 +338,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [libnfc](https://github.com/nfc-tools/libnfc) - Platform-independent NFC library covering ISO14443-A/B, FeliCa, and MIFARE, and the foundation most other NFC tooling builds on.
 * [MFCUK](https://github.com/nfc-tools/mfcuk) - Implementation of the Dark Side attack, recovering a first MIFARE Classic key when none is known.
 * [MFOC](https://github.com/nfc-tools/mfoc) - Nested attack that recovers the remaining MIFARE Classic sector keys once one key is known; pairs with MFCUK.
+* [mfoc-hardnested](https://github.com/nfc-tools/mfoc-hardnested) - Fork of MFOC adding the hardnested attack, which recovers MIFARE Classic keys from cards with hardened PRNGs that the offline nested attack alone cannot break; works with libnfc-supported readers.
 
 ### RF Tools (Non-SDR)
 
@@ -386,6 +396,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Security Assessment and Design Guidance
 
 * [OWASP IoT Security Testing Guide](https://github.com/OWASP/owasp-istg) - Methodology and test catalog for repeatable IoT penetration testing and security assessments.
+* [OWASP IoT Security Verification Standard](https://github.com/OWASP/IoT-Security-Verification-Standard-ISVS) - Open standard of security requirements for IoT ecosystems, spanning hardware platforms, software platforms, communications and user-space applications, for use across design, development and testing.
 * [PSA Certified](https://www.psacertified.org/) - IoT security framework, certification scheme, and developer resources for device, silicon, software, and root-of-trust security.
 
 ### Standards and Regulation
