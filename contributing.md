@@ -11,6 +11,18 @@ Good contributions include:
 - Small documentation or workflow improvements that make the list easier to
   maintain.
 
+### Commercial and closed-source tools
+
+Commercial or closed-source tools are listed only when one of these holds:
+
+- It has an open-source community edition, as Peach does. Link the community
+  edition and say in the description what the commercial product adds.
+- It is a de facto standard in the field, as IDA Pro is.
+
+A commercial tool with neither, such as a vendor service or a hosted product,
+will be declined however good it is. Mark any entry that is commercial or
+closed-source with 💰 (see [Markers](#markers)).
+
 ## Before You Open a PR
 
 Run the local checks:
