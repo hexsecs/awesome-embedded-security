@@ -88,6 +88,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Keystone](https://github.com/keystone-engine/keystone) - A lightweight multi-architecture assembler framework that complements Capstone.
 * [Miasm](https://github.com/cea-sec/miasm) - Reverse engineering framework with its own intermediate language, a JIT emulator, and symbolic execution, covering MSP430 and MIPS alongside the usual architectures.
 * [radare2](https://www.radare.org/n/) - A free/libre toolchain for easing several low level tasks like forensics, software reverse engineering, exploiting, debugging. It is composed by a bunch of libraries (which are extended with plugins) and programs that can be automated with almost any programming language.
+* [REA](https://github.com/morluto/rea) - Local CLI and MCP frontend for agent-assisted native executable analysis through separately installed Ghidra, Hopper, or IDA, with evidence provenance and explicit limitations.
 * [Reko](https://github.com/uxmal/reko) - Open-source decompiler with unusually broad architecture coverage, useful for embedded cores that mainstream tools support poorly.
 * [RetDec](https://github.com/avast/retdec) - Retargetable machine-code decompiler from Avast supporting ARM, MIPS, x86, and other architectures common in embedded firmware.
 * [Rizin](https://rizin.re/) - A free and open-source Reverse Engineering framework, providing a complete binary analysis experience with features like Disassembler, Hexadecimal editor, Emulation, Binary inspection, Debugger, and more.
