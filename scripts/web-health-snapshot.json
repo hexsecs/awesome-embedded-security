@@ -1,5 +1,846 @@
 {
   "version": 1,
   "note": "Written by scripts/check-web-health.js. Hand edits are overwritten. To sign off an outstanding finding, add the entry to scripts/web-health-acknowledged.json instead — this file is not the place to do it.",
-  "entries": {}
+  "entries": {
+    "https://airspy.com/": {
+      "finalUrl": "https://airspy.com/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 15 Oct 2026 10:00:02 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://android.googlesource.com/platform/external/avb/+/master/README.md": {
+      "finalUrl": "https://android.googlesource.com/platform/external/avb/+/master/README.md",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "e48935fdfb6ba7305f1a6669cac5e13c",
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://binary.ninja/": {
+      "finalUrl": "https://binary.ninja/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Wed, 14 Oct 2026 16:55:27 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://bruce.computer/": {
+      "finalUrl": "https://bruce.computer/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6ad0b08e-bed9\"",
+      "lastModified": "Thu, 15 Oct 2026 10:53:02 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://buspirate.com/": {
+      "finalUrl": "https://buspirate.com/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"4c1d-15FWNGqqXETf8R2hwR+5Vgk544k\"",
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://codeberg.org/blackmagic-debug/blackmagic": {
+      "finalUrl": "https://codeberg.org/blackmagic-debug/blackmagic",
+      "httpStatus": 200,
+      "hash": "060821413ee93bdc60c8c1417683f2939258db8b43c10a30fa275624f5e18603",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://csa-iot.org/all-solutions/matter/": {
+      "finalUrl": "https://csa-iot.org/all-solutions/matter/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 15 Oct 2026 10:57:23 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://csrc.nist.gov/pubs/fips/140-3/final": {
+      "finalUrl": "https://csrc.nist.gov/pubs/fips/140-3/final",
+      "httpStatus": 200,
+      "hash": "c5c4b1cc9053d72150be76d0497e93d511652b8a0bc699f33171d02fa3ea6ea6",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://csrc.nist.gov/pubs/ir/8259/a/final": {
+      "finalUrl": "https://csrc.nist.gov/pubs/ir/8259/a/final",
+      "httpStatus": 200,
+      "hash": "25d26db974cc6342464ae5fad46e299dc92670dda03742d418bbd013401eba4a",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://cutter.re/": {
+      "finalUrl": "https://cutter.re/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6a7e464d-7b5b\"",
+      "lastModified": "Thu, 13 Aug 2026 22:33:49 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://datatracker.ietf.org/doc/html/rfc7252": {
+      "finalUrl": "https://datatracker.ietf.org/doc/html/rfc7252",
+      "httpStatus": 200,
+      "hash": "fc589e21df45c6c367b54be182d517b10709808f779bd24dacf63d67e5e40e4b",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://datatracker.ietf.org/wg/suit/about/": {
+      "finalUrl": "https://datatracker.ietf.org/wg/suit/about/",
+      "httpStatus": 200,
+      "hash": "ba9401ef072668797cde6e06f179cc8ded5908eb51ffa2b00241f96c3432a0ec",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act": {
+      "finalUrl": "https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"1792061561\"",
+      "lastModified": "Thu, 15 Oct 2026 10:52:41 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://docs.flipper.net/": {
+      "finalUrl": "https://docs.flipper.net/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 15 Oct 2026 08:47:04 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html": {
+      "finalUrl": "https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"5551dd907637b7145338c39424dfbf41\"",
+      "lastModified": "Wed, 07 Oct 2026 14:53:15 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://docs.zephyrproject.org/latest/security/index.html": {
+      "finalUrl": "https://docs.zephyrproject.org/latest/security/index.html",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"7368dbc3d91afbad893deccb19e873d7\"",
+      "lastModified": "Wed, 14 Oct 2026 23:35:39 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://ectf.mitre.org/": {
+      "finalUrl": "https://ectf.mitre.org/",
+      "httpStatus": 200,
+      "hash": "5afe4569cfe652365c8a04ca6787b1fee89b3bcd8543fc010b87b40726d5efd1",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://embeddedsecurity.io/": {
+      "finalUrl": "https://embeddedsecurity.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 15 Oct 2026 10:57:16 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0387": {
+      "finalUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0387",
+      "httpStatus": 202,
+      "hash": "c552a1beabf386ffba7464b3af2176424378629383340cdcf3befc04bef0b8cb",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0388": {
+      "finalUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A42021X0388",
+      "httpStatus": 202,
+      "hash": "c552a1beabf386ffba7464b3af2176424378629383340cdcf3befc04bef0b8cb",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://fkie-cad.github.io/FACT_core/": {
+      "finalUrl": "https://fkie-cad.github.io/FACT_core/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6ac746eb-1fed\"",
+      "lastModified": "Thu, 08 Oct 2026 07:31:55 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://flashrom.org/": {
+      "finalUrl": "https://flashrom.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"6ace2052-270a\"",
+      "lastModified": "Tue, 13 Oct 2026 12:13:06 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://frida.re/": {
+      "finalUrl": "https://frida.re/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Fri, 09 Oct 2026 19:39:31 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://ghidra-sre.org/": {
+      "finalUrl": "https://github.com/NationalSecurityAgency/ghidra",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"176a539c4f9147398241c1d04fa80a39\"",
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://glasgow-embedded.org/": {
+      "finalUrl": "https://glasgow-embedded.org/en/intro.html",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"sha256-8d84cd052fe9f942b8c31875e095dac3801ed6bf8e65fe06048756eecc6f3da0\"",
+      "lastModified": "Thu, 15 Oct 2026 08:51:06 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://grandideastudio.com/training/": {
+      "finalUrl": "https://grandideastudio.com/training/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"863f-uLpDrqPs5ZaLzvG8rjqd7NzVw1s\"",
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://greatscottgadgets.com/cynthion/": {
+      "finalUrl": "https://greatscottgadgets.com/cynthion/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"2008-65c45717415ba\"",
+      "lastModified": "Fri, 25 Sep 2026 02:26:26 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://greatscottgadgets.com/greatfet/": {
+      "finalUrl": "https://greatscottgadgets.com/greatfet/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"17f0-65c45717438e2\"",
+      "lastModified": "Fri, 25 Sep 2026 02:26:26 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://greatscottgadgets.com/hackrf/": {
+      "finalUrl": "https://greatscottgadgets.com/hackrf/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"1775-65c4571743112\"",
+      "lastModified": "Fri, 25 Sep 2026 02:26:26 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://greatscottgadgets.com/yardstickone/": {
+      "finalUrl": "https://greatscottgadgets.com/yardstickone/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"2683-65c4571762688\"",
+      "lastModified": "Fri, 25 Sep 2026 02:26:26 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://hex-rays.com/ida-pro/": {
+      "finalUrl": "https://hex-rays.com/ida-pro",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Tue, 13 Oct 2026 21:36:38 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://hugsy.github.io/gef/": {
+      "finalUrl": "https://hugsy.github.io/gef/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6a87732f-c253\"",
+      "lastModified": "Thu, 20 Aug 2026 21:35:43 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://hydrabus.com/": {
+      "finalUrl": "https://hydrabus.com/?v=0b3b97fa6688",
+      "httpStatus": 200,
+      "hash": "969cd1a8a650cae486730ef6091aac5b91a40c81475aaba1c5e3598f2a89c624",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://in-toto.io/": {
+      "finalUrl": "https://in-toto.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"5d2ecc2391bf6b860d9d8b4132316360-ssl-df\"",
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://kaitai.io/": {
+      "finalUrl": "https://kaitai.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"696e4938-7504\"",
+      "lastModified": "Mon, 19 Jan 2026 15:09:44 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://keylime.dev/": {
+      "finalUrl": "https://keylime.dev/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6797792c-3141\"",
+      "lastModified": "Mon, 27 Jan 2025 12:16:44 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://learn.securinghardware.com/": {
+      "finalUrl": "https://learn.securinghardware.com/",
+      "httpStatus": 200,
+      "hash": "7490fd7f0567f3dc9326308725368d55ac27c860919342a8db833089fa60058f",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://libcoap.net/": {
+      "finalUrl": "https://libcoap.net/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"3197969994\"",
+      "lastModified": "Thu, 30 Jan 2025 08:33:33 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://limemicro.com/sdr/": {
+      "finalUrl": "https://limemicro.com/sdr/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"41b32905d3d476f4fac47bdd36556c90\"",
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://llvm.org/docs/LibFuzzer.html": {
+      "finalUrl": "https://llvm.org/docs/LibFuzzer.html",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"20cf3-65ddbaf218e6a-gzip\"",
+      "lastModified": "Thu, 15 Oct 2026 07:06:17 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://maia-sdr.org/": {
+      "finalUrl": "https://maia-sdr.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6a27cd73-2145\"",
+      "lastModified": "Tue, 09 Jun 2026 08:23:15 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://mender.io/": {
+      "finalUrl": "https://mender.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"d6c5b9b16201bbf19214e3689b6fe6b8\"",
+      "lastModified": "Wed, 14 Oct 2026 17:33:39 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://microcorruption.com/": {
+      "finalUrl": "https://microcorruption.com/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"dc766852cbb39e0edac9b1072c6e15d6\"",
+      "lastModified": "Fri, 28 Oct 2022 22:01:56 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://mqtt.org/faq/": {
+      "finalUrl": "https://mqtt.org/faq/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"69e0ed12-2322\"",
+      "lastModified": "Thu, 16 Apr 2026 14:07:14 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-193.pdf": {
+      "finalUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-193.pdf",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"d0823fdbabe3d31:0\"",
+      "lastModified": "Fri, 04 May 2018 13:28:58 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://opentitan.org/": {
+      "finalUrl": "https://opentitan.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"9c53583ee1c5f2a41beabc3d5f7adc20\"",
+      "lastModified": "Wed, 23 Sep 2026 07:29:43 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://optee.readthedocs.io/": {
+      "finalUrl": "https://optee.readthedocs.io/en/latest/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"c4db45dab91cf5922accaeeb5057f354\"",
+      "lastModified": "Mon, 28 Sep 2026 11:49:52 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://probe.rs/": {
+      "finalUrl": "https://probe.rs/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6ac4f036-8926\"",
+      "lastModified": "Tue, 06 Oct 2026 12:57:26 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://pwnagotchi.ai/": {
+      "finalUrl": "https://pwnagotchi.ai/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Wed, 19 Aug 2026 09:16:00 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://pyocd.io": {
+      "finalUrl": "https://pyocd.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6a44b4bf-4875\"",
+      "lastModified": "Wed, 01 Jul 2026 06:33:35 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://pypi.org/project/expliot/": {
+      "finalUrl": "https://pypi.org/project/expliot/",
+      "httpStatus": 200,
+      "hash": "e40ccca25f9ba94fcdf0ccbd59a3badda4ec516f104ea1b55339a6c0cb855294",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://raelize.com/blog": {
+      "finalUrl": "https://raelize.com/blog/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6a5fa001-35f2\"",
+      "lastModified": "Tue, 21 Jul 2026 16:36:17 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://rauc.io/": {
+      "finalUrl": "https://rauc.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"690fded2-3024\"",
+      "lastModified": "Sun, 09 Nov 2025 00:22:42 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://renode.io/": {
+      "finalUrl": "https://antmicro.com/platforms/renode/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Wed, 14 Oct 2026 09:19:07 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://rizin.re/": {
+      "finalUrl": "https://rizin.re/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6aca2a15-4886\"",
+      "lastModified": "Sat, 10 Oct 2026 12:05:41 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://sbabic.github.io/swupdate/": {
+      "finalUrl": "https://sbabic.github.io/swupdate/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6a196da4-898c\"",
+      "lastModified": "Fri, 29 May 2026 10:42:44 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://sel4.systems/": {
+      "finalUrl": "https://sel4.systems/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Wed, 14 Oct 2026 06:54:08 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://sigrok.org/": {
+      "finalUrl": "https://sigrok.org/wiki/Main_Page",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 06 Nov 2025 12:19:17 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://source.android.com/docs/security/features/trusty": {
+      "finalUrl": "https://source.android.com/docs/security/features/trusty?hl=fa",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Wed, 30 Sep 2026 20:37:43 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://theupdateframework.io/": {
+      "finalUrl": "https://theupdateframework.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"1caacf92875ef15e9ae860c9231aa650-ssl-df\"",
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://trustedfirmware-a.readthedocs.io/en/latest/": {
+      "finalUrl": "https://trustedfirmware-a.readthedocs.io/en/latest/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"1b52f1723e103a8ff674566f31d4e3ac\"",
+      "lastModified": "Sat, 03 Oct 2026 03:19:13 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://trustedfirmware-m.readthedocs.io/en/latest/": {
+      "finalUrl": "https://trustedfirmware-m.readthedocs.io/en/latest/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"1c3ce2bda69839afb17b529bc9d5a6b2\"",
+      "lastModified": "Fri, 09 Oct 2026 08:51:12 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://uptane.org/": {
+      "finalUrl": "https://uptane.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"68f379a6-94e3\"",
+      "lastModified": "Sat, 18 Oct 2025 11:27:34 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://urjtag.sourceforge.io/": {
+      "finalUrl": "https://urjtag.sourceforge.io/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6057a91b-f52\"",
+      "lastModified": "Sun, 21 Mar 2021 20:14:19 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.bettercap.org/modules/ble/": {
+      "finalUrl": "https://www.bettercap.org/modules/ble/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 20 Aug 2026 17:14:10 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.commoncriteriaportal.org/": {
+      "finalUrl": "https://www.commoncriteriaportal.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"9a-62e9b00c701fc-gzip\"",
+      "lastModified": "Thu, 20 Feb 2025 23:12:08 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/": {
+      "finalUrl": "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/02.01.01_60/",
+      "httpStatus": 200,
+      "hash": "cb070ebd2c5c527f3bec428097f4eb2c020e3af6ca37dd64a14914ec78fa9d81",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.ettus.com/": {
+      "finalUrl": "https://www.ettus.com/",
+      "httpStatus": 200,
+      "hash": "5a7c1711f2ea359bb3212967fc5ba5731829b1bff822259df203dcc27e3372df",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.freertos.org/Security/01-Security-overview": {
+      "finalUrl": "https://www.freertos.org/Security/01-Security-overview",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"a270749221d55a1ef2addbd2a8cf2542\"",
+      "lastModified": "Wed, 14 Oct 2026 10:05:33 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.futuresdr.org/": {
+      "finalUrl": "https://www.futuresdr.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6a0e2f62-1f1a\"",
+      "lastModified": "Wed, 20 May 2026 22:02:10 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.gnuradio.org/": {
+      "finalUrl": "https://www.gnuradio.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "W/\"6aa2dc0e-3fb4\"",
+      "lastModified": "Thu, 10 Sep 2026 16:34:22 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.gqrx.dk/": {
+      "finalUrl": "https://www.gqrx.dk/",
+      "httpStatus": 200,
+      "hash": "9d96c8b110d2b5fd1e93149cf386516ca1f3565b49a2e3301d4f68bf4cb44ace",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards": {
+      "finalUrl": "https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards",
+      "httpStatus": 200,
+      "hash": "612552585157986dbf29089db96e0825e85b46c38ddfb1cd92a82434f6e9da36",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.nuand.com/bladerf-2-0-micro/": {
+      "finalUrl": "https://www.nuand.com/bladerf-2-0-micro/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Tue, 13 Oct 2026 13:14:37 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.psacertified.org/": {
+      "finalUrl": "https://www.psacertified.org/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Wed, 23 Sep 2026 11:52:18 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.radare.org/n/": {
+      "finalUrl": "https://www.radare.org/n/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"f8d-65d53bbf2e72b\"",
+      "lastModified": "Thu, 08 Oct 2026 12:54:37 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.rtl-sdr.com/": {
+      "finalUrl": "https://www.rtl-sdr.com/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 15 Oct 2026 08:25:07 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.saleae.com/": {
+      "finalUrl": "https://www.saleae.com/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Thu, 08 Oct 2026 20:56:57 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.sleuthkit.org/sleuthkit/": {
+      "finalUrl": "https://www.sleuthkit.org/sleuthkit/",
+      "httpStatus": 200,
+      "hash": "76c3dec11840ab79932a170abd49bcdd50bbb131492716cbbe887d780ee8ddc1",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.sourceware.org/gdb/": {
+      "finalUrl": "https://www.sourceware.org/gdb/",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"411c-65c5086675bbe-gzip\"",
+      "lastModified": "Fri, 25 Sep 2026 15:39:42 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.synacktiv.com/en/publications/how-to-voltage-fault-injection": {
+      "finalUrl": "https://www.synacktiv.com/en/publications/how-to-voltage-fault-injection",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": "\"6acf3c55-5929\"",
+      "lastModified": "Wed, 14 Oct 2026 08:24:53 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.tockos.org/": {
+      "finalUrl": "https://www.tockos.org/",
+      "httpStatus": 200,
+      "hash": "58c8ed6f13515a78931753db6ddb9a706878a78d1c64a02e4a8fc1f9def27091",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.wireshark.org/docs/dfref/m/mqtt.html": {
+      "finalUrl": "https://www.wireshark.org/docs/dfref/m/mqtt.html",
+      "httpStatus": 200,
+      "hash": null,
+      "etag": null,
+      "lastModified": "Wed, 07 Oct 2026 21:24:09 GMT",
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    },
+    "https://www.wolfssl.com/products/wolfmqtt/": {
+      "finalUrl": "https://www.wolfssl.com/products/wolfmqtt/",
+      "httpStatus": 200,
+      "hash": "e684f5ab9162b51fc400b10f1c48c1fe1f6188f27109b352f5989375598eb846",
+      "etag": null,
+      "lastModified": null,
+      "firstSeen": "2026-10-15",
+      "lastChanged": "2026-10-15",
+      "lastChecked": "2026-10-15"
+    }
+  }
 }
