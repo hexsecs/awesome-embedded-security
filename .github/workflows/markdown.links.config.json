@@ -30,6 +30,12 @@
     },
     {
       "pattern": "^https://trustedcomputinggroup\\.org/"
+    },
+    {
+      "pattern": "^https://digital-strategy\\.ec\\.europa\\.eu/"
+    },
+    {
+      "pattern": "^https://sigrok\\.org/"
     }
   ],
   "aliveStatusCodes": [
