@@ -219,6 +219,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Bluetooth and BLE Security
 
 * [Bettercap BLE](https://www.bettercap.org/modules/ble/) - BLE scanning, enumeration, and characteristic read/write module integrated into the bettercap Swiss-army knife framework.
+* [BLEeding](https://github.com/sammwyy/BLEeding) - Bluetooth/BLE jamming, signal inhibition, DoS and DeAuth attack.
 * [BlueToolkit](https://github.com/sgxgsx/BlueToolkit) - Modular black-box vulnerability testing framework for Bluetooth Classic and BLE with Recon/Exploit/Report modules covering 40+ public exploits (MITM, RCE, DoS); used to uncover 128 vulnerabilities across 22 vehicles from major automakers. USENIX WOOT 2025.
 * [BrakTooth](https://github.com/Matheus-Garbelini/braktooth_esp32_bluetooth_classic_attacks) - Directed exploit suite for Bluetooth Classic LMP layer vulnerabilities, targeting protocol layers inaccessible from standard host stacks; affected 1,400+ products from Intel, Qualcomm, and Broadcom. USENIX Security 2022.
 * [BtleJuice](https://github.com/DigitalSecurity/btlejuice) 🗄️ - Bluetooth Low Energy MITM proxy framework for real-time interception and manipulation of BLE communications. Archived since 2018; see BtleJack or the WHAD Framework for maintained alternatives.
@@ -287,6 +288,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Hardware Debug Interfaces
 
 * [blueTag](https://github.com/Aodrulez/blueTag) - JTAGulator alternative for RP2040 boards such as the Raspberry Pi Pico that detects JTAG and SWD pinouts on unknown targets, and doubles as a CMSIS-DAP adapter, flashrom SPI programmer and USB-to-serial bridge.
+* [DirtyJTAG](https://github.com/dirtyjtag/DirtyJTAG) - JTAG probe firmware.
 * [JTAGenum](https://github.com/cyphunk/JTAGenum) - Enumerates JTAG pinouts on unknown boards by brute-force testing candidate pin mappings.
 * [JTAGulator](https://github.com/grandideastudio/jtagulator) - Automates discovery of JTAG, SWD, and UART debug interfaces on unknown PCBs by brute-forcing pin combinations, with sigrok-compatible logic analyzer mode and direct OpenOCD integration for post-discovery exploitation.
 * [UrJTAG](https://urjtag.sourceforge.io/) - Open-source JTAG toolkit for boundary scan, flash programming, and low-level target interaction.
@@ -324,8 +326,10 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [ChipSHOUTER](https://github.com/newaetech/ChipSHOUTER) 💰 - Benchtop electromagnetic fault injection platform from NewAE with a documented Python API and published schematic; the hardware itself is not open, unlike the PicoEMP derived from it.
 * [EM-Fault-It-Yourself](https://github.com/fgsect/EM-Fault-It-Yourself) - Motorized XYZ-stage EMFI platform targeting desktop and server SoCs (successfully attacked the AMD Secure Processor), with 2.5µm accuracy, 100mm travel, and a web UI for automated scanning campaigns. IEEE HOST 2022.
 * [Faulty Cat](https://github.com/ElectronicCats/faultycat) - Low-cost open hardware EMFI tool from Electronic Cats built on an RP2040, offering both electromagnetic and crowbar voltage-glitching fault injection with single-shot and parameter-sweep campaign modes.
+* [mull](https://github.com/mull-project/mull) - Practical mutation testing and fault injection for C and C++.
 * [PicoEMP](https://github.com/newaetech/chipshouter-picoemp) - NewAE's open hardware EMFI tool built on a Raspberry Pi Pico and photographic-flash transformer circuit; the community standard entry-level electromagnetic fault injection platform.
 * [PicoGlitcher](https://github.com/MKesenheimer/fault-injection-library) - RP2040/RP2350-based voltage glitching platform with 66A crowbar, sub-10ns pulse resolution via PIO sampling, and a high-level Python (`findus`) API for scripting attack campaigns. Validated by SySS Research.
+* [tool-journal](https://github.com/RaycarlLei/tool-journal) - TypeScript execution journal for retryable tools: SQLite durability, lease fencing, explicit uncertainty, and reproducible crash tests.
 
 ### Logic Analyzers
 
