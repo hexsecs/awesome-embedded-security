@@ -115,6 +115,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Secure Boot and Firmware Trust
 
+* [Auditor](https://github.com/GrapheneOS/Auditor) - Hardware-based attestation app for Android that verifies a device's verified boot state and OS integrity from a second device.
 * [AVB (Android Verified Boot)](https://android.googlesource.com/platform/external/avb/+/master/README.md) - Reference implementation and design guidance for chained trust and verified partitions in embedded Android systems.
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
 * [Trusted Firmware-A](https://trustedfirmware-a.readthedocs.io/en/latest/) - Reference secure-world firmware for Arm A-profile processors, providing the EL3 secure monitor and a Trusted Board Boot chain of trust following Arm's TBBR-CLIENT specification.
