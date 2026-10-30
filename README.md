@@ -181,6 +181,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Intel SGX SDK](https://github.com/intel/confidential-computing.sgx) - Open-source Linux SDK and Platform Software for Intel Software Guard Extensions, providing the build/install toolchain for developing and deploying hardware-based memory enclave applications.
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
 * [Samsung TrustZone Research Toolkit](https://github.com/quarkslab/samsung-trustzone-research) - Quarkslab's RE toolkit for Samsung Kinibi TrustZone: Ghidra loader for MCLF trustlet binaries, Unicorn-based trustlet emulator for exploit development, and Python bindings for communicating with Trusted Applications.
+* [sgx-step](https://github.com/jovanbulck/sgx-step) - Framework for precise single-stepping of SGX enclaves to enable controlled-channel and side-channel attacks.
 * [Trusted Firmware-M](https://trustedfirmware-m.readthedocs.io/en/latest/) - Open-source secure firmware for Arm Cortex-M TrustZone systems, providing isolation, secure services, and PSA security APIs.
 * [Trusty TEE](https://source.android.com/docs/security/features/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
 
@@ -215,6 +216,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [U-Fuzz](https://github.com/asset-group/U-Fuzz) - Universal stateful fuzzer that infers a protocol's state machine from a handful of benign packet captures, then generates crashing test cases; demonstrated against CoAP, Zigbee, and 5G NR.
 * [Wireshark MQTT](https://www.wireshark.org/docs/dfref/m/mqtt.html) - Protocol analyzer support for MQTT traffic inspection and security analysis.
 * [wolfMQTT](https://www.wolfssl.com/products/wolfmqtt/) - MQTT client library with TLS support optimized for embedded systems.
+* [wolfSSH](https://github.com/wolfSSL/wolfssh) - Small, fast, portable SSH library with SCP and SFTP support, built for embedded and RTOS targets.
 
 ### Bluetooth and BLE Security
 
@@ -287,6 +289,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Hardware Debug Interfaces
 
 * [blueTag](https://github.com/Aodrulez/blueTag) - JTAGulator alternative for RP2040 boards such as the Raspberry Pi Pico that detects JTAG and SWD pinouts on unknown targets, and doubles as a CMSIS-DAP adapter, flashrom SPI programmer and USB-to-serial bridge.
+* [DirtyJTAG](https://github.com/dirtyjtag/DirtyJTAG) - JTAG probe firmware for cheap STM32 boards and ST-Link clones, compatible with UrJTAG, OpenOCD and flashrom.
 * [JTAGenum](https://github.com/cyphunk/JTAGenum) - Enumerates JTAG pinouts on unknown boards by brute-force testing candidate pin mappings.
 * [JTAGulator](https://github.com/grandideastudio/jtagulator) - Automates discovery of JTAG, SWD, and UART debug interfaces on unknown PCBs by brute-forcing pin combinations, with sigrok-compatible logic analyzer mode and direct OpenOCD integration for post-discovery exploitation.
 * [UrJTAG](https://urjtag.sourceforge.io/) - Open-source JTAG toolkit for boundary scan, flash programming, and low-level target interaction.

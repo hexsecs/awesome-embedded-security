@@ -144,6 +144,46 @@
       "url": "https://github.com/hypery11/flipper-tesla-fsd",
       "reason": "Flipper Zero and ESP32 mods for Tesla vehicles, such as disabling driver-attention nags and unlocking FSD by region. Vehicle modding rather than a security research resource, and the repository has no license.",
       "date": "2026-09-23"
+    },
+    {
+      "url": "https://github.com/wilbowes/EchoMuse",
+      "reason": "Alexa replacement and controller for the Echo Dot, a consumer device project rather than a security tool or resource.",
+      "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/mull-project/mull",
+      "reason": "Software mutation testing for C/C++; its fault-injection topic is the testing sense, not hardware glitching, which is what the Fault Injection section covers.",
+      "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/ra9fael/FPGA_MCU_Debugger_Collections",
+      "reason": "DIY collection of debugger builds including clones of commercial probes, rather than a security tool; documentation is primarily Chinese.",
+      "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/sammwyy/BLEeding",
+      "reason": "Narrow BLE/BR-EDR flooding and DoS script whose coverage overlaps BlueToolkit's broader BLE attack framework.",
+      "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/alestanalves/guia-ackercode",
+      "reason": "General Portuguese-language hacking study guide and awesome list, not embedded-security-specific.",
+      "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/RaycarlLei/tool-journal",
+      "reason": "TypeScript durable-execution journal for AI tools; the fault-injection topic is incidental and it is not embedded security.",
+      "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/joembedded/JesFs",
+      "reason": "Embedded filesystem library for serial NOR flash, not a security resource; its secure-boot and OTA topics are incidental.",
+      "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/GainSec/anti-crime-ecosystem-research",
+      "reason": "Self-published white paper on a single connected public-safety ecosystem, not a general embedded-security resource.",
+      "date": "2026-10-30"
     }
   ]
 }
