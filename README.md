@@ -160,6 +160,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [IoTGoat](https://github.com/OWASP/IoTGoat) - OWASP intentionally insecure firmware for Raspberry Pi and x86 platforms, providing hands-on practice for the OWASP IoT Top 10 vulnerabilities.
 * [kernel-hardening-checker](https://github.com/a13xp0p0v/kernel-hardening-checker) - Audits Linux kernel Kconfig options and boot parameters against KSPP, CLIP OS, and STIG hardening recommendations; supports ARM, ARM64, x86, and RISC-V. Works in Yocto/OpenEmbedded pipelines.
 * [Metasploit](https://github.com/rapid7/metasploit-framework) - Open source penetration testing framework (BSD licensed) maintained by Rapid7, with modules for exploiting vulnerabilities, scanning, and post-exploitation across embedded Linux and IoT targets.
+* [onepct](https://github.com/evanslify/onepct) - Tooling for LLM-assisted vulnerability discovery in IoT and embedded firmware, open-sourced from a Black Hat USA talk: capability graphs that synthesize findings into attack chains, reseeding of findings across context compactions, and schema-validated subagent contracts.
 
 ### Firmware Taint Analysis
 
