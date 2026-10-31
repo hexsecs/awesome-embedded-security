@@ -69,6 +69,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [ubi_reader](https://github.com/onekey-sec/ubi_reader) - Extracts UBI and UBIFS images, the raw-NAND filesystem format that generic carvers handle poorly.
 * [UEFITool](https://github.com/LongSoft/UEFITool) - Viewer and editor for UEFI firmware images, able to parse the volume structure and extract or replace individual modules.
 * [unblob](https://github.com/onekey-sec/unblob) - Fast, accurate firmware extraction engine from ONEKEY supporting 100+ archive, compression, and filesystem formats with fewer false positives than Binwalk. Presented at DEF CON 30.
+* [vmlinux-to-elf](https://github.com/marin-m/vmlinux-to-elf) - Recovers a fully analyzable ELF from a raw kernel image by extracting the kernel symbol table (kallsyms).
 * [VulHunt](https://github.com/vulhunt-re/vulhunt) - Lua-rule-based vulnerability detection framework from Binarly's research team that operates across disassembly, IR, and decompiled code simultaneously, with dedicated UEFI module scanning support.
 
 ### Disassemblers/Decompilers
