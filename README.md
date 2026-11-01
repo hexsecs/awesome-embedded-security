@@ -303,6 +303,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [LUNA](https://github.com/greatscottgadgets/luna) - FPGA-based USB analysis and development platform from Great Scott Gadgets, enabling USB sniffing, protocol fuzzing, and custom USB peripheral development via Amaranth HDL.
 * [OpenVizsla](https://github.com/openvizsla/ov_ftdi) - Open hardware USB protocol tracer with an FPGA capture path and host software for sniffing full and high-speed traffic; boards are sold by sysmocom and 3mdeb.
 * [Packetry](https://github.com/greatscottgadgets/packetry) - Great Scott Gadgets' USB 2.0 protocol analysis application, decoding traffic captured live by Cynthion or loaded from pcap files.
+* [usb-rea](https://github.com/emirmrkaljevic/usb-rea) - Infers a device's vendor USB protocol from labelled usbmon or USBPcap captures (commands, value encodings, checksums, handshakes, image streams), linking each finding to the packets behind it, and generates a Python driver and Wireshark dissector.
 
 ### Chip-Off and Memory Forensics
 
