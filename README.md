@@ -194,6 +194,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Caliptra](https://github.com/chipsalliance/Caliptra) - Apache-2.0 silicon root of trust block for datacenter CPUs, GPUs, and DPUs providing DICE identity, measured boot, and attestation; maintained under CHIPS Alliance, with ML-DSA post-quantum signing added in 2.x.
 * [IBM Software TPM](https://sourceforge.net/projects/ibmswtpm2/) - Software TPM 2.0 emulator for testing and development.
 * [Keylime](https://keylime.dev/) - Open source TPM-based remote attestation for cloud and edge.
+* [OpenSK](https://github.com/google/OpenSK) - Open-source FIDO2 security key firmware in Rust for embedded targets, implementing the U2F and FIDO2 authenticator standards.
 * [OpenTitan](https://opentitan.org/) - Open-source silicon root of trust project with security-certified hardware designs and commercial-grade IP blocks.
 * [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
 * [tpm2-algtest](https://github.com/crocs-muni/tpm2-algtest) - Tests real TPM 2.0 chips for RNG output quality, key generation timing, algorithm support, and implementation fingerprints across 80+ firmware revisions from 6 vendors. From CRoCS (discoverers of ROCA). CHES 2024.
