@@ -23,7 +23,7 @@
   "devDependencies": {
     "awesome-lint": "2.3.0",
     "markdown-link-check": "3.15.0",
-    "markdownlint-cli2": "0.23.3"
+    "markdownlint-cli2": "0.24.0"
   },
   "overrides": {
     "smol-toml": "1.7.2"
