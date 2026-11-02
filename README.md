@@ -199,6 +199,8 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
 * [tpm2-algtest](https://github.com/crocs-muni/tpm2-algtest) - Tests real TPM 2.0 chips for RNG output quality, key generation timing, algorithm support, and implementation fingerprints across 80+ firmware revisions from 6 vendors. From CRoCS (discoverers of ROCA). CHES 2024.
 * [tpm2-tss](https://github.com/tpm2-software/tpm2-tss) - Reference implementation of the TCG TPM2 Software Stack (TSS2), providing the APIs for key management and attestation.
+* [TPMGenie](https://github.com/nccgroup/TPMGenie) - I2C bus interposer for discrete TPMs that intercepts and modifies TPM traffic for vulnerability research.
+* [wolfTPM](https://github.com/wolfSSL/wolfTPM) - Portable TPM 2.0 library designed for embedded use, supporting SPI and I2C TPMs plus a firmware TPM option.
 
 ### OTA Update Security
 
