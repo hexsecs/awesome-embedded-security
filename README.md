@@ -140,6 +140,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [honggfuzz](https://github.com/google/honggfuzz) - A feedback-driven evolutionary fuzzer supporting hardware-based coverage (Intel BTS/PT) and persistent mode for extreme speed.
 * [libFuzzer](https://llvm.org/docs/LibFuzzer.html) - In-process, coverage-guided, evolutionary fuzzing engine integrated with LLVM.
 * [Peach](https://gitlab.com/peachtech/peach-fuzzer-community) 💰 - A smart fuzzer supporting both generation-based and mutation-based fuzzing via Peach Pit definitions. Community edition is source-available; full product is commercial.
+* [Revizor](https://github.com/microsoft/side-channel-fuzzer) - Model-based relational fuzzer from Microsoft that runs random programs on real x86 CPUs and checks hardware execution traces against speculation contracts to surface Spectre-class side-channel leaks.
 
 ### Language Specific Decompilers
 
