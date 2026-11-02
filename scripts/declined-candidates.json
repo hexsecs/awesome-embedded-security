@@ -214,6 +214,11 @@
       "url": "https://github.com/insightglacier/Dictionary-Of-Pentesting",
       "reason": "General pentesting wordlist collection, not embedded-specific.",
       "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/ASCIT31/Dark-Moon",
+      "reason": "General autonomous pentest platform (web/API/Active Directory/Kubernetes/cloud); firmware/IoT is a minor module wrapping already-listed tools (binwalk, firmwalker). Not embedded-specific. PR #23 closed as off-scope 2026-11-02.",
+      "date": "2026-11-02"
     }
   ]
 }
