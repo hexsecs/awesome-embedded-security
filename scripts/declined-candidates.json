@@ -161,11 +161,6 @@
       "date": "2026-10-30"
     },
     {
-      "url": "https://github.com/sammwyy/BLEeding",
-      "reason": "Narrow BLE/BR-EDR flooding and DoS script whose coverage overlaps BlueToolkit's broader BLE attack framework.",
-      "date": "2026-10-30"
-    },
-    {
       "url": "https://github.com/alestanalves/guia-ackercode",
       "reason": "General Portuguese-language hacking study guide and awesome list, not embedded-security-specific.",
       "date": "2026-10-30"
@@ -184,6 +179,41 @@
       "url": "https://github.com/GainSec/anti-crime-ecosystem-research",
       "reason": "Self-published white paper on a single connected public-safety ecosystem, not a general embedded-security resource.",
       "date": "2026-10-30"
+    },
+    {
+      "url": "https://github.com/ionescu007/tpmtool",
+      "reason": "Desktop-oriented TPM 2.0 NV-space utility, dormant since 2021, not embedded-specific.",
+      "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/nsacyber/HIRS",
+      "reason": "Enterprise TPM provisioning and supply-chain validation platform, not embedded security.",
+      "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/chris-ritsen/samsung-tv-root",
+      "reason": "Single-device root for Samsung Tizen TVs, a consumer-device exploit rather than a reusable embedded-security tool.",
+      "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/branover/hexgraph",
+      "reason": "Small new agentic vulnerability-research project for general binaries, unproven and not embedded-specific.",
+      "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/The-Istasha/memguard-rs",
+      "reason": "General-purpose Rust secure-memory library, not embedded-specific.",
+      "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/schutzwerk/PROBoter",
+      "reason": "Automated PCB analysis platform dormant since 2023, small and not security-specific.",
+      "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/insightglacier/Dictionary-Of-Pentesting",
+      "reason": "General pentesting wordlist collection, not embedded-specific.",
+      "date": "2026-11-02"
     }
   ]
 }
