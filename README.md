@@ -62,6 +62,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [FLARE-FLOSS](https://github.com/mandiant/flare-floss) - FLARE Obfuscated String Solver that automatically extracts obfuscated, encoded, and stack strings from binaries for rapid firmware triage.
 * [Kaitai Struct](https://kaitai.io/) - Declarative language used to describe various binary data structures, laid out in files or in memory: i.e. binary file formats, network stream packet formats, etc.
 * [LIEF](https://github.com/lief-project/LIEF) - Library to Instrument Executable Formats: parse, modify, and abstract ELF, PE, Mach-O, DEX, and OAT binaries found in firmware images.
+* [moria](https://github.com/nmatt0/moria) - Identifies files and structures embedded in firmware and IoT images, including filesystems, kernels, bootloaders, archives, and keys, and unpacks most of what it finds, reporting each finding with a byte offset and confidence score.
 * [OFRAK](https://github.com/redballoonsecurity/ofrak) - Binary analysis and modification platform that combines the ability to unpack, analyze, modify, and repack binaries.
 * [Patcherex2](https://github.com/purseclab/Patcherex2) - Static binary patching framework for x86, ARM, MIPS, and PowerPC, supporting instruction insertion and function replacement in extracted firmware.
 * [sasquatch](https://github.com/devttys0/sasquatch) - Patched unsquashfs that handles the vendor-modified SquashFS variants common in consumer router firmware; used internally by Binwalk and unblob.
@@ -128,6 +129,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [CVE Binary Tool](https://github.com/ossf/cve-bin-tool) - OpenSSF tool that scans binaries directly for 350+ known-vulnerable open source components (OpenSSL, libpng, BusyBox, and more), without requiring a pre-built SBOM; can also generate one from the scan.
 * [Grype](https://github.com/anchore/grype) - Vulnerability scanner that consumes SBOMs to identify known CVEs in firmware dependencies.
 * [in-toto](https://in-toto.io/) - Framework for supply chain integrity that records signed provenance steps and enforces layout verification.
+* [mithril](https://github.com/nmatt0/mithril) - Offline static scanner for firmware contents that recovers embedded secrets, SBOMs, CVEs, licenses, and weak or leaked keys from single files or unpacked root filesystems.
 * [Sigstore Cosign](https://github.com/sigstore/cosign) - Tooling for keyless signing and verification of firmware/container artifacts in CI/CD pipelines.
 * [Syft](https://github.com/anchore/syft) - SBOM generator for filesystems and artifacts, useful for firmware package/component inventories.
 
@@ -157,6 +159,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Bjorn](https://github.com/infinition/Bjorn) - Network scanning and offensive security tool for the Raspberry Pi with a 2.13-inch e-Paper HAT that discovers hosts, open ports, and exposed services, then runs brute-force and custom attack scripts against them.
 * [Darkmoon](https://github.com/ASCIT31/Dark-Moon) - Open source (GPL-3.0) autonomous AI penetration testing platform covering web, API, Active Directory and Kubernetes surfaces; an LLM orchestrates specialist agents and offensive tools over MCP and proves each finding with a real exploit.
 * [EXPLIoT](https://pypi.org/project/expliot/) - Framework for security testing and exploiting IoT products and IoT infrastructure. It provides a set of plugins (test cases) which are used to perform the assessment and can be extended easily with new ones.
+* [FirmLens](https://github.com/Srikanth-Rudrarapu/firm-lens) - Research-grade analysis framework for bare-metal ESP32 firmware combining static inspection of partition tables and bootloader metadata with hardware-in-the-loop testing.
 * [Firmware Analysis and Comparison Tool (FACT)](https://fkie-cad.github.io/FACT_core/) - Automated Firmware Security analysis (Router, IoT, UEFI, Webcams, Drones, …). It is easy to use (web UI), extend (plug-in system) and integrate (REST API).
 * [FwAnalyzer (Firmware Analyzer)](https://github.com/cruise-automation/fwanalyzer) - Tool to analyze (ext2/3/4), FAT/VFat, SquashFS, UBIFS filesystem images, cpio archives, and directory content using a set of configurable rules.
 * [IoTGoat](https://github.com/OWASP/IoTGoat) - OWASP intentionally insecure firmware for Raspberry Pi and x86 platforms, providing hands-on practice for the OWASP IoT Top 10 vulnerabilities.

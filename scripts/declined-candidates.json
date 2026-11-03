@@ -219,6 +219,36 @@
       "url": "https://github.com/ASCIT31/Dark-Moon",
       "reason": "General autonomous pentest platform (web/API/Active Directory/Kubernetes/cloud); firmware/IoT is a minor module wrapping already-listed tools (binwalk, firmwalker). Not embedded-specific. PR #23 closed as off-scope 2026-11-02.",
       "date": "2026-11-02"
+    },
+    {
+      "url": "https://github.com/gremwell/go-jtagenum",
+      "reason": "Go port of the already-listed JTAGenum, dormant since 2024; no reason to list both.",
+      "date": "2026-11-03"
+    },
+    {
+      "url": "https://github.com/0xricksanchez/dlink-decrypt",
+      "reason": "Single-vendor firmware decryption proof of concept, dormant since 2023; a one-device exploit, not reusable tooling.",
+      "date": "2026-11-03"
+    },
+    {
+      "url": "https://github.com/DroidKali/iot-firmware-vuln-hunting",
+      "reason": "AI assistant skill/prompt pack rather than a standalone tool; 5 stars and unproven.",
+      "date": "2026-11-03"
+    },
+    {
+      "url": "https://github.com/KimLee-12138/FirmHound-CLI",
+      "reason": "Small competition project (7 stars) with Chinese-only documentation; unproven track record.",
+      "date": "2026-11-03"
+    },
+    {
+      "url": "https://github.com/lcapossio/fpgacapZero",
+      "reason": "FPGA debug cores for general hardware debug; not security-specific.",
+      "date": "2026-11-03"
+    },
+    {
+      "url": "https://github.com/viveris/jtag-boundary-scanner",
+      "reason": "JTAG boundary-scan coverage already provided by the listed UrJTAG; test-oriented rather than a distinct security tool.",
+      "date": "2026-11-03"
     }
   ]
 }
