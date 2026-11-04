@@ -120,6 +120,8 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Auditor](https://github.com/GrapheneOS/Auditor) - Hardware-based attestation app for Android that verifies a device's verified boot state and OS integrity from a second device.
 * [AVB (Android Verified Boot)](https://android.googlesource.com/platform/external/avb/+/master/README.md) - Reference implementation and design guidance for chained trust and verified partitions in embedded Android systems.
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
+* [meta-raspberrypi-secure](https://github.com/embetrix/meta-raspberrypi-secure) - Yocto layer providing a security-hardened baseline for Raspberry Pi images, with a signed boot chain, verified and encrypted storage, runtime integrity checks, and A/B updates.
+* [Punchboot](https://github.com/jonasblixt/punchboot) - Secure bootloader for NXP i.MX systems that verifies signed images in the boot chain, with A/B updates and automatic rollback.
 * [Trusted Firmware-A](https://trustedfirmware-a.readthedocs.io/en/latest/) - Reference secure-world firmware for Arm A-profile processors, providing the EL3 secure monitor and a Trusted Board Boot chain of trust following Arm's TBBR-CLIENT specification.
 * [U-Boot Verified Boot](https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html) - FIT-signature based verified boot support for embedded Linux boot chains.
 * [wolfBoot](https://github.com/wolfSSL/wolfBoot) - Portable secure bootloader for 32-bit MCUs using wolfCrypt for image signature verification (Ed25519, ECC, RSA, post-quantum LMS/XMSS), with delta updates, encrypted images, and explicit voltage-glitch countermeasures.
@@ -180,6 +182,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [RT-Thread Security](https://github.com/RT-Thread/rt-thread/security) - Security resources and vulnerability reporting for RT-Thread IoT OS.
 * [seL4](https://sel4.systems/) - Formally verified microkernel with machine-checked proofs of functional correctness, integrity, and confidentiality, providing the strongest security guarantees of any production OS kernel.
 * [Tock OS](https://www.tockos.org/) - Rust-based embedded OS for microcontrollers designed for security through hardware-enforced memory isolation and a capability-based driver model, targeting Cortex-M and RISC-V platforms.
+* [wolfSentry](https://github.com/wolfSSL/wolfsentry) - Embedded firewall and intrusion detection and prevention engine for RTOS and bare-metal targets, integrating with lwIP and configurable via JSON policies.
 * [Zephyr Project Security](https://docs.zephyrproject.org/latest/security/index.html) - Security documentation for the Zephyr RTOS including TF-M integration, verified boot, and security testing.
 
 ### TEE/Trusted Execution Environments
