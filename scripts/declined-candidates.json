@@ -249,6 +249,26 @@
       "url": "https://github.com/viveris/jtag-boundary-scanner",
       "reason": "JTAG boundary-scan coverage already provided by the listed UrJTAG; test-oriented rather than a distinct security tool.",
       "date": "2026-11-03"
+    },
+    {
+      "url": "https://github.com/GrapheneOS/AttestationServer",
+      "reason": "Companion server code for the already-listed Auditor app; near-overlap with no reason to list both.",
+      "date": "2026-11-04"
+    },
+    {
+      "url": "https://github.com/wolfSSL/wolfCOSE",
+      "reason": "General-purpose COSE/CBOR encoding library, not a security tool; no fitting section.",
+      "date": "2026-11-04"
+    },
+    {
+      "url": "https://github.com/lamassuiot/lamassuiot",
+      "reason": "Server-side IoT PKI platform for fleet certificate management, not an embedded-device security tool or resource.",
+      "date": "2026-11-04"
+    },
+    {
+      "url": "https://github.com/Ares-X/VulWiki",
+      "reason": "Chinese-language general vulnerability knowledge base spanning web, middleware and network devices, not embedded-specific.",
+      "date": "2026-11-04"
     }
   ]
 }
