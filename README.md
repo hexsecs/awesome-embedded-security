@@ -57,6 +57,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [argXtract](https://github.com/projectbtle/argXtract) 🗄️ - Statically extracts arguments to SVC calls and HAL functions from stripped ARM Cortex-M BLE firmware without symbol tables, enabling security audits of Nordic and similar binaries. ACSAC 2021.
 * [Binwalk](https://github.com/ReFirmLabs/binwalk) - Fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
+* [CERT UEFI Parser](https://github.com/cmu-sei/cert-uefi-parser) - Python tool for inspecting UEFI firmware ROM images and installers, recovering module, phase, protocol, and dependency structure for vulnerability research.
 * [checksec](https://github.com/slimm609/checksec) - Go tool reporting binary hardening flags (NX, PIE, RELRO, stack canary, FORTIFY_SOURCE) on ELF executables extracted from firmware, with JSON and XML output and kernel config auditing; rewritten from the original shell script.
 * [cwe_checker](https://github.com/fkie-cad/cwe_checker) - Binary analysis tool that checks ELF binaries for violations of Common Weakness Enumerations (CWEs) using abstract interpretation, with cross-architecture support.
 * [FLARE-FLOSS](https://github.com/mandiant/flare-floss) - FLARE Obfuscated String Solver that automatically extracts obfuscated, encoded, and stack strings from binaries for rapid firmware triage.
@@ -446,6 +447,7 @@ List of security lists.
   * [Connected Things](https://github.com/V33RU/awesome-connected-things-sec) - Security resources for connected devices spanning IoT, automotive, medical, and SCADA, covering hardware, firmware, and radio tooling alongside research write-ups.
   * [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security) - Firmware analysis, emulation, and IoT security research, maintained by Fraunhofer FKIE.
   * [General Embedded](https://github.com/nhivp/Awesome-Embedded) - Embedded development resources: RTOSes, toolchains, libraries, and hardware platforms.
+  * [TEE-reversing](https://github.com/enovella/TEE-reversing) - Curated list of public resources for learning to reverse-engineer TEEs and achieve trusted code execution on ARM devices.
 * General Security
   * [Android Security](https://github.com/ashishb/android-security-awesome) - Android reverse engineering, exploitation, and mobile application security tooling.
   * [Application Security](https://github.com/paragonie/awesome-appsec) - Secure development practices, code analysis, and application security testing.
