@@ -269,6 +269,31 @@
       "url": "https://github.com/Ares-X/VulWiki",
       "reason": "Chinese-language general vulnerability knowledge base spanning web, middleware and network devices, not embedded-specific.",
       "date": "2026-11-04"
+    },
+    {
+      "url": "https://github.com/mikeroyal/Firmware-Guide",
+      "reason": "General firmware development guide spanning languages, tooling, and learning resources; not security-specific.",
+      "date": "2026-11-05"
+    },
+    {
+      "url": "https://github.com/ismailtsdln/firmalyzer",
+      "reason": "Firmware analysis toolkit with a single day of commits in January 2026 and 12 stars; dormant since and unproven.",
+      "date": "2026-11-05"
+    },
+    {
+      "url": "https://github.com/Wack0/CVE-2022-21894",
+      "reason": "Single-CVE proof of concept for a 2022 Secure Boot bypass; not reusable tooling.",
+      "date": "2026-11-05"
+    },
+    {
+      "url": "https://github.com/vllogic/vllink_lite",
+      "reason": "Low-cost CMSIS-DAP debug probe with Chinese-only documentation; a debug tool, not a security resource.",
+      "date": "2026-11-05"
+    },
+    {
+      "url": "https://github.com/Exeinspa/exein-openwrt-public",
+      "reason": "Vendor OpenWrt fork bundling a commercial security framework; a product fork, not a standalone security resource.",
+      "date": "2026-11-05"
     }
   ]
 }
