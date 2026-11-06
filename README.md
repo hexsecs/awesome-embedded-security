@@ -445,6 +445,8 @@ List of security lists.
     * [Awesome Automotive Security](https://github.com/hexsecs/awesome-automotive-security) - Vehicle security research covering CAN, ECUs, telematics, and automotive standards.
     * [CAN IDs](https://github.com/iDoka/awesome-automotive-can-id) - Catalogue of decoded CAN bus identifiers and message formats across vehicle makes and models.
     * [CANbus](https://github.com/iDoka/awesome-canbus) - CAN bus tooling, adapters, protocol documentation, and reverse engineering resources.
+  * Industrial Control Systems
+    * [Awesome ICS/SCADA Writeups](https://github.com/neutrinoguy/awesome-ics-writeups) - Collection of ICS/SCADA security writeups: exploitation research, vendor blogs, talks, and CTF write-ups covering OT and IIoT.
 * Embedded
   * [Awesome UEFI Security](https://github.com/river-li/awesome-uefi-security) - Curated collection of UEFI security papers, tools, exploits, talks, and CTF challenges.
   * [Connected Things](https://github.com/V33RU/awesome-connected-things-sec) - Security resources for connected devices spanning IoT, automotive, medical, and SCADA, covering hardware, firmware, and radio tooling alongside research write-ups.
