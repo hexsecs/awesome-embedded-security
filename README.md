@@ -100,6 +100,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Debugging Tools
 
+* [Akheron Proxy](https://github.com/rapid7/akheron-proxy) - Python tool that proxies UART traffic between chips on a board, capturing and replaying inter-chip communications with checksum recalculation.
 * [assembly-repl](https://github.com/pirate/assembly-repl) - Native assembly, LLVM IR, C, C++, and Objective-C REPLs for macOS and Linux.
 * [Black Magic Probe](https://codeberg.org/blackmagic-debug/blackmagic) - An open-source JTAG/SWD debugger with embedded GDB server and automatic target detection.
 * [Frida](https://frida.re/) - Dynamic instrumentation toolkit for injecting JavaScript or native code into running processes on embedded Linux, Android, iOS, and bare-metal targets.
@@ -367,6 +368,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [ChameleonUltra](https://github.com/RfidResearchGroup/ChameleonUltra) - Pocket friendly powerful LF and HF emulation & manipulation tool which is based on the open-source project ChameleonMini.
 * [cyber-controller](https://github.com/LxveAce/cyber-controller) - Dashboard for flashing, controlling, and coordinating ESP32 security firmware (Marauder, Bruce, GhostESP), Flipper Zero, and Raspberry Pi hardware from one place.
 * [Flipper Zero](https://docs.flipper.net/) - Portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more.
+* [PromptZero](https://github.com/xunholy/promptzero) - Natural-language operator for Flipper Zero and ESP32 Marauder that builds, deploys, and runs Sub-GHz, NFC, RFID, IR, BadUSB, and Wi-Fi payloads.
 * [Proxmark3](https://github.com/RfidResearchGroup/proxmark3) - Open-source RFID research platform for low-level interaction, analysis, and testing across a wide range of LF and HF tags and systems.
 * [rfcat](https://github.com/atlas0fd00m/rfcat) - Firmware and Python framework for CC1111-based sub-GHz radio dongles, including the Yard Stick One listed below.
 * [rtl_433](https://github.com/merbanan/rtl_433) - Decoder for over 250 ISM-band device protocols covering sensors, utility meters, TPMS, and remotes, built on cheap RTL-SDR hardware.
@@ -444,6 +446,7 @@ List of security lists.
     * [CAN IDs](https://github.com/iDoka/awesome-automotive-can-id) - Catalogue of decoded CAN bus identifiers and message formats across vehicle makes and models.
     * [CANbus](https://github.com/iDoka/awesome-canbus) - CAN bus tooling, adapters, protocol documentation, and reverse engineering resources.
 * Embedded
+  * [Awesome UEFI Security](https://github.com/river-li/awesome-uefi-security) - Curated collection of UEFI security papers, tools, exploits, talks, and CTF challenges.
   * [Connected Things](https://github.com/V33RU/awesome-connected-things-sec) - Security resources for connected devices spanning IoT, automotive, medical, and SCADA, covering hardware, firmware, and radio tooling alongside research write-ups.
   * [Embedded and IoT Security](https://github.com/fkie-cad/awesome-embedded-and-iot-security) - Firmware analysis, emulation, and IoT security research, maintained by Fraunhofer FKIE.
   * [General Embedded](https://github.com/nhivp/Awesome-Embedded) - Embedded development resources: RTOSes, toolchains, libraries, and hardware platforms.
