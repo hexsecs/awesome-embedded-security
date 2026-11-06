@@ -294,6 +294,51 @@
       "url": "https://github.com/Exeinspa/exein-openwrt-public",
       "reason": "Vendor OpenWrt fork bundling a commercial security framework; a product fork, not a standalone security resource.",
       "date": "2026-11-05"
+    },
+    {
+      "url": "https://github.com/AIshihzong/awesome-reverse-engineer-anything",
+      "reason": "General software reverse-engineering showcase about AI agents rebuilding applications, not embedded-security-specific.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/arceuzvx/Cybersecurity_resources",
+      "reason": "General cybersecurity eBook collection, not embedded-security-specific.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/AUCOHL/Fault",
+      "reason": "Design-for-test framework for chip design; the JTAG topic is incidental and it is not a security tool.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/PentHertz/grimoire",
+      "reason": "Offline search over general offensive-security knowledge bases (HackTricks, PayloadsAllTheThings); not embedded-specific.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/albertito/libfiu",
+      "reason": "C library for software fault injection (fail points in code), not hardware glitching; same reason as the earlier failpoint decline.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/Akascape/Datamosher-Pro",
+      "reason": "Video datamoshing effects app; matched the glitching search on the word alone, not a security tool.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/jserv/talks",
+      "reason": "Personal archive of one developer's presentation slides, not a security resource.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/krispuckett/SwiftUIShaders",
+      "reason": "SwiftUI visual-effects library; matched the glitching search on the word alone, not a security tool.",
+      "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/ComThings/PandwaRF",
+      "reason": "Sub-GHz RF tool built on the already-listed RfCat and Yard Stick One, with no recognized open-source license; no clear reason to list both.",
+      "date": "2026-11-06"
     }
   ]
 }
