@@ -414,6 +414,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [HardwareAllTheThings](https://github.com/swisskyrepo/HardwareAllTheThings) - Actively maintained hardware and IoT pentesting wiki by swisskyrepo covering fault injection, JTAG/SWD/UART exploitation, firmware dumping, side-channel attacks, and RF attacks with practical tooling references.
 * [Microcorruption](https://microcorruption.com/) - Browser-based embedded security CTF presenting a series of challenges on a fictional MSP430-based lock system, covering stack overflows through advanced memory corruption exploitation.
 * [MITRE eCTF](https://ectf.mitre.org/) - Annual collegiate "build-then-break" competition where teams harden and then attack each other's firmware on real ARM Cortex-M microcontrollers; open source tooling and insecure reference designs published each year.
+* [root-node](https://github.com/LukedeMunk/root-node) - Intentionally vulnerable ESP8266-based IoT training device for learning embedded security hands-on: web exploitation, serial attacks, insecure storage, and firmware analysis.
 * [SecuringHardware.com](https://learn.securinghardware.com/) 💰 - Paid hardware security training courses by Joe Fitz [@securelyfitz](https://x.com/securelyfitz).
 
 ### Security Assessment and Design Guidance
