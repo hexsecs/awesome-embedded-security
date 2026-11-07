@@ -418,6 +418,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Security Assessment and Design Guidance
 
+* [Anti-Crime Ecosystem Research](https://github.com/GainSec/anti-crime-ecosystem-research) - Independent white paper documenting 51 security findings, 22 with assigned CVEs, across gunshot detection systems, license plate readers, and compute modules.
 * [OWASP IoT Security Testing Guide](https://github.com/OWASP/owasp-istg) - Methodology and test catalog for repeatable IoT penetration testing and security assessments.
 * [OWASP IoT Security Verification Standard](https://github.com/OWASP/IoT-Security-Verification-Standard-ISVS) - Open standard of security requirements for IoT ecosystems, spanning hardware platforms, software platforms, communications and user-space applications, for use across design, development and testing.
 * [PSA Certified](https://www.psacertified.org/) - IoT security framework, certification scheme, and developer resources for device, silicon, software, and root-of-trust security.
