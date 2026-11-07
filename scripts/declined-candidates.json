@@ -339,6 +339,21 @@
       "url": "https://github.com/ComThings/PandwaRF",
       "reason": "Sub-GHz RF tool built on the already-listed RfCat and Yard Stick One, with no recognized open-source license; no clear reason to list both.",
       "date": "2026-11-06"
+    },
+    {
+      "url": "https://github.com/sangyeon-iris-cho/P1-replay-ATmega328P",
+      "reason": "Single-course student project on replay-attack mitigation; not a reusable tool or maintained resource.",
+      "date": "2026-11-07"
+    },
+    {
+      "url": "https://github.com/whitecapfc/qnx-security-roadmap",
+      "reason": "Personal learning-in-public notes on QNX security; not a reusable tool or resource.",
+      "date": "2026-11-07"
+    },
+    {
+      "url": "https://github.com/EWA-SC/Embedded-Security-Controller",
+      "reason": "Single-purpose hobby Arduino demo project, 0 stars and no license; not a reusable security resource.",
+      "date": "2026-11-07"
     }
   ]
 }
