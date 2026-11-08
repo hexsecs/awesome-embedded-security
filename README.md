@@ -255,6 +255,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Baseband Security
 
+* [CellGuard](https://github.com/seemoo-lab/CellGuard) - iOS app that observes baseband packets and flags behaviour suggesting a rogue base station.
 * [FirmWire](https://github.com/FirmWire/FirmWire) - Full-system emulation platform for Samsung (Shannon) and MediaTek cellular baseband firmware with AFL++ fuzzing integration, a task-injection ModKit, and dynamic debugging support. Found 7 pre-authentication memory corruptions. NDSS 2022.
 * [Open5GS](https://github.com/open5gs/open5gs) - Open-source 5G core and 4G EPC, used to stand up a controlled network for baseband and cellular protocol testing.
 * [OsmocomBB](https://github.com/osmocom/osmocom-bb) - Free Software GSM baseband (Layer 1-3) implementation for TI Calypso-based phones, replacing proprietary baseband firmware entirely and enabling open research into the GSM air interface.
@@ -360,6 +361,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [MFCUK](https://github.com/nfc-tools/mfcuk) - Implementation of the Dark Side attack, recovering a first MIFARE Classic key when none is known.
 * [MFOC](https://github.com/nfc-tools/mfoc) - Nested attack that recovers the remaining MIFARE Classic sector keys once one key is known; pairs with MFCUK.
 * [mfoc-hardnested](https://github.com/nfc-tools/mfoc-hardnested) - Fork of MFOC adding the hardnested attack, which recovers MIFARE Classic keys from cards with hardened PRNGs that the offline nested attack alone cannot break; works with libnfc-supported readers.
+* [MifareClassicTool](https://github.com/ikarus23/MifareClassicTool) - Android app for reading, writing, and analysing MIFARE Classic RFID tags.
 
 ### RF Tools (Non-SDR)
 
@@ -392,6 +394,8 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Gqrx](https://www.gqrx.dk/) - General-purpose SDR receiver built on GNU Radio and Qt, with a waterfall display and AM/FM/SSB demodulation for surveying unknown spectrum.
 * [inspectrum](https://github.com/miek/inspectrum) - Offline analyser for captured IQ recordings, with cursors for measuring symbol rates and extracting bits from an unknown modulation.
 * [Maia SDR](https://maia-sdr.org/) - Open-source FPGA-based SDR project focusing on the ADALM Pluto.
+* [PortaPack Mayhem](https://github.com/portapack-mayhem/mayhem-firmware) - Community firmware for the HackRF PortaPack that turns the radio into a standalone handheld tool with apps for signal analysis, replay, and protocol decoding.
+* [SDR++](https://www.sdrpp.org/) - Cross-platform SDR receiver with a modular plugin architecture.
 * [SDRangel](https://www.sdrangel.org/) - Multi-mode SDR frontend with transmit support and decoders for ADS-B, AIS, DMR, POCSAG, and other protocols encountered in embedded and IoT radio work.
 * [SigDigger](https://github.com/BatchDrake/SigDigger) - Real-time signal analyser with FSK, PSK, and ASK demodulation and no GNU Radio dependency, aimed at characterising unknown transmissions.
 
