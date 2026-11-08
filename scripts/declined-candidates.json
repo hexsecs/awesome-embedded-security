@@ -176,11 +176,6 @@
       "date": "2026-10-30"
     },
     {
-      "url": "https://github.com/GainSec/anti-crime-ecosystem-research",
-      "reason": "Self-published white paper on a single connected public-safety ecosystem, not a general embedded-security resource.",
-      "date": "2026-10-30"
-    },
-    {
       "url": "https://github.com/ionescu007/tpmtool",
       "reason": "Desktop-oriented TPM 2.0 NV-space utility, dormant since 2021, not embedded-specific.",
       "date": "2026-11-02"
@@ -354,6 +349,41 @@
       "url": "https://github.com/EWA-SC/Embedded-Security-Controller",
       "reason": "Single-purpose hobby Arduino demo project, 0 stars and no license; not a reusable security resource.",
       "date": "2026-11-07"
+    },
+    {
+      "url": "https://github.com/murkl/arch-os",
+      "reason": "Desktop Arch Linux installer; the Secure Boot mention is incidental, not an embedded security tool.",
+      "date": "2026-11-08"
+    },
+    {
+      "url": "https://github.com/SatDump/SatDump",
+      "reason": "Generic satellite data processing software, not embedded security.",
+      "date": "2026-11-08"
+    },
+    {
+      "url": "https://github.com/ruvnet/RuView",
+      "reason": "Wi-Fi sensing and presence detection product, not a security tool.",
+      "date": "2026-11-08"
+    },
+    {
+      "url": "https://github.com/arendst/Tasmota",
+      "reason": "Alternative home-automation firmware for ESP devices, not a security tool.",
+      "date": "2026-11-08"
+    },
+    {
+      "url": "https://github.com/DarkFlippers/unleashed-firmware",
+      "reason": "Custom Flipper Zero firmware; near-overlap with the already-listed Flipper Zero entry.",
+      "date": "2026-11-08"
+    },
+    {
+      "url": "https://github.com/MarlinFirmware/Marlin",
+      "reason": "3D-printer firmware, not a security tool.",
+      "date": "2026-11-08"
+    },
+    {
+      "url": "https://github.com/m3y54m/Embedded-Engineering-Roadmap",
+      "reason": "General embedded-engineering learning roadmap, not security-specific.",
+      "date": "2026-11-08"
     }
   ]
 }
