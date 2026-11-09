@@ -384,6 +384,16 @@
       "url": "https://github.com/m3y54m/Embedded-Engineering-Roadmap",
       "reason": "General embedded-engineering learning roadmap, not security-specific.",
       "date": "2026-11-08"
+    },
+    {
+      "url": "https://github.com/isec-tugraz/meltdown",
+      "reason": "Meltdown proof-of-concept code for desktop/server x86 speculative execution, not embedded-specific.",
+      "date": "2026-11-09"
+    },
+    {
+      "url": "https://github.com/kenleejl/xEndityv2",
+      "reason": "IoT firmware emulation platform demoed at DEF CON 34, but the linked repository 404s and the public v2 snapshot is a single day of commits in April 2026 with 5 stars; unproven, worth reconsidering if it gains a track record.",
+      "date": "2026-11-09"
     }
   ]
 }
