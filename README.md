@@ -236,6 +236,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Bluetooth and BLE Security
 
 * [Bettercap BLE](https://www.bettercap.org/modules/ble/) - BLE scanning, enumeration, and characteristic read/write module integrated into the bettercap Swiss-army knife framework.
+* [BLE-Security-Attack-Defence](https://github.com/Charmve/BLE-Security-Attack-Defence) - Curated collection of Bluetooth Low Energy attack and defence research, covering tools, papers, and documented vulnerabilities in BLE stacks.
 * [BLEeding](https://github.com/sammwyy/BLEeding) - Bluetooth/BLE jamming, signal inhibition, DoS and DeAuth attack.
 * [BlueToolkit](https://github.com/sgxgsx/BlueToolkit) - Modular black-box vulnerability testing framework for Bluetooth Classic and BLE with Recon/Exploit/Report modules covering 40+ public exploits (MITM, RCE, DoS); used to uncover 128 vulnerabilities across 22 vehicles from major automakers. USENIX WOOT 2025.
 * [BrakTooth](https://github.com/Matheus-Garbelini/braktooth_esp32_bluetooth_classic_attacks) - Directed exploit suite for Bluetooth Classic LMP layer vulnerabilities, targeting protocol layers inaccessible from standard host stacks; affected 1,400+ products from Intel, Qualcomm, and Broadcom. USENIX Security 2022.
