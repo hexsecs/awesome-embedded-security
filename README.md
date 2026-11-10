@@ -306,6 +306,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Hardware Debug Interfaces
 
+* [Apollo](https://github.com/greatscottgadgets/apollo) - Microcontroller-based FPGA and JTAG programmer from Great Scott Gadgets for programming and debugging FPGA targets.
 * [blueTag](https://github.com/Aodrulez/blueTag) - JTAGulator alternative for RP2040 boards such as the Raspberry Pi Pico that detects JTAG and SWD pinouts on unknown targets, and doubles as a CMSIS-DAP adapter, flashrom SPI programmer and USB-to-serial bridge.
 * [DirtyJTAG](https://github.com/dirtyjtag/DirtyJTAG) - JTAG probe firmware for cheap STM32 boards and ST-Link clones, compatible with UrJTAG, OpenOCD and flashrom.
 * [JTAGenum](https://github.com/cyphunk/JTAGenum) - Enumerates JTAG pinouts on unknown boards by brute-force testing candidate pin mappings.
@@ -404,6 +405,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [ESP32 Marauder](https://github.com/justcallmekoko/ESP32Marauder) - A suite of WiFi/Bluetooth offensive and defensive tools for the ESP32.
 * [GhostESP](https://github.com/GhostESP-Revival/GhostESP) - ESP-IDF-native Wi-Fi and BLE assessment firmware for ESP32 boards, with live capture streaming to Wireshark, on-device PCAP handling, and wardriving support across a wide range of board targets.
+* [openwifi](https://github.com/open-sdr/openwifi) - Open-source IEEE 802.11 Wi-Fi baseband implementation for FPGA and SDR platforms, enabling low-level wireless research and custom access-point builds.
 * [Pwnagotchi](https://pwnagotchi.ai/) - A2C-based “AI” powered by bettercap and running on a Raspberry Pi Zero W that learns from its surrounding WiFi environment in order to maximize the crackable WPA key material it captures.
 
 ## Further Learning and Training
