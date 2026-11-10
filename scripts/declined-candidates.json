@@ -394,6 +394,71 @@
       "url": "https://github.com/kenleejl/xEndityv2",
       "reason": "IoT firmware emulation platform demoed at DEF CON 34, but the linked repository 404s and the public v2 snapshot is a single day of commits in April 2026 with 5 stars; unproven, worth reconsidering if it gains a track record.",
       "date": "2026-11-09"
+    },
+    {
+      "url": "https://github.com/linux-can/can-utils",
+      "reason": "General CAN bus utility suite with no fitting section; CAN resources live in the linked awesome-canbus lists.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/cantools/cantools",
+      "reason": "General CAN database and diagnostic tooling with no fitting section; CAN resources live in the linked awesome-canbus lists.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/hardbyte/python-can",
+      "reason": "General-purpose CAN library, not a security tool; no fitting section.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/linuxboot/heads",
+      "reason": "Secure-boot firmware for laptops and desktops, not embedded devices; same reason as sbctl.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/Foxboron/ssh-tpm-agent",
+      "reason": "Desktop SSH agent using TPM keys, not an embedded security tool.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/zhinkgit/embeddedskills",
+      "reason": "AI coding-assistant skills for embedded development, not a security resource.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/x64dbg/x64dbg",
+      "reason": "Windows desktop debugger, not embedded.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/permissionlesstech/bitchat",
+      "reason": "Consumer Bluetooth mesh chat app, not a security tool.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/Hack-with-Github/Awesome-Hacking",
+      "reason": "General hacking mega-list, not embedded-specific.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/xtekky/gpt4free",
+      "reason": "General AI model access repository, not embedded security.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/spieglt/FlyingCarpet",
+      "reason": "Cross-platform file-transfer tool, not a security tool.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/sgoudelis/ground-station",
+      "reason": "Satellite SDR ground station, not embedded security; same reason as SatDump.",
+      "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/utmapp/UTM",
+      "reason": "Desktop virtual-machine app for iOS and macOS, not embedded security.",
+      "date": "2026-11-10"
     }
   ]
 }
