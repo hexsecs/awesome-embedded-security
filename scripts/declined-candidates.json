@@ -459,6 +459,126 @@
       "url": "https://github.com/utmapp/UTM",
       "reason": "Desktop virtual-machine app for iOS and macOS, not embedded security.",
       "date": "2026-11-10"
+    },
+    {
+      "url": "https://github.com/reacher-z/Awesome-REA",
+      "reason": "General reverse-engineering list spanning websites, games, apps and firmware, not embedded-security-specific; same reason as the Awesome-Hacking decline.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/vindeckyy/smartcast-backdoor",
+      "reason": "Single-device (VIZIO TV) exploit research, not reusable tooling; same reason as the dlink-decrypt decline.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/unfr0zen/unfr0zen",
+      "reason": "Consumer-device rooting for local control of Nest thermostats, a device-modding project rather than a security research tool.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/jedisct1/wasmcop",
+      "reason": "Side-channel leakage analyzer for WebAssembly modules, not embedded.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/AhmedJaffar/OpenKeystroke",
+      "reason": "Acoustic keystroke side-channel research platform, not embedded-specific; 0 stars and unproven.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/ilia-ershov/yandex-station-lite-research",
+      "reason": "Single-device smart-speaker security research, not reusable tooling.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/caoc30255-eng/glitchscope",
+      "reason": "FPGA-based UART fault-injection testing tool, 2 stars and unproven; worth reconsidering if it gains a track record.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/opendevicedb/opendevicedb",
+      "reason": "Directory of devices whose firmware is already open, not a security resource.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/divagr18/gpu-instance-fingerprint",
+      "reason": "GPU fingerprinting via atomic-add ordering, a desktop/GPU side channel, not embedded security.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/Ta0p1/ResolveLab",
+      "reason": "Fault-injection evaluation harness for LLM agents, not hardware fault injection.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/Electro-Gamma/AndroProgX",
+      "reason": "Android CH341A programmer for I2C/SPI flash chips, a hardware tool, not a security resource.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/navotvolkgroundup/exitcheck",
+      "reason": "Network exit-node/proxy detection tool, not embedded security.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/zis3c/RedLilyGO",
+      "reason": "ESP32-S3 firmware bundling the already-listed ESP32 Marauder with USB HID injection; near-overlap with no reason to list both.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/karim852/KAMSTRIKE",
+      "reason": "Vague surveillance/offensive-security framework, 4 stars and unproven, not embedded-specific.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/coffeegrind123/denon-prime4plus-research",
+      "reason": "Single-device DJ controller security research, not reusable tooling.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/skbskhud/p104-gen2-unlock",
+      "reason": "GPU PCIe unlock tool for desktop graphics cards, not embedded security.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/BrainVirus/SAINTCON2026-BadgeHack",
+      "reason": "Single-event conference badge CTF writeup, not a reusable resource.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/adamvalves/secureboot-state-emulation",
+      "reason": "UEFI Secure Boot state emulation for Windows desktops, not embedded; same reason as sbctl.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/adamvalves/uefi-tcg-measured-boot-replay",
+      "reason": "Bare-metal UEFI/TPM measured-boot demo for desktop platforms, not embedded.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/hugoallaine/fuerteboote",
+      "reason": "UEFI Secure Boot for GRUB on NixOS desktops, not embedded; same reason as sbctl.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/stormchampionchart/mw4-tpm-secureboot-readiness-checker",
+      "reason": "Windows game TPM/Secure Boot readiness checker, not embedded security.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/federiconbaez/cortex9-jitter-exfil",
+      "reason": "Timing-jitter covert-channel detector, 0 stars, unaudited and unproven.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/leo-aa88/aerodoppler",
+      "reason": "Audio forensics tool locating recordings via aircraft Doppler signatures, not embedded security.",
+      "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/ghostbreachh/reaper",
+      "reason": "ESP32-S3 Flipper-style wireless auditing firmware, new and unproven, near-overlap with the already-listed ESP32 Marauder, GhostESP and Bruce.",
+      "date": "2026-11-11"
     }
   ]
 }
