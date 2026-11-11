@@ -225,6 +225,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 * [CoAP Security](https://datatracker.ietf.org/doc/html/rfc7252) - Constrained Application Protocol (CoAP) security with DTLS.
 * [Cotopaxi](https://github.com/Samsung/cotopaxi) - Multi-protocol IoT security testing toolkit from Samsung R&D covering MQTT, CoAP, AMQP, DTLS, KNX, QUIC, RTSP, SSDP, HTTP/2, gRPC, and more; supports fingerprinting, fuzzing, and known-vulnerability identification across 14 protocols.
+* [iotaudit](https://github.com/emirmrkaljevic/iotaudit) - Audits smart-home devices on a local network, grading plaintext traffic, open ports, and outbound connections in an HTML report.
 * [KillerBee](https://github.com/riverloopsec/killerbee) - IEEE 802.15.4/ZigBee security research framework for capturing, injecting, and analyzing ZigBee network traffic using compatible radio hardware.
 * [libcoap](https://libcoap.net/) - C implementation of CoAP with DTLS support for secure IoT communication.
 * [TLS for MQTT](https://mqtt.org/faq/) - Overview of TLS implementation for MQTT brokers and clients.
@@ -276,6 +277,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Avatar2](https://github.com/avatartwo/avatar2) - Dynamic analysis orchestration framework for binary firmware that coordinates execution across emulators (QEMU, Unicorn) and real hardware targets.
 * [Firmadyne](https://github.com/firmadyne/firmadyne) - Automated system for emulating and analyzing Linux-based embedded firmware; extracts and boots firmware images in QEMU to enable dynamic vulnerability discovery.
 * [FirmAE](https://github.com/pr0v3rbs/FirmAE) - An automated framework for emulation and vulnerability analysis of IoT firmware with an 79% success rate using arbitration techniques.
+* [Firmenstein](https://github.com/Firmenstein/Firmenstein) - Agent-driven rehosting of Linux firmware services for dynamic analysis, synthesizing API-level interventions to resolve environment dependencies. USENIX Security 2026.
 * [FirmSolo](https://github.com/BUseclab/FirmSolo) - Reverse-engineers vendor Linux kernel module version magic to load proprietary `.ko` drivers into a compatible kernel for dynamic analysis and fuzzing, unlocking code previously inaccessible to emulators. USENIX Security 2023.
 * [Greenhouse](https://github.com/sefcom/greenhouse) - User-space rehosting of single network services from Linux-based firmware, using a patched QEMU and AFL++ for fuzzing; rehosted 2,841 of 7,140 images from nine vendors. USENIX Security 2023.
 * [HALucinator](https://github.com/embedded-sec/halucinator) - MCU firmware emulation framework that replaces Hardware Abstraction Layer (HAL) functions with high-level models, enabling full firmware execution without physical hardware.
@@ -364,6 +366,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [MFOC](https://github.com/nfc-tools/mfoc) - Nested attack that recovers the remaining MIFARE Classic sector keys once one key is known; pairs with MFCUK.
 * [mfoc-hardnested](https://github.com/nfc-tools/mfoc-hardnested) - Fork of MFOC adding the hardnested attack, which recovers MIFARE Classic keys from cards with hardened PRNGs that the offline nested attack alone cannot break; works with libnfc-supported readers.
 * [MifareClassicTool](https://github.com/ikarus23/MifareClassicTool) - Android app for reading, writing, and analysing MIFARE Classic RFID tags.
+* [NFC_Apdu_Spy](https://github.com/Menrix/NFC_Apdu_Spy) - Flipper Zero app that emulates an ISO14443-4A tag and logs the APDUs exchanged with a reader, for reverse-engineering NFC device conversations.
 
 ### RF Tools (Non-SDR)
 
