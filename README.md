@@ -46,6 +46,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
   * [Software Defined Radio Software](#software-defined-radio-software)
   * [Wi-Fi Tools](#wi-fi-tools)
 * [Further Learning and Training](#further-learning-and-training)
+  * [Conference Talks](#conference-talks)
   * [Security Assessment and Design Guidance](#security-assessment-and-design-guidance)
   * [Standards and Regulation](#standards-and-regulation)
 * [Other Awesome Lists](#other-awesome-lists)
@@ -426,6 +427,10 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [MITRE eCTF](https://ectf.mitre.org/) - Annual collegiate "build-then-break" competition where teams harden and then attack each other's firmware on real ARM Cortex-M microcontrollers; open source tooling and insecure reference designs published each year.
 * [root-node](https://github.com/LukedeMunk/root-node) - Intentionally vulnerable ESP8266-based IoT training device for learning embedded security hands-on: web exploitation, serial attacks, insecure storage, and firmware analysis.
 * [SecuringHardware.com](https://learn.securinghardware.com/) 💰 - Paid hardware security training courses by Joe Fitz [@securelyfitz](https://x.com/securelyfitz).
+
+### Conference Talks
+
+* [Hacking Hearts by Reverse Engineering Pacemaker Firmware](https://media.defcon.org/DEF%20CON%2034/DEF%20CON%2034%20villages%20and%20creators/DEF%20CON%2034%20-%20Biohacking%20Village%20-%20Hacking%20Hearts%20by%20Reverse%20Engineering%20Pacemaker%20Firmware%20-%20Panel.mp4) - DEF CON 34 Biohacking Village talk by Marie Moe, Shayan Alinejad, and Kristian Karlsen: reverse engineering the Biotronik pacemaker ecosystem (implant, home monitoring unit, and external programmer), covering firmware extraction from life-critical hardware and the vulnerabilities found.
 
 ### Security Assessment and Design Guidance
 
