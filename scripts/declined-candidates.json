@@ -579,6 +579,51 @@
       "url": "https://github.com/ghostbreachh/reaper",
       "reason": "ESP32-S3 Flipper-style wireless auditing firmware, new and unproven, near-overlap with the already-listed ESP32 Marauder, GhostESP and Bruce.",
       "date": "2026-11-11"
+    },
+    {
+      "url": "https://github.com/brannondorsey/dns-rebind-toolkit",
+      "reason": "General web DNS-rebinding attack toolkit, not embedded-specific; unmaintained since 2021.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/Charmve/BLE-Security-Attack-Defence",
+      "reason": "Curated BLE vulnerability link collection whose contents largely duplicate entries already in the Bluetooth and BLE Security section; unmaintained since 2024.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/sincerelystepper/BLE_Protocol_Security_Testbed",
+      "reason": "Single-star BLE testbed for ESP32, too small and unproven to list.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/barrenechea/ESP-UniPwn",
+      "reason": "Single-target proof of concept (Unitree robot BLE command injection), not a general tool.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/deavers/iot-hardware-arsenal",
+      "reason": "Personal study-notes repository, zero stars, not a substantive resource.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/DependencyTrack/dependency-track",
+      "reason": "General software component-analysis platform, not embedded-specific.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/aboutcode-org/scancode-toolkit",
+      "reason": "General license and copyright scanner for software compliance, not embedded security.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/oss-review-toolkit/ort",
+      "reason": "General software compliance automation suite, not embedded security.",
+      "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/RetireJS/retire.js",
+      "reason": "Scanner for known-vulnerable JavaScript libraries, not embedded security.",
+      "date": "2026-11-12"
     }
   ]
 }
