@@ -624,6 +624,56 @@
       "url": "https://github.com/RetireJS/retire.js",
       "reason": "Scanner for known-vulnerable JavaScript libraries, not embedded security.",
       "date": "2026-11-12"
+    },
+    {
+      "url": "https://github.com/keyuraghao/chipwhisperer-studio",
+      "reason": "Desktop companion app for ChipWhisperer hardware, 27 stars and six weeks old; unproven, worth reconsidering if it gains a track record.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/JoeyZzZzZz/treasure-map",
+      "reason": "MCP firmware map for AI agents, 4 stars and days old; unproven.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/djnnvx/balrog",
+      "reason": "Post-extraction firmware triage for ELF files, 2 stars; too small and unproven.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/exein-io/analyzer-scan",
+      "reason": "GitHub Action wrapper for the commercial Exein Analyzer scanner; a vendor product with no open-source community edition.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/anas-nizami/secure_boot",
+      "reason": "Self-taught secure-boot learning project, 2 stars; not a reusable tool or resource.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/khalleb/honda-civic-headunit",
+      "reason": "Single-vehicle headunit mod (Honda Civic G10 warning screen), not reusable security tooling.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/garmin/meta-lts-collab",
+      "reason": "Yocto LTS collaboration layer, not a security resource.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/saschadaemgen/SimpleGo",
+      "reason": "SimpleX messaging client for ESP32-S3, a messaging app rather than a security tool.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/nodecross/nodex",
+      "reason": "End-to-end encrypted messaging platform, not embedded security.",
+      "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/karaaslanlabs/kl-security-key",
+      "reason": "Experimental RP2040 FIDO2 authenticator, 9 stars and unproven.",
+      "date": "2026-11-13"
     }
   ]
 }
