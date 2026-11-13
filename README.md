@@ -206,6 +206,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Keylime](https://keylime.dev/) - Open source TPM-based remote attestation for cloud and edge.
 * [OpenSK](https://github.com/google/OpenSK) - Open-source FIDO2 security key firmware in Rust for embedded targets, implementing the U2F and FIDO2 authenticator standards.
 * [OpenTitan](https://opentitan.org/) - Open-source silicon root of trust project with security-certified hardware designs and commercial-grade IP blocks.
+* [swtpm](https://github.com/stefanberger/swtpm) - Libtpms-based software TPM emulator giving each QEMU/libvirt guest its own virtual TPM (1.2 or 2.0), with socket, character device, and CUSE front-ends plus EK and platform certificate tooling.
 * [TPM 2.0 Reference Implementation](https://trustedcomputinggroup.org/resource-library/) - TPM 2.0 specification and reference software from the TCG.
 * [tpm2-algtest](https://github.com/crocs-muni/tpm2-algtest) - Tests real TPM 2.0 chips for RNG output quality, key generation timing, algorithm support, and implementation fingerprints across 80+ firmware revisions from 6 vendors. From CRoCS (discoverers of ROCA). CHES 2024.
 * [tpm2-tss](https://github.com/tpm2-software/tpm2-tss) - Reference implementation of the TCG TPM2 Software Stack (TSS2), providing the APIs for key management and attestation.
@@ -411,6 +412,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [GhostESP](https://github.com/GhostESP-Revival/GhostESP) - ESP-IDF-native Wi-Fi and BLE assessment firmware for ESP32 boards, with live capture streaming to Wireshark, on-device PCAP handling, and wardriving support across a wide range of board targets.
 * [openwifi](https://github.com/open-sdr/openwifi) - Open-source IEEE 802.11 Wi-Fi baseband implementation for FPGA and SDR platforms, enabling low-level wireless research and custom access-point builds.
 * [Pwnagotchi](https://pwnagotchi.ai/) - A2C-based “AI” powered by bettercap and running on a Raspberry Pi Zero W that learns from its surrounding WiFi environment in order to maximize the crackable WPA key material it captures.
+* [wifisting](https://github.com/yslxotwod/wifisting) - GTK4 wireless security toolkit for Linux bundling 58 modules across Wi-Fi, Bluetooth, RF, and router/network MITM workflows in one interface.
 
 ## Further Learning and Training
 
