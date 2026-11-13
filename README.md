@@ -171,6 +171,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [kernel-hardening-checker](https://github.com/a13xp0p0v/kernel-hardening-checker) - Audits Linux kernel Kconfig options and boot parameters against KSPP, CLIP OS, and STIG hardening recommendations; supports ARM, ARM64, x86, and RISC-V. Works in Yocto/OpenEmbedded pipelines.
 * [Metasploit](https://github.com/rapid7/metasploit-framework) - Open source penetration testing framework (BSD licensed) maintained by Rapid7, with modules for exploiting vulnerabilities, scanning, and post-exploitation across embedded Linux and IoT targets.
 * [onepct](https://github.com/evanslify/onepct) - Tooling for LLM-assisted vulnerability discovery in IoT and embedded firmware, open-sourced from a Black Hat USA talk: capability graphs that synthesize findings into attack chains, reseeding of findings across context compactions, and schema-validated subagent contracts.
+* [OOBscan](https://github.com/runZeroInc/oobscan) - Scanner for out-of-band management devices (BMCs, IP-KVMs, PDUs) that audits IPMI exposure and reproduces the findings of the Black Hat USA 2026 "Lights Out" BMC research.
 
 ### Firmware Taint Analysis
 
