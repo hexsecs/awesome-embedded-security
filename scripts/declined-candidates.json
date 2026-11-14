@@ -674,6 +674,21 @@
       "url": "https://github.com/karaaslanlabs/kl-security-key",
       "reason": "Experimental RP2040 FIDO2 authenticator, 9 stars and unproven.",
       "date": "2026-11-13"
+    },
+    {
+      "url": "https://github.com/aquasecurity/trivy",
+      "reason": "Container and Kubernetes vulnerability scanner with SBOM support; general software supply chain, not embedded-specific.",
+      "date": "2026-11-14"
+    },
+    {
+      "url": "https://github.com/microsoft/secureboot_objects",
+      "reason": "Microsoft's recommended UEFI Secure Boot objects for Windows PCs; desktop UEFI, not embedded.",
+      "date": "2026-11-14"
+    },
+    {
+      "url": "https://github.com/ElectronicCats/jieli-ble-badge-research",
+      "reason": "Single-device BLE badge reverse-engineering writeup; too narrow, not a general tool or reusable resource.",
+      "date": "2026-11-14"
     }
   ]
 }
