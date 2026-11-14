@@ -125,6 +125,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [MCUboot](https://github.com/mcu-tools/mcuboot) - Secure bootloader for 32-bit microcontrollers supporting signed images, rollback protection, and measured boot flows.
 * [meta-raspberrypi-secure](https://github.com/embetrix/meta-raspberrypi-secure) - Yocto layer providing a security-hardened baseline for Raspberry Pi images, with a signed boot chain, verified and encrypted storage, runtime integrity checks, and A/B updates.
 * [Punchboot](https://github.com/jonasblixt/punchboot) - Secure bootloader for NXP i.MX systems that verifies signed images in the boot chain, with A/B updates and automatic rollback.
+* [rpi-sb-provisioner](https://github.com/raspberrypi/rpi-sb-provisioner) - Automated provisioning station that programs secure boot and storage encryption on Raspberry Pi devices over USB.
 * [Trusted Firmware-A](https://trustedfirmware-a.readthedocs.io/en/latest/) - Reference secure-world firmware for Arm A-profile processors, providing the EL3 secure monitor and a Trusted Board Boot chain of trust following Arm's TBBR-CLIENT specification.
 * [U-Boot Verified Boot](https://docs.u-boot.org/en/latest/usage/fit/verified-boot.html) - FIT-signature based verified boot support for embedded Linux boot chains.
 * [wolfBoot](https://github.com/wolfSSL/wolfBoot) - Portable secure bootloader for 32-bit MCUs using wolfCrypt for image signature verification (Ed25519, ECC, RSA, post-quantum LMS/XMSS), with delta updates, encrypted images, and explicit voltage-glitch countermeasures.
@@ -191,8 +192,10 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### TEE/Trusted Execution Environments
 
+* [ACE-RISCV](https://github.com/IBM/ACE-RISCV) - VM-based trusted execution environment for embedded RISC-V systems with a formally verified security monitor.
 * [AMD SEV](https://developer.amd.com/sev/) - Secure Encrypted Virtualization for encrypting VM memory with AMD-V hardware assistance.
 * [Intel SGX SDK](https://github.com/intel/confidential-computing.sgx) - Open-source Linux SDK and Platform Software for Intel Software Guard Extensions, providing the build/install toolchain for developing and deploying hardware-based memory enclave applications.
+* [mTower](https://github.com/Samsung/mTower) - Trusted execution environment for Cortex-M and RISC-V microcontrollers with GlobalPlatform APIs, designed for size-constrained IoT devices.
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
 * [Samsung TrustZone Research Toolkit](https://github.com/quarkslab/samsung-trustzone-research) - Quarkslab's RE toolkit for Samsung Kinibi TrustZone: Ghidra loader for MCLF trustlet binaries, Unicorn-based trustlet emulator for exploit development, and Python bindings for communicating with Trusted Applications.
 * [sgx-step](https://github.com/jovanbulck/sgx-step) - Framework for precise single-stepping of SGX enclaves to enable controlled-channel and side-channel attacks.
@@ -433,7 +436,9 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 
 ### Conference Talks
 
+* [Breaking the Root of Trust: Practical Side-Channel Key Extraction from a TPM](https://youtu.be/hk-Yyuh4cM8) - Hardwear.io USA 2026 talk by Roman Korkikian: power side-channel extraction of ECDH private keys from a commercial TPM using a roughly $2,000 measurement setup, plus SPI bus sniffing of vault keys and PCR values.
 * [Hacking Hearts by Reverse Engineering Pacemaker Firmware](https://media.defcon.org/DEF%20CON%2034/DEF%20CON%2034%20villages%20and%20creators/DEF%20CON%2034%20-%20Biohacking%20Village%20-%20Hacking%20Hearts%20by%20Reverse%20Engineering%20Pacemaker%20Firmware%20-%20Panel.mp4) - DEF CON 34 Biohacking Village talk by Marie Moe, Shayan Alinejad, and Kristian Karlsen: reverse engineering the Biotronik pacemaker ecosystem (implant, home monitoring unit, and external programmer), covering firmware extraction from life-critical hardware and the vulnerabilities found.
+* [Reverse Engineering a Ledger Nano X Hardware Implant](https://youtu.be/WNpW52x-EWY) - Hardwear.io USA 2026 talk by Joe Grand: reverse engineering a real hardware implant found inside a secondhand Ledger Nano X, covering decapsulation, firmware extraction, and RF analysis of a supply-chain attack on a cryptocurrency wallet.
 
 ### Security Assessment and Design Guidance
 
