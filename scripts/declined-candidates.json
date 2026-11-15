@@ -26,6 +26,56 @@
   ],
   "declined": [
     {
+      "url": "https://github.com/foxcornlab/zyxel-gs1900-scanner",
+      "reason": "Single-CVE detection script for one Zyxel switch model; not a reusable tool.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/RobinFitzek/Alexa-Platform",
+      "reason": "Single-device Echo Dot 3 security research notes; not reusable tooling.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/jawadahmadliaqat-dot/Firmware-Liberation-Engine",
+      "reason": "Research prototype for verified firmware extraction with Lean 4; 1 star, no adoption yet.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/UniXNU/QcomBaseband",
+      "reason": "Qualcomm baseband data-path bridge for running XNU on iPadOS hardware, not a security research tool.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/amirali-cheraghi-cyber/shahin-extractor",
+      "reason": "Single-purpose UART extraction tool built for hardware CTF competitions; no adoption.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/gautham-sai05/ComparIoT_V3",
+      "reason": "New 1-star hardware-security training badge; no adoption yet.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/Mustafaiq1998x/Firmware-Security-Analyzer",
+      "reason": "Unproven 1-star static-analysis project with a one-line description and no adoption.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/d0ok/secure-ota-pipeline",
+      "reason": "Educational CI/CD demo for secure vehicle OTA updates, not a reusable tool or reference.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/grimh3xx/dmaguard",
+      "reason": "Brand-new DMA attack-surface auditor, 1 star and two days old; no adoption yet.",
+      "date": "2026-11-15"
+    },
+    {
+      "url": "https://github.com/grimh3xx/bootcha1n",
+      "reason": "Brand-new UEFI Secure Boot key-hierarchy and TPM measured-boot auditor, 1 star and two days old; no adoption yet.",
+      "date": "2026-11-15"
+    },
+    {
       "url": "https://github.com/hexsecs/awesome-embedded-security",
       "reason": "This list itself. It matches most of the search terms and would otherwise be proposed for inclusion in itself.",
       "date": "2026-09-17"
