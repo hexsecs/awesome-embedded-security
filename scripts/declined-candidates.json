@@ -739,6 +739,21 @@
       "url": "https://github.com/ElectronicCats/jieli-ble-badge-research",
       "reason": "Single-device BLE badge reverse-engineering writeup; too narrow, not a general tool or reusable resource.",
       "date": "2026-11-14"
+    },
+    {
+      "url": "https://github.com/fbef0102/L4D1_2-Plugins",
+      "reason": "Left 4 Dead game server plugins; matched only on the word glitch, not embedded security.",
+      "date": "2026-11-16"
+    },
+    {
+      "url": "https://github.com/georgemandis/bubo-rss",
+      "reason": "Minimalist RSS feed reader; matched only on Glitch hosting, not embedded security.",
+      "date": "2026-11-16"
+    },
+    {
+      "url": "https://github.com/GlitchCodec/GLIC",
+      "reason": "Glitch-art image codec; matched only on the word glitch, not fault injection.",
+      "date": "2026-11-16"
     }
   ]
 }
