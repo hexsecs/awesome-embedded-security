@@ -764,11 +764,6 @@
       "url": "https://github.com/edgelesssys/edgelessrt",
       "reason": "Intel SGX SDK and runtime for server and desktop confidential microservices, not embedded.",
       "date": "2026-11-17"
-    },
-    {
-      "url": "https://github.com/LxveAce/cyber-controller",
-      "reason": "Dashboard bundling the already-listed Marauder, Bruce and GhostESP firmwares; 97 stars and unproven, no distinct security tool of its own.",
-      "date": "2026-11-17"
     }
   ]
 }
