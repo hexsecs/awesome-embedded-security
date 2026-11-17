@@ -754,6 +754,21 @@
       "url": "https://github.com/GlitchCodec/GLIC",
       "reason": "Glitch-art image codec; matched only on the word glitch, not fault injection.",
       "date": "2026-11-16"
+    },
+    {
+      "url": "https://github.com/Dstack-TEE/dstack",
+      "reason": "Confidential-computing framework for server-side AI workloads on TDX, not embedded.",
+      "date": "2026-11-17"
+    },
+    {
+      "url": "https://github.com/edgelesssys/edgelessrt",
+      "reason": "Intel SGX SDK and runtime for server and desktop confidential microservices, not embedded.",
+      "date": "2026-11-17"
+    },
+    {
+      "url": "https://github.com/LxveAce/cyber-controller",
+      "reason": "Dashboard bundling the already-listed Marauder, Bruce and GhostESP firmwares; 97 stars and unproven, no distinct security tool of its own.",
+      "date": "2026-11-17"
     }
   ]
 }
