@@ -199,6 +199,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [OP-TEE](https://optee.readthedocs.io/) - Open Source Trusted Execution Environment providing isolation for secure world execution on ARM TrustZone processors.
 * [Samsung TrustZone Research Toolkit](https://github.com/quarkslab/samsung-trustzone-research) - Quarkslab's RE toolkit for Samsung Kinibi TrustZone: Ghidra loader for MCLF trustlet binaries, Unicorn-based trustlet emulator for exploit development, and Python bindings for communicating with Trusted Applications.
 * [sgx-step](https://github.com/jovanbulck/sgx-step) - Framework for precise single-stepping of SGX enclaves to enable controlled-channel and side-channel attacks.
+* [Teaclave TrustZone SDK](https://github.com/apache/teaclave-trustzone-sdk) - Rust SDK for developing ARM TrustZone trustlets on OP-TEE, with memory-safe APIs for secure-world services.
 * [Trusted Firmware-M](https://trustedfirmware-m.readthedocs.io/en/latest/) - Open-source secure firmware for Arm Cortex-M TrustZone systems, providing isolation, secure services, and PSA security APIs.
 * [Trusty TEE](https://source.android.com/docs/security/features/trusty) - Trusted Execution Environment used in Android for secure services and keystore.
 
@@ -239,6 +240,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [Wireshark MQTT](https://www.wireshark.org/docs/dfref/m/mqtt.html) - Protocol analyzer support for MQTT traffic inspection and security analysis.
 * [wolfMQTT](https://www.wolfssl.com/products/wolfmqtt/) - MQTT client library with TLS support optimized for embedded systems.
 * [wolfSSH](https://github.com/wolfSSL/wolfssh) - Small, fast, portable SSH library with SCP and SFTP support, built for embedded and RTOS targets.
+* [wolfSSL](https://github.com/wolfSSL/wolfssl) - Small, fast, portable TLS implementation for embedded and RTOS targets, with support for TLS 1.3 and DTLS 1.3.
 
 ### Bluetooth and BLE Security
 
