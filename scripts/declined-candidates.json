@@ -769,6 +769,101 @@
       "url": "https://github.com/RichJJ98/firmware-auditor",
       "reason": "Zero-emulation static rootfs auditor; 0 stars, no license, no adoption yet.",
       "date": "2026-11-18"
+    },
+    {
+      "url": "https://github.com/fynks/awesome-temporary-root",
+      "reason": "Curated index of temporary-root loaders for locked Android bootloaders; consumer phone rooting/modding rather than an embedded security research resource.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/Trustpoint-Project/trustpoint",
+      "reason": "Server-side PKI and certificate lifecycle platform for industrial OT; not an embedded-device security tool, same reason as the lamassuiot decline.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/SpiralRise/binary-audit-pipeline",
+      "reason": "0-star static audit pipeline gluing already-listed tools (capa, cwe_checker, Ghidra); no adoption yet.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/PAXECT-Interface/paxect-cra-readiness-scanner",
+      "reason": "0-star EU Cyber Resilience Act readiness scanner; brand new and unproven, worth reconsidering if it gains adoption.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/shengmojiaogexing/godox-firmware-lab",
+      "reason": "Single-vendor (Godox flash) firmware reverse-engineering toolkit, 3 stars and Chinese-only documentation; too narrow and unproven.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/Krishita17/flipdoctor-flipperzero",
+      "reason": "Flipper Zero self-diagnostics utility, 5 stars; a device health tool, not a security resource.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/TelcoSec-Tools/AirTAP-Framework",
+      "reason": "Modular cellular radio diagnostics framework, 2 stars and unproven.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/radiolab81/parlioSDR",
+      "reason": "ESP32 baseband/RF software-defined radio, 3 stars and unproven.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/alirafiqmalik/rrcscope",
+      "reason": "Live LTE/5G NAS and RRC capture from rooted Pixel modems, 0 stars and unproven.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/SIGILIPELLI/freertos-mastery-path",
+      "reason": "General FreeRTOS training path, not security-specific.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/DmitriyTopka/qnx-blueprint",
+      "reason": "QNX 8.0 architecture contracts and notes, 0 stars; not a reusable security resource.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/hookprobe/hookprobe",
+      "reason": "Vague AI-driven network defence product for cheap hardware; not embedded-specific.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/dilates/protodissect",
+      "reason": "Turns packet captures into Wireshark dissectors automatically, 1 star; general protocol tooling, unproven.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/GainSec/ReadyArmor-DeepSeaResearch-DSR",
+      "reason": "0-star AI vulnerability-research framework for firmware; brand new and unproven.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/juliangreyravenscroft/vbi-siliarch",
+      "reason": "Adaptive trusted-hardware platform description, 1 star; vague scope and no adoption.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/firmdura/meta-firmdura-kirkstone",
+      "reason": "Yocto security-maintenance reference layer, 0 stars; a distro layer, not a security tool or resource.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/solcoteh/Surveillance-Security-Research",
+      "reason": "Security-research notes repository on surveillance systems, 0 stars; not a reusable tool or resource.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/systemslibrarian/crypto-lab-cold-boot",
+      "reason": "Browser-based cold-boot key-recovery demo, 0 stars; a teaching toy, not a substantive resource.",
+      "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/systemslibrarian/crypto-lab-lattice-fault",
+      "reason": "Browser-based lattice fault-attack demo, 1 star; a teaching toy, not a substantive resource.",
+      "date": "2026-11-19"
     }
   ]
 }
