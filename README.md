@@ -266,6 +266,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 ### Baseband Security
 
 * [CellGuard](https://github.com/seemoo-lab/CellGuard) - iOS app that observes baseband packets and flags behaviour suggesting a rogue base station.
+* [DiagNG](https://github.com/P1sec/DiagNG) - Successor to QCSuper: captures raw 2G to 5G radio frames from Qualcomm basebands over the Diag protocol, with a GUI and CLI producing PCAPs for analysis in Wireshark.
 * [FirmWire](https://github.com/FirmWire/FirmWire) - Full-system emulation platform for Samsung (Shannon) and MediaTek cellular baseband firmware with AFL++ fuzzing integration, a task-injection ModKit, and dynamic debugging support. Found 7 pre-authentication memory corruptions. NDSS 2022.
 * [Open5GS](https://github.com/open5gs/open5gs) - Open-source 5G core and 4G EPC, used to stand up a controlled network for baseband and cellular protocol testing.
 * [OsmocomBB](https://github.com/osmocom/osmocom-bb) - Free Software GSM baseband (Layer 1-3) implementation for TI Calypso-based phones, replacing proprietary baseband firmware entirely and enabling open research into the GSM air interface.
