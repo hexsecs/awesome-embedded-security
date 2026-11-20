@@ -864,6 +864,11 @@
       "url": "https://github.com/systemslibrarian/crypto-lab-lattice-fault",
       "reason": "Browser-based lattice fault-attack demo, 1 star; a teaching toy, not a substantive resource.",
       "date": "2026-11-19"
+    },
+    {
+      "url": "https://github.com/presidio-v/presidio-hardened-esp32",
+      "reason": "New v0.1.0 ESP-IDF hardening component; 4 stars, no adoption yet.",
+      "date": "2026-11-20"
     }
   ]
 }
