@@ -869,6 +869,16 @@
       "url": "https://github.com/presidio-v/presidio-hardened-esp32",
       "reason": "New v0.1.0 ESP-IDF hardening component; 4 stars, no adoption yet.",
       "date": "2026-11-20"
+    },
+    {
+      "url": "https://github.com/GainSec/anti-crime-ecosystem-research",
+      "reason": "Single-ecosystem white paper on public-safety technology, not an embedded-security tool or general resource.",
+      "date": "2026-11-21"
+    },
+    {
+      "url": "https://github.com/phayes/sidefuzz",
+      "reason": "Timing side-channel fuzzer for WebAssembly/Rust crypto, not embedded-specific.",
+      "date": "2026-11-21"
     }
   ]
 }
