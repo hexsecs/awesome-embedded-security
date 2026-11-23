@@ -879,6 +879,11 @@
       "url": "https://github.com/phayes/sidefuzz",
       "reason": "Timing side-channel fuzzer for WebAssembly/Rust crypto, not embedded-specific.",
       "date": "2026-11-21"
+    },
+    {
+      "url": "https://github.com/kalachbeg/Hearthscan",
+      "reason": "General home-network discovery scanner; not embedded-security specific.",
+      "date": "2026-11-23"
     }
   ]
 }
