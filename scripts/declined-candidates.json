@@ -884,6 +884,16 @@
       "url": "https://github.com/kalachbeg/Hearthscan",
       "reason": "General home-network discovery scanner; not embedded-security specific.",
       "date": "2026-11-23"
+    },
+    {
+      "url": "https://github.com/laserbirdx/tpl-m7300-exploit",
+      "reason": "Single-device command-injection PoC, not a substantive tool or resource.",
+      "date": "2026-11-24"
+    },
+    {
+      "url": "https://github.com/sifatnotes/secbyte-wifi-security-wpa2-wpa3-rogue-ap-embedded-iot-ctf-labs",
+      "reason": "General Wi-Fi security CTF labs, not embedded-security specific.",
+      "date": "2026-11-24"
     }
   ]
 }
