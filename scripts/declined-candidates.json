@@ -894,6 +894,16 @@
       "url": "https://github.com/sifatnotes/secbyte-wifi-security-wpa2-wpa3-rogue-ap-embedded-iot-ctf-labs",
       "reason": "General Wi-Fi security CTF labs, not embedded-security specific.",
       "date": "2026-11-24"
+    },
+    {
+      "url": "https://github.com/cedricp/ddt4all",
+      "reason": "General OBD diagnostic tooling for Renault/Dacia vehicles, not a security research resource; no fitting section.",
+      "date": "2026-11-26"
+    },
+    {
+      "url": "https://github.com/carteakey/alvidaa",
+      "reason": "Single-vendor smart-TV launcher and jailbreak; device modding rather than a security research resource, and no license.",
+      "date": "2026-11-26"
     }
   ]
 }
