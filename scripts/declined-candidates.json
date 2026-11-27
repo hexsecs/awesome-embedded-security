@@ -904,6 +904,231 @@
       "url": "https://github.com/carteakey/alvidaa",
       "reason": "Single-vendor smart-TV launcher and jailbreak; device modding rather than a security research resource, and no license.",
       "date": "2026-11-26"
+    },
+    {
+      "url": "https://github.com/Geraldkilic70/eventide-h910",
+      "reason": "Audio pitch-shifter plugin for music production; matched the 'glitch' keyword only, not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/stillhunter/stillhunter",
+      "reason": "Claude Code plugin hunting bugs in web-app changes; not hardware fault injection.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/unipicto/appaudit",
+      "reason": "General AI-assisted security assessments, not embedded-specific.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/xbsheng/lakala-cs80",
+      "reason": "POS customer display repurposed as a second monitor; hardware modding, not security research.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/applefreak/wt41n0-buildroot",
+      "reason": "Buildroot configuration for a Zebra wrist computer, not a security resource.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/repeaterdroid/cmp170hx-mig-nvdec-nvjpg-ofa-unlock",
+      "reason": "GPU feature unlock via OTP fuses; hardware modding, not security research.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/Pupariaa/18650-4CHN-SWD-Monitor",
+      "reason": "SWD telemetry for a Li-ion charger/tester; hardware telemetry, not security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/laserbirdx/seagate-nas2bay-omv",
+      "reason": "Debian/OpenMediaVault install on a NAS enclosure, not security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/Kc57/contra-pocket-mod",
+      "reason": "Game-console firmware modding and custom launcher, not security research.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/NikolaiT/botstop.io",
+      "reason": "Bot-detection website; web anti-bot, not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/Rayaan-AP/ghost-pulse-reflex-poc",
+      "reason": "Unproven 1-star microarchitectural covert-timing PoC, no adoption.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/jackpham-rgb/rf-mixed-signal-security-game",
+      "reason": "Game-theory simulator for chip power/RF leakage, not a security tool.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/seuros/rogue_machines",
+      "reason": "Ruby fault-injection/chaos engineering for web services, not hardware fault injection.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/ranajahanzaib/cf-quota-lab",
+      "reason": "Cloudflare Workers quota testing, not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/ranajahanzaib/agent-tool-response-fault-tester",
+      "reason": "AI-agent faulty-response testing, not hardware fault injection.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/kunalgoesbyken/seedfall",
+      "reason": "Crash testing for Go services, not hardware fault injection.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/ashvolt/replayguard",
+      "reason": "Durable-workflow crash testing, not hardware fault injection.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/Muriel-Gasparini/grubz-refind",
+      "reason": "Animated UEFI boot selector, not a security resource.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/Arsslensoft/Amethystora",
+      "reason": "Hardened desktop OS; desktop hardening, not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/vektort13/AntiBotPCExplorer-VM-Detection-and-Hardware-Fingerprinting",
+      "reason": "Windows VM detection and hardware fingerprinting for anti-bot, not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/rep-stosw/Allwinner-T113-s3-SDK",
+      "reason": "Bare-metal SDK for an Allwinner SoC, not a security tool.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/harshacreate/NeuralEdge-IDS",
+      "reason": "IoT threat detector trained on synthetic traffic; unproven, 3 stars.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/umbette/sentinel",
+      "reason": "DNS defense and browser hardening; not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/ascension-association/ramekin",
+      "reason": "Generic secure application deployment platform, not embedded-specific.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/jossseluuu/ZeroTrace",
+      "reason": "Daily cybersecurity tips; general awareness content, not embedded-specific.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/DeStRoYeR-droid/trust-routing-wsn",
+      "reason": "NS-3 trust-routing simulation for sensor networks, not a tool.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/Jimuelle07/eclipse-near",
+      "reason": "Payment firewall for AI agents on NEAR; not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/tallesnetto/architecting-trust-sos-tee",
+      "reason": "Conceptual TEE trust-model PoC; academic, 1 star, no adoption.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/edycutjong/sealed",
+      "reason": "Bug bounties for committed invariants; not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/wardumb-t3/t3n-awesome",
+      "reason": "Awesome list of TEE AI agents; not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/KhasziaAja/trust-hash-protocol",
+      "reason": "Decentralized data-provenance protocol; not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/elb1982az-del/elb1982-del",
+      "reason": "Private Android controller for a lab tool, not a public resource.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/ALLaNRoY-TECH/Acoustic-keystroke-project",
+      "reason": "Acoustic keystroke side-channel demo, not embedded-specific; 0 stars and unproven.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/nihalalarifi/sarmad-em-sentinel",
+      "reason": "EM-leakage detection for air-gapped computers, 0 stars and unproven.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/mayday5000/UefiSecureVault-Suite",
+      "reason": "New UEFI Secure Boot lab, 2 stars, no adoption yet; revisit if it matures.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/smartworldarafath/Reverse-Engineer-WiFi-Router",
+      "reason": "New 2-star AI-generated router RE guide/skill, no adoption yet; revisit if it matures.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/cybermaksx/ESP32-Evil-Twin-Deauth-Captive-Portal",
+      "reason": "New 4-star ESP32 WiFi attack lab, no adoption yet; revisit if it matures.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/cardlang/cardlang",
+      "reason": "New 2-star language for isolated secure applications, no adoption yet.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/JiChiRen/Quilla",
+      "reason": "New 1-star secure-boot-capable embedded OS derived from Contiki-NG, no adoption yet.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/ifreake/ESP32-CyberLab",
+      "reason": "New 1-star ESP32 IoT cybersecurity lab, no adoption yet.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/jurajliskalc/ai-networking-academy",
+      "reason": "AI cluster networking training (RDMA/RoCE/InfiniBand), not embedded security.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/yslxotwod/atomicsweep",
+      "reason": "New 1-star device sweep TUI, no adoption yet.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/DavidBuchanan314/hello-trustonic",
+      "reason": "New 1-star hello-world Trustonic trustlet example, no adoption yet.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/AzfarNajam/firmware-update-verification-lab",
+      "reason": "New 0-star MCUboot imgtool lab, no adoption yet.",
+      "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/mizzsx/Firmware-Security-Analysis",
+      "reason": "New 0-star hands-on firmware security lab, no adoption yet.",
+      "date": "2026-11-27"
     }
   ]
 }
