@@ -1129,6 +1129,186 @@
       "url": "https://github.com/mizzsx/Firmware-Security-Analysis",
       "reason": "New 0-star hands-on firmware security lab, no adoption yet.",
       "date": "2026-11-27"
+    },
+    {
+      "url": "https://github.com/NSM-Barii/framework",
+      "reason": "Unproven single-author framework, no license, self-described as in active development; reconsider if it gains a track record.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/7wp81x/NRSuite-firmware",
+      "reason": "19 stars, two months old; ESP32 Wi-Fi/BLE attack firmware overlapping Bruce and Marauder already listed.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/dev-rehaann/AetherDeck",
+      "reason": "0 stars, created 2026-11-27; headless ESP32 Wi-Fi/BLE toolkit, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/sanskargupta0-7/BLE-Security-Auditor",
+      "reason": "0 stars, created 2026-11-27; BLE scanner CLI, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/dougborg/AirHound",
+      "reason": "14 stars; Wi-Fi/BLE surveillance-detection toolkit, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/VIGIL-IoT/VIGIL-FUSE",
+      "reason": "0 stars; embedded firmware analysis module, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/mkinfe/uds-iso-tp-server",
+      "reason": "0 stars, created 2026-11-27; single-purpose UDS demo server, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/f15-hx/CAN-AutoGuard",
+      "reason": "0 stars; CAN monitoring simulator, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/Md-Gulab/CAN-bus-security-project",
+      "reason": "0 stars; student CAN intrusion-detection project, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/owlsecx/OCANBus",
+      "reason": "0 stars; defensive CAN analysis lab, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/tntech-ngin/in-vehicle-security-survey",
+      "reason": "Paper list for a survey article, not a listable tool or resource.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/oscardagrach/soc2qemu-fuzz",
+      "reason": "3 stars, six weeks old; SoC firmware fuzzing, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/EMBA-support-repos/RTOSploit",
+      "reason": "0 stars, no pushes since March 2026; RTOS testing framework, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/dessertlab/FuzzBox",
+      "reason": "7 stars, quiet since 2025; QEMU full-system fuzzing for embedded targets, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/seb30123/Mewtwo",
+      "reason": "1 star; catalogue of PQC side-channel attacks, thin.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/shonology/Cyber_Physical_Systems_Labs",
+      "reason": "0 stars; personal side-channel and fault-injection lab notes.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/Madicce/Side-Channel-Fault-Attacks-Lab",
+      "reason": "0 stars; personal side-channel and fault-injection lab.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/OSR-Lab/osr-303",
+      "reason": "0 stars; STM32 evaluation board for side-channel analysis, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/OSR-Lab/OSR-FPGA-A7100T",
+      "reason": "0 stars; FPGA evaluation board for side-channel analysis, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/w1ld3r/Raspi_Hackbox",
+      "reason": "6 stars; general pentest Raspberry Pi image, not embedded-security specific.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/pbarsamian/ai-for-dragons",
+      "reason": "0 stars; AI assistant wrapper around SDR tooling, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/thomas169/web_hackrf",
+      "reason": "0 stars; browser frontend for HackRF, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/CJYMage/HackRF-Garage-Door-Opener-Lab-3--Communiations-engineering",
+      "reason": "0 stars; coursework lab, not a listable resource.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/DavidClawson/headunit-toolkit",
+      "reason": "0 stars; single-device car head-unit RE notes, too narrow.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/Darshan1234170/dji-goggles3-display",
+      "reason": "0 stars; single-device RE project, too narrow.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/qn06142/zv-e10-re",
+      "reason": "24 stars; single-device camera RE project, too narrow.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/jammyfu/reverse-engineering-atlas",
+      "reason": "22 stars; cross-platform map of game and app decompilations, not embedded-security specific.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/lukesau/ezgb",
+      "reason": "25 stars; single-device flash-cart RE project, too narrow.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/prasys/eannon-x3-fw-reverse",
+      "reason": "0 stars; single-device head-unit firmware RE, too narrow.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/HelgeSverre/keystepmk2-firmware-sdk",
+      "reason": "0 stars; single-device MIDI controller firmware SDK, too narrow.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/boxlite-ai/boxlite",
+      "reason": "Micro-VM for AI agents, not embedded security.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/Mikegustavo19/esp32-iot-smartlock-security-lab",
+      "reason": "0 stars; single-device ESP32 smart-lock vulnerability lab, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/murrez/pocbit-archive",
+      "reason": "1 star; archived IoT exploit PoC collection, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/Huguescy9/Flair_Sentinel_R5IA13",
+      "reason": "0 stars; IoT sensor-fleet AI copilot, unproven and not embedded-security specific.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/Rocklaye/IoT-vulnerability-pivot-exploitation",
+      "reason": "0 stars; IoT vulnerability pivoting project, unproven.",
+      "date": "2026-11-28"
+    },
+    {
+      "url": "https://github.com/PantaRhei/inFactory-TH-RF-Spoofer-HackRF-One",
+      "reason": "0 stars; single-device RF spoofer, too narrow.",
+      "date": "2026-11-28"
     }
   ]
 }
