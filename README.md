@@ -388,6 +388,7 @@ Topics covered include firmware extraction and fuzzing, secure boot and root of 
 * [ChameleonUltra](https://github.com/RfidResearchGroup/ChameleonUltra) - Pocket friendly powerful LF and HF emulation & manipulation tool which is based on the open-source project ChameleonMini.
 * [cyber-controller](https://github.com/LxveAce/cyber-controller) - Dashboard for flashing, controlling, and coordinating ESP32 security firmware (Marauder, Bruce, GhostESP), Flipper Zero, and Raspberry Pi hardware from one place.
 * [Flipper Zero](https://docs.flipper.net/) - Portable multi-tool for pentesters and geeks in a toy-like body. It loves hacking digital stuff, such as radio protocols, access control systems, hardware and more.
+* [Minino](https://github.com/ElectronicCats/Minino) - Open-hardware ESP32-C6 board for sniffing, communicating with, and attacking BLE, Zigbee, Thread, and Wi-Fi IoT devices.
 * [PromptZero](https://github.com/xunholy/promptzero) - Natural-language operator for Flipper Zero and ESP32 Marauder that builds, deploys, and runs Sub-GHz, NFC, RFID, IR, BadUSB, and Wi-Fi payloads.
 * [Proxmark3](https://github.com/RfidResearchGroup/proxmark3) - Open-source RFID research platform for low-level interaction, analysis, and testing across a wide range of LF and HF tags and systems.
 * [rfcat](https://github.com/atlas0fd00m/rfcat) - Firmware and Python framework for CC1111-based sub-GHz radio dongles, including the Yard Stick One listed below.
